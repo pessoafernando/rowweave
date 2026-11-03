@@ -14,7 +14,7 @@ test; a successful run in a smaller path does not qualify a larger one.
 | Path | Lifecycle | Use for | Primary validation |
 |---|---|---|---|
 | Local embedding | In the application JVM; no required listener | Application embedding, evaluation, and functional checks | Typed result or sink completion |
-| In-process cluster | Explicit `InProcessCluster` Master and Worker roles in one JVM | Isolated cluster lifecycle, admission, placement, and parallelism checks | `AutoCloseable` close plus result parity |
+| In-process cluster | Owned `RowWeave.startInProcessCluster` Master and Worker roles in one JVM | Isolated cluster lifecycle, admission, placement, and parallelism checks | `AutoCloseable` close plus result parity |
 | Batch process cluster | Separate Client, Master, and Worker JVMs | Shared nothing execution and independent process recovery | `MASTER_PORT=`, `WORKER_READY=`, and sink validation |
 | Stream process cluster | Master-only and Worker-only JVMs | Durable state, savepoints, rescale, and resident sources | `STREAM_MASTER_READY=` and `STREAM_WORKER_READY=` plus operation status |
 
@@ -98,7 +98,7 @@ output ends with `Equivalent result sets: true`.
 lifecycles in one JVM without network listeners:
 
 ```java
-try (InProcessCluster cluster = new InProcessCluster(4, new File(stateDirectory))) {
+try (InProcessCluster cluster = RowWeave.startInProcessCluster(4, new File(stateDirectory))) {
     ExecutionEnvironment environment = new ExecutionEnvironment(
             "in-process-deploy", "in-process-deploy", cluster);
     environment.setParallelism(4);
@@ -352,7 +352,7 @@ what the job actually published.
   durable outcome with `queryBatchSinkOutcome(runId)`. It projects one of
   `NOT_FOUND`, `PREPARING`, `COMMIT_DECIDED`, `COMMITTED`, `ABORT_DECIDED`,
   `ABORTED`, or `CORRUPT_OR_CONFLICT`
-  (`io/rowweave/cluster/RealClusterJobClient.java:687`,
+  (`io/rowweave/cluster/ClusterJobClient.java:687`,
   `io/rowweave/commit/BatchSinkOutcome.java:9-16`). A communication failure
   never resolves to `NOT_FOUND`, and `COMMITTED` is the only state that
   certifies publication. The ZooKeeper-backed client exposes the same query

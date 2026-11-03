@@ -48,7 +48,7 @@ import java.util.function.BooleanSupplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** RealCluster Stream product Master endpoint for submission and lifecycle control. */
+/** Cluster Stream product Master endpoint for submission and lifecycle control. */
 public final class StreamProductJobMasterServer implements AutoCloseable {
     private static final Logger LOG = LoggerFactory.getLogger(
             StreamProductJobMasterServer.class);

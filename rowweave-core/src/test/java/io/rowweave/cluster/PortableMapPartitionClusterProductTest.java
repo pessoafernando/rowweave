@@ -164,7 +164,7 @@ class PortableMapPartitionClusterProductTest {
                      WorkerServer worker1 = WorkerServer.newUnguarded(
                              "map-worker-1", 8, locator,
                              temp.resolve("worker-1").toFile(), capableRuntime);
-                     RealClusterJobClient client = new RealClusterJobClient(
+                     ClusterJobClient client = new ClusterJobClient(
                              locator, capableRuntime)) {
                     RegistryWorker registeredOld = registry.worker("old-worker");
                     assertNotNull(registeredOld);
@@ -259,7 +259,7 @@ class PortableMapPartitionClusterProductTest {
                              "legacy-capable-1", 8, locator,
                              temp.resolve("legacy-capable-1").toFile(),
                              capableRuntime);
-                     RealClusterJobClient client = new RealClusterJobClient(
+                     ClusterJobClient client = new ClusterJobClient(
                              locator, capableRuntime)) {
                     Path rawOutput = temp.resolve("raw-map-partition.tsv");
                     client.submit(legacyGraph(rawOutput));
@@ -333,7 +333,7 @@ class PortableMapPartitionClusterProductTest {
                     ControlSecurityConfig.fromProperties(capable);
             try (DeploymentRuntime clientRuntime = DeploymentRuntime.load(
                          capable, security, Runtime.getRuntime().maxMemory());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new FixedMasterLocator(new Endpoint(
                                  "127.0.0.1", masterPort)), clientRuntime)) {
                 ExecutionReport report = client.submit(

@@ -40,7 +40,7 @@ class WorkerRendezvousLifecycleTest {
         try (MasterServer master = new MasterServer(5_000L);
              WorkerServer w0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), d0);
              WorkerServer w1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), d1)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             for (int job = 0; job < 8; job++) {
                 ExecutionEnvironment session = new ExecutionEnvironment("rz-" + job, "rz-" + job, client);
                 session.setParallelism(2);

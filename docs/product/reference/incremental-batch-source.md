@@ -222,7 +222,7 @@ instead of double-publishing.
 - [`MasterIncrementalPreparationTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/MasterIncrementalPreparationTest.java)
   and [`WorkerIncrementalSourceActionTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/WorkerIncrementalSourceActionTest.java):
   preparation on the Master and provider execution on a Worker.
-- [`RealClusterIncrementalSubmissionTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/RealClusterIncrementalSubmissionTest.java)
+- [`ClusterIncrementalSubmissionTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/ClusterIncrementalSubmissionTest.java)
   and [`IncrementalScaleProfileTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/IncrementalScaleProfileTest.java):
   end-to-end runs against real processes, and bounded scale behaviour.
 - [`ObjectManifestIncrementalSourceProfileTest`](../../../rowweave-core/src/test/java/io/rowweave/incremental/ObjectManifestIncrementalSourceProfileTest.java):

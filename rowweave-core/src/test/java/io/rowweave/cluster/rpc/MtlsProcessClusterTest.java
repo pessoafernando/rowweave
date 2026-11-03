@@ -26,7 +26,7 @@ import io.rowweave.cluster.Endpoint;
 import io.rowweave.cluster.ClusterMain;
 import io.rowweave.cluster.DurableRunSubmitException;
 import io.rowweave.cluster.FixedMasterLocator;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.deployment.DeploymentManifest;
 import io.rowweave.deployment.DeploymentManifestCodec;
 import io.rowweave.deployment.DeploymentRuntime;
@@ -158,7 +158,7 @@ class MtlsProcessClusterTest {
             try (DeploymentRuntime runtime = DeploymentRuntime.load(
                          clientProperties, base,
                          Runtime.getRuntime().maxMemory());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new FixedMasterLocator(new Endpoint(
                                  "127.0.0.1", masterPort)), runtime)) {
                 IncrementalRunSubmission submission =
@@ -267,7 +267,7 @@ class MtlsProcessClusterTest {
             ControlSecurityConfig base = ControlSecurityConfig.fromProperties(clientProperties);
             try (DeploymentRuntime runtime = DeploymentRuntime.load(
                          clientProperties, base, Runtime.getRuntime().maxMemory());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new FixedMasterLocator(new Endpoint("127.0.0.1", masterPort)), runtime)) {
                 ExecutionReport report = client.submit(
                         LegacyPlanArtifactAdapter.wrap("mtls-built-in", graph));
@@ -528,7 +528,7 @@ class MtlsProcessClusterTest {
             ControlSecurityConfig base = ControlSecurityConfig.fromProperties(clientProperties);
             try (DeploymentRuntime runtime = DeploymentRuntime.load(
                          clientProperties, base, Runtime.getRuntime().maxMemory());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new FixedMasterLocator(new Endpoint(
                                  "127.0.0.1", masterPort)), runtime)) {
                 java.util.concurrent.atomic.AtomicReference<Throwable> failure =
@@ -636,7 +636,7 @@ class MtlsProcessClusterTest {
             ControlSecurityConfig base = ControlSecurityConfig.fromProperties(clientProperties);
             try (DeploymentRuntime runtime = DeploymentRuntime.load(
                          clientProperties, base, Runtime.getRuntime().maxMemory());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new FixedMasterLocator(new Endpoint("127.0.0.1", masterPort)), runtime)) {
                 ClassLoader loader = runtime.applicationClassLoader("application");
                 Source input = (Source) loader.loadClass("app.JobComponents$SignedInput")
@@ -828,7 +828,7 @@ class MtlsProcessClusterTest {
             try (DeploymentRuntime runtime = DeploymentRuntime.load(
                          clientProperties, base, Runtime.getRuntime().maxMemory())) {
                 AtomicInteger lookups = new AtomicInteger();
-                try (RealClusterJobClient client = new RealClusterJobClient(() -> {
+                try (ClusterJobClient client = new ClusterJobClient(() -> {
                     lookups.incrementAndGet();
                     return new Endpoint("127.0.0.1", masterPort);
                 }, runtime)) {
@@ -978,7 +978,7 @@ class MtlsProcessClusterTest {
             String clusterSetId;
             try (DeploymentRuntime runtime = DeploymentRuntime.load(
                          untrustedProperties, untrustedBase, Runtime.getRuntime().maxMemory());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new FixedMasterLocator(new Endpoint("127.0.0.1", masterPort)), runtime)) {
                 clusterSetId = runtime.deploymentSetId();
                 Path target = temp.resolve("untrusted-certificate.tsv");
@@ -997,7 +997,7 @@ class MtlsProcessClusterTest {
                     ControlSecurityConfig.fromProperties(mismatchProperties);
             try (DeploymentRuntime runtime = DeploymentRuntime.load(
                          mismatchProperties, mismatchBase, Runtime.getRuntime().maxMemory());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new FixedMasterLocator(new Endpoint("127.0.0.1", masterPort)), runtime)) {
                 assertFalse(clusterSetId.equals(runtime.deploymentSetId()),
                         "negative fixture must carry a genuinely different deployment set");

@@ -85,7 +85,7 @@ public final class SubmitDagsClient {
     private static String only;
     private static void submit(String name, Dag dag) {
         if (only != null && !name.contains(only)) return;
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new RealClusterJobClient("127.0.0.1", masterPort));
+        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new ClusterJobClient("127.0.0.1", masterPort));
         s.setParallelism(2);
         long t0 = System.currentTimeMillis();
         dag.build(s);

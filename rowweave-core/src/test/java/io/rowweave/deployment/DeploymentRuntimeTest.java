@@ -131,8 +131,8 @@ class DeploymentRuntimeTest {
                  io.rowweave.cluster.rpc.InProcessRpcRegistry.Registration workerRegistration =
                          io.rowweave.cluster.rpc.InProcessRpcRegistry.register(
                                  "127.0.0.1", worker.port(), worker.handler());
-                 io.rowweave.cluster.RealClusterJobClient client =
-                         new io.rowweave.cluster.RealClusterJobClient(
+                 io.rowweave.cluster.ClusterJobClient client =
+                         new io.rowweave.cluster.ClusterJobClient(
                                  new io.rowweave.cluster.FixedMasterLocator(
                                          new io.rowweave.cluster.Endpoint(
                                                  "127.0.0.1", master.port())), runtime)) {

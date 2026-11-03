@@ -20,7 +20,7 @@ import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class RealClusterJobClientTelemetryTest {
+class ClusterJobClientTelemetryTest {
 
     @Test
     void reportedSingleSinkRouteDoesNotDiscardClusterTelemetry(@TempDir Path temp) {
@@ -32,7 +32,7 @@ class RealClusterJobClientTelemetryTest {
              WorkerServer worker = WorkerServer.newUnguarded(
                      "reported-telemetry-worker", 1, "127.0.0.1", master.port(),
                      temp.toFile());
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      "127.0.0.1", master.port())) {
             ExecutionReport report = client.submitToSinkReported(graph);
 
@@ -52,7 +52,7 @@ class RealClusterJobClientTelemetryTest {
         RpcMessage result = RpcMessage.jobResult(
                 true, 17L, null, ExecutionTelemetrySummaryCodec.encode(summary));
 
-        ExecutionReport report = RealClusterJobClient.executionReport(result);
+        ExecutionReport report = ClusterJobClient.executionReport(result);
 
         assertEquals(17L, report.rowsOut());
         assertEquals(TelemetryCoverage.COMPLETE, report.resourceTelemetryCoverage());
@@ -67,9 +67,9 @@ class RealClusterJobClientTelemetryTest {
                 ExecutionTelemetrySummary.unavailable());
         damaged[15] ^= 1;
 
-        ExecutionReport bad = RealClusterJobClient.executionReport(
+        ExecutionReport bad = ClusterJobClient.executionReport(
                 RpcMessage.jobResult(true, 23L, null, damaged));
-        ExecutionReport legacy = RealClusterJobClient.executionReport(
+        ExecutionReport legacy = ClusterJobClient.executionReport(
                 RpcMessage.jobResult(true, 29L, null));
 
         assertEquals(23L, bad.rowsOut());

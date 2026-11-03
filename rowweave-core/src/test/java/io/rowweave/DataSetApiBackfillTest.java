@@ -1,7 +1,7 @@
 package io.rowweave;
 
 import io.rowweave.cluster.MasterServer;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.WorkerServer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -134,7 +134,7 @@ class DataSetApiBackfillTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("apic", "apic", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("apic", "apic", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             DataSet ds = s.fromSource(new CollectionSource(META, data)).sum("amt");
             // In a cluster the Sink is written by the worker, and WorkerCollectingOutput is not worker-writable, so a client copy receives no rows,

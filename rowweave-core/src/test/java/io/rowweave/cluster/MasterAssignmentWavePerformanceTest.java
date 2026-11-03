@@ -76,7 +76,7 @@ class MasterAssignmentWavePerformanceTest {
             master.handler().apply(RpcMessage.registerWorker(
                     "slow-worker", "127.0.0.1", fakeWorker.port(), 32));
             long started = System.nanoTime();
-            new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             return (System.nanoTime() - started) / 1_000_000L;
         }
     }

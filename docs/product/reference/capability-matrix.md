@@ -25,7 +25,7 @@ contracts fails admission or decoding; it is not silently approximated.
 | Validation | typed row validation with fail-fast error codes |
 | Pipeline composition | explicit versioned boundary in `rowweave-pipeline` |
 
-Batch deployment modes are Local, InProcess, and real cluster. The plan graph,
+Batch deployment modes are Local, InProcess, and cluster. The plan graph,
 operator implementations, join strategy, and decimal semantics remain the
 same across those modes.
 

@@ -50,7 +50,7 @@ class MasterGracefulCloseTest {
         AtomicReference<Throwable> submitFailure = new AtomicReference<>();
         Thread submit = new Thread(() -> {
             try {
-                new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(slowWholeGraph());
+                new ClusterJobClient("127.0.0.1", master.port()).submitToSink(slowWholeGraph());
             } catch (Throwable failure) {
                 submitFailure.set(failure);
             }
@@ -168,7 +168,7 @@ class MasterGracefulCloseTest {
             MasterServer targetMaster = master;
             submit = new Thread(() -> {
                 try {
-                    new RealClusterJobClient("127.0.0.1", targetMaster.port()).submitToSink(slowWholeGraph());
+                    new ClusterJobClient("127.0.0.1", targetMaster.port()).submitToSink(slowWholeGraph());
                 } catch (RuntimeException expectedDuringClose) {
                 }
             }, "zero-drain-submit");

@@ -55,7 +55,7 @@ class ClusterManifestCommitTest {
                      "manifest-w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "manifest-w1", 32, "127.0.0.1", master.port(), w1)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             ExecutionReport report = client.submitAttempt(graph, "cluster-attempt-1");
 
             assertEquals(6L, report.rowsOut());
@@ -104,7 +104,7 @@ class ClusterManifestCommitTest {
         try (MasterServer master = new MasterServer(5_000L);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "single-manifest-worker", 8, "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             ExecutionReport report = client.submitAttempt(graph, "single-attempt");
 
             assertEquals(2L, report.rowsOut());
@@ -124,7 +124,7 @@ class ClusterManifestCommitTest {
         try (MasterServer master = new MasterServer(5_000L);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "retry-manifest-worker", 8, "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             PlanGraph original = new PlanGraph(Arrays.asList(
                     PlanNode.source(META, Arrays.asList(row(31L))),
                     PlanNode.sink(META, 0,

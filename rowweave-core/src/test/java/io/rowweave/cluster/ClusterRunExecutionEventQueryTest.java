@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class RealClusterRunExecutionEventQueryTest {
+class ClusterRunExecutionEventQueryTest {
 
     @Test
     void eachPageReresolvesLeaderAndReturnsTheExactValidatedPage() {
@@ -31,7 +31,7 @@ class RealClusterRunExecutionEventQueryTest {
                             Collections.singletonList(event(sequence)), call == 1)));
         })) {
             AtomicInteger lookups = new AtomicInteger();
-            RealClusterJobClient client = new RealClusterJobClient(() -> {
+            ClusterJobClient client = new ClusterJobClient(() -> {
                 lookups.incrementAndGet();
                 return new Endpoint("127.0.0.1", server.port());
             });
@@ -49,7 +49,7 @@ class RealClusterRunExecutionEventQueryTest {
     @Test
     void invalidArgumentsFailBeforeLeaderLookup() {
         AtomicInteger lookups = new AtomicInteger();
-        RealClusterJobClient client = new RealClusterJobClient(() -> {
+        ClusterJobClient client = new ClusterJobClient(() -> {
             lookups.incrementAndGet();
             throw new AssertionError("invalid query must not locate a leader");
         });
@@ -81,7 +81,7 @@ class RealClusterRunExecutionEventQueryTest {
     private static void assertClientFailure(
             java.util.function.Function<RpcMessage, RpcMessage> response) {
         try (RpcServer server = new RpcServer(response)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", server.port());
             assertThrows(RuntimeException.class,
                     () -> client.queryRunEvents("run", 0L, 1));

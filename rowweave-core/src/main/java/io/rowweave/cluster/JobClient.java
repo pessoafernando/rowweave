@@ -23,7 +23,7 @@ public interface JobClient {
     /**
      * As {@link #submitToSink}, but returns the advisory metrics in an {@link ExecutionReport}:
      * rows written, spills and skew. The default delegates to submitToSink, so a client without
-     * metrics, such as the cross-process real cluster client, reports only rows written and
+     * metrics, such as the cross-process cluster client, reports only rows written and
      * leaves the rest zero or empty; the in-process client overrides it. The sink is still
      * written by a worker at the end of execution, so only value objects travel back, never
      * rows.

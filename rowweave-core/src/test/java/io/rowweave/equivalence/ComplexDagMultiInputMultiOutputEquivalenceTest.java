@@ -13,7 +13,7 @@ import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.InProcessCluster;
 import io.rowweave.cluster.MasterServer;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.TenDagData;
 import io.rowweave.cluster.WorkerServer;
 import io.rowweave.ops.OrderBy;
@@ -187,7 +187,7 @@ class ComplexDagMultiInputMultiOutputEquivalenceTest {
         List<List<DataRow>> p1 = run(name + "-s1", 1, null, dag, m1);
         assertEquals(nOut, p1.size(), name + " output count");
         List<List<DataRow>> p4 = run(name + "-s4", 4, null, dag, m4);
-        List<List<DataRow>> c2 = run(name + "-c2", 2, new RealClusterJobClient("127.0.0.1", master.port()), dag, mc);
+        List<List<DataRow>> c2 = run(name + "-c2", 2, new ClusterJobClient("127.0.0.1", master.port()), dag, mc);
         List<List<DataRow>> lc4;
         // The constructor argument is only a slots hint; the graph still runs at P=4, and 128 slots are reserved for the full multi-root dag.
         try (InProcessCluster lc = new InProcessCluster(8, new File(dir.toFile(), name + "-lc"))) {

@@ -780,7 +780,7 @@ class MasterInFlightRunRecoveryTest {
                     .batchSinkAbort(fence);
             assertEquals(BatchSinkAbortRecord.State.ABORT_DECIDED, abort.state());
             assertEquals(reservedGeneration, abort.generation());
-            BatchSinkOutcome outcome = new RealClusterJobClient(
+            BatchSinkOutcome outcome = new ClusterJobClient(
                     "127.0.0.1", master.port()).queryBatchSinkOutcome(runId);
             assertEquals(BatchSinkOutcome.State.ABORT_DECIDED, outcome.state());
             assertEquals("MANIFEST_ABORT_DECIDED", outcome.detailCode());
@@ -1070,7 +1070,7 @@ class MasterInFlightRunRecoveryTest {
                     assertFalse(reader.hasNext());
                 }
             }
-            BatchSinkOutcome outcome = new RealClusterJobClient(
+            BatchSinkOutcome outcome = new ClusterJobClient(
                     "127.0.0.1", master.port()).queryBatchSinkOutcome(runId);
             assertEquals(BatchSinkOutcome.State.COMMITTED, outcome.state());
             assertArrayEquals(expectedIdentity, outcome.identityDigest());
@@ -1105,7 +1105,7 @@ class MasterInFlightRunRecoveryTest {
                     unresolved.currentAttempt().status());
             assertNull(new ManifestFileStore(domain).latest());
             assertEquals(BatchSinkOutcome.State.COMMIT_DECIDED,
-                    new RealClusterJobClient("127.0.0.1", master.port())
+                    new ClusterJobClient("127.0.0.1", master.port())
                             .queryBatchSinkOutcome(runId).state());
         }
     }

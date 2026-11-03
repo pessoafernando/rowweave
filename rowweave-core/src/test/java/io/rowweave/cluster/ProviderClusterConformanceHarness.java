@@ -33,11 +33,11 @@ import java.util.List;
 import java.util.Set;
 
 /** Test-only black-box bridge: every conformance backend crosses client/Master/Worker RPC. */
-public final class ProviderRealClusterConformanceHarness {
+public final class ProviderClusterConformanceHarness {
     private static final DataSchema META = new DataSchema(
             new Field("id", DataType.IntegerType));
 
-    private ProviderRealClusterConformanceHarness() { }
+    private ProviderClusterConformanceHarness() { }
 
     public static ScenarioEvidence runScenario(
             boolean manifestBackend, Path workspace,
@@ -269,7 +269,7 @@ public final class ProviderRealClusterConformanceHarness {
                 try (WorkerServer worker = new WorkerServer(
                              "manifest-leader-worker", 4,
                              new RegistryMasterLocator(registry), spill.toFile());
-                     RealClusterJobClient client = new RealClusterJobClient(
+                     ClusterJobClient client = new ClusterJobClient(
                              new RegistryMasterLocator(registry))) {
                     return executeLeaderReplacement(
                             client, worker, first, replacement, firstElection,
@@ -307,7 +307,7 @@ public final class ProviderRealClusterConformanceHarness {
                          "adversarial-leader-worker", 4,
                          new RegistryMasterLocator(registry), spill.toFile(),
                          runtime);
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new RegistryMasterLocator(registry), runtime)) {
                 return executeLeaderReplacement(
                         client, worker, first, replacement, firstElection,
@@ -323,7 +323,7 @@ public final class ProviderRealClusterConformanceHarness {
     }
 
     private static ScenarioEvidence executeLeaderReplacement(
-            RealClusterJobClient client, WorkerServer worker,
+            ClusterJobClient client, WorkerServer worker,
             MasterServer first,
             MasterServer replacement, MasterElection firstElection,
             MasterElection replacementElection, Path output,
@@ -479,7 +479,7 @@ public final class ProviderRealClusterConformanceHarness {
                          "manifest-abort-worker", 4,
                          new FixedMasterLocator(new Endpoint(
                                  "127.0.0.1", master.port())), spill.toFile());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          "127.0.0.1", master.port())) {
                 return executeAbortBeforeDecision(
                         client, master, worker, output, true, scenario, events);
@@ -499,7 +499,7 @@ public final class ProviderRealClusterConformanceHarness {
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())),
                      spill.toFile(), runtime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), runtime)) {
             return executeAbortBeforeDecision(
@@ -510,7 +510,7 @@ public final class ProviderRealClusterConformanceHarness {
     }
 
     private static ScenarioEvidence executeAbortBeforeDecision(
-            RealClusterJobClient client, MasterServer master,
+            ClusterJobClient client, MasterServer master,
             WorkerServer worker, Path output, boolean manifestBackend,
             DurableSinkConformanceScenario scenario,
             EnumSet<DurableSinkConformanceObservation.Event> events)
@@ -873,7 +873,7 @@ public final class ProviderRealClusterConformanceHarness {
                          "manifest-reject-worker", 4,
                          new FixedMasterLocator(new Endpoint(
                                  "127.0.0.1", master.port())), spill.toFile());
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          "127.0.0.1", master.port())) {
                 reject(client, invalidGraph(true, outputRoot, scenarioId),
                         scenarioId, outputRoot);
@@ -893,7 +893,7 @@ public final class ProviderRealClusterConformanceHarness {
                      "adversarial-reject-worker", 4,
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), spill.toFile(), runtime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), runtime)) {
             reject(client, invalidGraph(false, outputRoot, scenarioId),
@@ -904,7 +904,7 @@ public final class ProviderRealClusterConformanceHarness {
     }
 
     private static void reject(
-            RealClusterJobClient client, PlanGraph graph, String scenarioId,
+            ClusterJobClient client, PlanGraph graph, String scenarioId,
             Path outputRoot) throws Exception {
         String runId = "conformance-reject-" + scenarioId;
         boolean rejected = false;
@@ -987,7 +987,7 @@ public final class ProviderRealClusterConformanceHarness {
                      "manifest-conformance-worker", 8,
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), spill.toFile());
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      "127.0.0.1", master.port())) {
             configureAckLoss(master, worker, scenario);
             return submit(client, worker, outputRoot, scenarioId,
@@ -1013,7 +1013,7 @@ public final class ProviderRealClusterConformanceHarness {
                      "adversarial-conformance-worker", 8,
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), spill.toFile(), runtime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), runtime)) {
             configureAckLoss(master, worker, scenario);
@@ -1057,7 +1057,7 @@ public final class ProviderRealClusterConformanceHarness {
     }
 
     private static Evidence submit(
-            RealClusterJobClient client, WorkerServer worker,
+            ClusterJobClient client, WorkerServer worker,
             Path outputRoot, String scenarioId, int sinkCount,
             boolean duplicateSubmit, boolean manifestBackend,
             DurableSinkConformanceScenario scenario) throws Exception {

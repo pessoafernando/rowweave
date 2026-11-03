@@ -103,14 +103,14 @@ class ClusterFanoutTest {
         try (MasterServer m1 = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m1.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m1.port(), w1)) {
-            long[][] c1 = run("fo-c1", 1, new RealClusterJobClient("127.0.0.1", m1.port()), input, tmp);
+            long[][] c1 = run("fo-c1", 1, new ClusterJobClient("127.0.0.1", m1.port()), input, tmp);
             assertArrayEquals(oracle[0], c1[0], "cluster P1 fan-out branch 1 versus the single-process run");
             assertArrayEquals(oracle[1], c1[1], "cluster P1 fan-out branch 2 versus the single-process run");
         }
         try (MasterServer m2 = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m2.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m2.port(), w1)) {
-            long[][] c2 = run("fo-c2", 2, new RealClusterJobClient("127.0.0.1", m2.port()), input, tmp);
+            long[][] c2 = run("fo-c2", 2, new ClusterJobClient("127.0.0.1", m2.port()), input, tmp);
             assertArrayEquals(oracle[0], c2[0], "cluster P2 fan-out branch 1 versus the single-process run");
             assertArrayEquals(oracle[1], c2[1], "cluster P2 fan-out branch 2 versus the single-process run");
         }
@@ -132,7 +132,7 @@ class ClusterFanoutTest {
              WorkerServer worker = WorkerServer.newUnguarded(
                      "snapshot-w0", 8, "127.0.0.1", master.port(), workerDir)) {
             ExecutionEnvironment session = new ExecutionEnvironment("snapshot-fanout", "snapshot-fanout",
-                    new RealClusterJobClient("127.0.0.1", master.port()));
+                    new ClusterJobClient("127.0.0.1", master.port()));
             session.setParallelism(1);
             DataSet shared = session.fromSource(new CollectionSource(TIME_META, Collections.singletonList(row)));
             shared.map(MUTATE_TIMESTAMP).sinkTo(new FileSink(TIME_META, mutatedPath.toString()));

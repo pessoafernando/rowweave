@@ -64,7 +64,7 @@ class StreamProductRealWorkerDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamSubmissionId submission = StreamSubmissionId.of(
                         "submit-before-worker-registration");
@@ -116,7 +116,7 @@ class StreamProductRealWorkerDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamSession session = session(client);
                 StreamJobHandle job = session.submit(
@@ -183,7 +183,7 @@ class StreamProductRealWorkerDispatchTest {
             StreamSubmissionId submission =
                     StreamSubmissionId.of("process-master-replacement");
             io.rowweave.stream.api.StreamJobId jobId;
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", port(exchange, "master-1"))) {
                 StreamJobHandle job = session(client).submit(submission);
                 jobId = job.id();
@@ -198,7 +198,7 @@ class StreamProductRealWorkerDispatchTest {
             awaitFile(exchange.resolve("master-2.port"), 5_000L);
             assertNotEquals(firstMasterIdentity,
                     text(exchange.resolve("master-2.identity")));
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", port(exchange, "master-2"))) {
                 StreamJobHandle attached = client.attachSubmission(submission);
                 assertEquals(jobId, attached.id());
@@ -246,7 +246,7 @@ class StreamProductRealWorkerDispatchTest {
             StreamSubmissionId submission = StreamSubmissionId.of(
                     "master-and-worker-loss");
             io.rowweave.stream.api.StreamJobId jobId;
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", port(exchange, "master-1"))) {
                 StreamJobHandle job = session(client).submit(submission);
                 jobId = job.id();
@@ -269,7 +269,7 @@ class StreamProductRealWorkerDispatchTest {
             secondMaster = launchMaster(2L, exchange);
             awaitFile(exchange.resolve("master-2.port"), 5_000L);
 
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", port(exchange, "master-2"))) {
                 StreamJobHandle attached = client.attach(jobId);
                 assertEquals(StreamJobStatus.RUNNING,

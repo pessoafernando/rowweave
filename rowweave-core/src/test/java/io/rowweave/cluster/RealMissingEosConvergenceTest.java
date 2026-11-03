@@ -62,8 +62,8 @@ class RealMissingEosConvergenceTest {
 
             long started = System.nanoTime();
             RuntimeException failure;
-            try (RealClusterJobClient client =
-                         new RealClusterJobClient("127.0.0.1", masterPort)) {
+            try (ClusterJobClient client =
+                         new ClusterJobClient("127.0.0.1", masterPort)) {
                 failure = assertThrows(RuntimeException.class,
                         () -> client.submitToSink(graph()));
             }
@@ -86,8 +86,8 @@ class RealMissingEosConvergenceTest {
 
             System.setProperty(timeoutKey, "5000");
             System.setProperty(cleanupKey, "1000");
-            try (RealClusterJobClient client =
-                         new RealClusterJobClient("127.0.0.1", masterPort)) {
+            try (ClusterJobClient client =
+                         new ClusterJobClient("127.0.0.1", masterPort)) {
                 assertEquals(32L, client.submitToSink(graph()),
                         "all canceled stage/slot ownership must be reusable");
             }

@@ -13,7 +13,7 @@ import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.TypedQualityManifest;
 import io.rowweave.cluster.JobClient;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.commit.CommitManifest;
 import io.rowweave.commit.ManifestFileStore;
 import io.rowweave.local.LocalJobClient;
@@ -125,8 +125,8 @@ class ObjectStorageRowRejectProfileTest {
                     "-D" + OPERATOR_MIN_MEMORY + "=" + operatorBytes);
             worker0 = launch(workerArgs, "WORKER_READY=", new StringBuilder());
             worker1 = launch(workerArgs, "WORKER_READY=", new StringBuilder());
-            RealClusterJobClient cluster =
-                    new RealClusterJobClient("127.0.0.1", masterPort);
+            ClusterJobClient cluster =
+                    new ClusterJobClient("127.0.0.1", masterPort);
 
             System.out.println();
             System.out.println("=== Object row-reject publication profile ===");

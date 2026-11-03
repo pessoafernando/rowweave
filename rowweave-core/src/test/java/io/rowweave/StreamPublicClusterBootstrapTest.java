@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** applications bootstrap RealCluster without internal imports. */
+/** applications bootstrap Cluster without internal imports. */
 @Tag("multiprocess")
 class StreamPublicClusterBootstrapTest {
 

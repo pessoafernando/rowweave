@@ -78,7 +78,7 @@ class ClusterFailFastTest {
              WorkerServer w0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0tmp);
              WorkerServer w1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1tmp)) {
 
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             long start = System.currentTimeMillis();
             assertThrows(RuntimeException.class, () -> client.submitToSink(graph), "a throwing left source makes the submit fail fast");
             long elapsed = System.currentTimeMillis() - start;

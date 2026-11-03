@@ -181,7 +181,7 @@ semantics behind that metadata are in
 [`ZkRemoteJobClient`](../../../rowweave-registry-zk/src/main/java/io/rowweave/cluster/registry/zk/ZkRemoteJobClient.java)
 at `io/rowweave/cluster/registry/zk/ZkRemoteJobClient.java:40` is a Batch `JobClient`
 that needs only a connect string: it builds a registry (`:53`) and a
-`RegistryMasterLocator`, then delegates to the ordinary real-cluster client (`:56`).
+`RegistryMasterLocator`, then delegates to the ordinary cluster client (`:56`).
 Because the locator resolves whoever is leader at the moment of each submit, a change
 of Master stays invisible to the caller. The connection is opened in the constructor,
 so a bad connect string fails there rather than at the first submit, and the class is

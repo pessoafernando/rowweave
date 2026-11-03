@@ -63,7 +63,7 @@ class ClusterKeyedShuffleTest {
              WorkerServer w0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0tmp);
              WorkerServer w1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1tmp)) {
 
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             long rowCount = client.submitToSink(graph);
 
             List<DataRow> got = FileSink.read(GB, outFile.getAbsolutePath());

@@ -8,7 +8,7 @@ import io.rowweave.FileSink;
 import io.rowweave.Source;
 import io.rowweave.ExecutionEnvironment;
 import io.rowweave.DataSchema;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.ops.ParallelGroupByAgg;
 import io.rowweave.ops.SortField;
 import io.rowweave.ops.join.JoinType;
@@ -115,7 +115,7 @@ class BigDataCsvBenchmarkTest {
                 + PARTNERS + " rows (on-disk files, generated or reused " + genMs + "ms, directory " + dataDir + ") ===");
 
         // A large job runs for a long time, so the Master stage barrier timeout scales with the data
-        // size, and the client read timeout matches it (RealClusterJobClient defaults to 10min).
+        // size, and the client read timeout matches it (ClusterJobClient defaults to 10min).
         String stageTimeout = "-Drowweave.cluster.stageTimeoutMs=" + Math.max(120_000L, ORDERS / 5);
         // Worker memory is set explicitly for a controllable benchmark: the heap -Xmx (2G by default)
         // plus the managed pool rowweave.worker.memory (1G by default, with a 1G minimum).
@@ -300,10 +300,10 @@ class BigDataCsvBenchmarkTest {
         runViaSession(name + "-p4", 4, null, scene, new FileSink(outMeta, f4.getAbsolutePath()));
         long p4ms = (System.nanoTime() - t) / 1_000_000;
 
-        // The cluster path injects RealClusterJobClient and commits, with a real Master and Workers and
+        // The cluster path injects ClusterJobClient and commits, with a real Master and Workers and
         // socket shuffle.
         t = System.nanoTime();
-        runViaSession(name + "-cluster", 4, new RealClusterJobClient("127.0.0.1", masterPort),
+        runViaSession(name + "-cluster", 4, new ClusterJobClient("127.0.0.1", masterPort),
                 scene, new FileSink(outMeta, fc.getAbsolutePath()));
         long cms = (System.nanoTime() - t) / 1_000_000;
 

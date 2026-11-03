@@ -94,7 +94,7 @@ class TypedQualityPublicationDurabilityTest {
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "quality-w1", 32, "127.0.0.1", master.port(), w1)) {
             awaitWorkers(registry, 2);
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
             master.setManifestPublishHooks(() -> {
                 QualityGateCommitJournalSnapshot journal = registry
@@ -150,7 +150,7 @@ class TypedQualityPublicationDurabilityTest {
                      "failure-w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "failure-w1", 32, "127.0.0.1", master.port(), w1)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
             assertThrows(RuntimeException.class,
                     () -> run(client, 2, domain,

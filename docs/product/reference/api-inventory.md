@@ -117,9 +117,9 @@ Boundary: Positional cells, explicit schemas, cursors, codecs, and tagged output
 [`io.rowweave.StreamClusterMain`](../../../rowweave-core/src/main/java/io/rowweave/StreamClusterMain.java)
 [`io.rowweave.StreamMasterRuntime`](../../../rowweave-core/src/main/java/io/rowweave/StreamMasterRuntime.java)
 [`io.rowweave.StreamWorkerRuntime`](../../../rowweave-core/src/main/java/io/rowweave/StreamWorkerRuntime.java)
+[`io.rowweave.cluster.ClusterJobClient`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ClusterJobClient.java)
 [`io.rowweave.cluster.ClusterMain`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ClusterMain.java)
 [`io.rowweave.cluster.InProcessCluster`](../../../rowweave-core/src/main/java/io/rowweave/cluster/InProcessCluster.java)
-[`io.rowweave.cluster.RealClusterJobClient`](../../../rowweave-core/src/main/java/io/rowweave/cluster/RealClusterJobClient.java)
 
 Boundary: Single-JVM and separate-process execution entry points.
 
@@ -517,6 +517,7 @@ Each name links to its production source declaration.
 
 - [`io.rowweave.cluster.BeatHeartbeat`](../../../rowweave-core/src/main/java/io/rowweave/cluster/BeatHeartbeat.java) — public class.
 - [`io.rowweave.cluster.ClusterConfig`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ClusterConfig.java) — public class.
+- [`io.rowweave.cluster.ClusterJobClient`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ClusterJobClient.java) — public class.
 - [`io.rowweave.cluster.ClusterMain`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ClusterMain.java) — public class.
 - [`io.rowweave.cluster.ClusterSubmissionPreflight`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ClusterSubmissionPreflight.java) — public class.
 - [`io.rowweave.cluster.DataPlaneConfig`](../../../rowweave-core/src/main/java/io/rowweave/cluster/DataPlaneConfig.java) — public class.
@@ -546,7 +547,6 @@ Each name links to its production source declaration.
 - [`io.rowweave.cluster.ProcessBootstrapEnvelope`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ProcessBootstrapEnvelope.java) — public class.
 - [`io.rowweave.cluster.ProcessCapacityException`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ProcessCapacityException.java) — public class.
 - [`io.rowweave.cluster.ProcessTlsEnvelope`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ProcessTlsEnvelope.java) — public class.
-- [`io.rowweave.cluster.RealClusterJobClient`](../../../rowweave-core/src/main/java/io/rowweave/cluster/RealClusterJobClient.java) — public class.
 - [`io.rowweave.cluster.RegistryMasterLocator`](../../../rowweave-core/src/main/java/io/rowweave/cluster/RegistryMasterLocator.java) — public class.
 - [`io.rowweave.cluster.RegistryRoleElection`](../../../rowweave-core/src/main/java/io/rowweave/cluster/RegistryRoleElection.java) — public class.
 - [`io.rowweave.cluster.RegistryRoleLocator`](../../../rowweave-core/src/main/java/io/rowweave/cluster/RegistryRoleLocator.java) — public class.
@@ -1204,13 +1204,13 @@ Each name links to its production source declaration.
 
 ##### `io.rowweave.stream.cluster`
 
+- [`io.rowweave.stream.cluster.ClusterStreamJobClient`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/ClusterStreamJobClient.java) — public class.
 - [`io.rowweave.stream.cluster.FileStreamClusterRunAuthority`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/FileStreamClusterRunAuthority.java) — public class.
 - [`io.rowweave.stream.cluster.FileStreamProductJobAuthority`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/FileStreamProductJobAuthority.java) — public class.
 - [`io.rowweave.stream.cluster.InMemoryStreamClusterRunStateStore`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/InMemoryStreamClusterRunStateStore.java) — public class.
 - [`io.rowweave.stream.cluster.InMemoryStreamProductJobStateStore`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/InMemoryStreamProductJobStateStore.java) — public class.
 - [`io.rowweave.stream.cluster.LeadershipBoundStreamProductRunFactory`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/LeadershipBoundStreamProductRunFactory.java) — public class.
 - [`io.rowweave.stream.cluster.LocalStreamRuntimeFactory`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/LocalStreamRuntimeFactory.java) — public class.
-- [`io.rowweave.stream.cluster.RealClusterStreamJobClient`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/RealClusterStreamJobClient.java) — public class.
 - [`io.rowweave.stream.cluster.RegistryStreamWorkerDirectory`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/RegistryStreamWorkerDirectory.java) — public class.
 - [`io.rowweave.stream.cluster.RemoteStreamSourceSinkRunFactory`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/RemoteStreamSourceSinkRunFactory.java) — public class.
 - [`io.rowweave.stream.cluster.RemoteStreamWorkerEndpoint`](../../../rowweave-core/src/main/java/io/rowweave/stream/cluster/RemoteStreamWorkerEndpoint.java) — public class.

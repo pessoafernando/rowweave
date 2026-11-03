@@ -249,7 +249,7 @@ class ZkRemoteJobClientTest {
             Thread.sleep(500);  // Settle: the worker registration is visible in ZooKeeper.
 
             try {
-                // The point of the test: only a connection string is given, so the client builds its own registry and locator and delegates to RealClusterJobClient.
+                // The point of the test: only a connection string is given, so the client builds its own registry and locator and delegates to ClusterJobClient.
                 try (ZkRemoteJobClient client = new ZkRemoteJobClient(connect)) {
                     ExecutionEnvironment s = new ExecutionEnvironment("zkjob", "zkjob", client);
                     s.setParallelism(2);

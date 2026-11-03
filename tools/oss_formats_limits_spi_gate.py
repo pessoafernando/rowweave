@@ -149,7 +149,7 @@ REQUIRED_TESTS = (
     "StreamBoundedSourceConformanceKitTest",
     "StreamConnectorConformanceKitTest",
     "DurableBatchSinkProviderConformanceRedTest",
-    "ProviderRealClusterConformanceHarness", "SignedProviderRealClusterTest",
+    "ProviderClusterConformanceHarness", "SignedProviderClusterTest",
     "VersionedDatasetAuthorityRecordStoreConformanceTest",
     "MuxConnectionPoolFanoutTest",
 )

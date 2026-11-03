@@ -69,7 +69,7 @@ class MasterAssignmentSerializationTest {
         try (MasterServer master = new MasterServer(5000L);
              WorkerServer a = WorkerServer.newUnguarded("w0", 16, "127.0.0.1", master.port(), w0);
              WorkerServer b = WorkerServer.newUnguarded("w1", 16, "127.0.0.1", master.port(), w1)) {
-            new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
         }
 
         assertEquals(1, GuardedInput.PEAK.get(),

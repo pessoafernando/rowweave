@@ -39,7 +39,7 @@ class StreamPublicRegistryClusterTest {
                      root.resolve("master"),
                      new RegistryStreamWorkerDirectory(registry, security),
                      security, 0);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      master.host(), master.port(), security)) {
             List<RemoteStreamWorkerEndpoint> discovered =
                     new RegistryStreamWorkerDirectory(

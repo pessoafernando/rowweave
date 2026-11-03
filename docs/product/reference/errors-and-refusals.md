@@ -48,7 +48,7 @@ means the family has a closed code table in a later section.
 | [`ControlResidentBudgetExceededException`](../../../rowweave-core/src/main/java/io/rowweave/cluster/rpc/ControlResidentBudgetExceededException.java) | no | A control-plane decode, handler, run, or assignment exceeded its resident budget. | Reduce state, fan-out, parallelism, or frame pressure; raise the explicit bound only after capacity review. | `MasterDurableRunDispatchTest`, `WhitelistObjectInputStreamResidentTest` |
 | [`DeadlockException`](../../../rowweave-core/src/main/java/io/rowweave/sched/DeadlockException.java) | no | Pipeline progress cannot continue without violating scheduling or backpressure invariants. | Correct the reported condition and retry only when the operation is idempotent. | `No direct dedicated test` |
 | [`DeploymentValidationException`](../../../rowweave-core/src/main/java/io/rowweave/deployment/DeploymentValidationException.java) | yes | A closed code table below gives each stable outcome and refusal. | Follow the code-specific corrective action in the table below. | `DeploymentArchiveScannerTest`, `TrustedSignerRegistryTest` |
-| [`DurableRunSubmitException`](../../../rowweave-core/src/main/java/io/rowweave/cluster/DurableRunSubmitException.java) | yes | A closed code table below gives each stable outcome and refusal. | Follow the code-specific corrective action in the table below. | `DurableCommitBarrierFailureTest`, `RealClusterJobClientDurableRunTest` |
+| [`DurableRunSubmitException`](../../../rowweave-core/src/main/java/io/rowweave/cluster/DurableRunSubmitException.java) | yes | A closed code table below gives each stable outcome and refusal. | Follow the code-specific corrective action in the table below. | `DurableCommitBarrierFailureTest`, `ClusterJobClientDurableRunTest` |
 | [`ExprEvalException`](../../../rowweave-core/src/main/java/io/rowweave/expr/ExprEvalException.java) | no | Expression evaluation failed on the supplied row or value. | Correct the reported condition and retry only when the operation is idempotent. | `No direct dedicated test` |
 | [`ExprParseException`](../../../rowweave-core/src/main/java/io/rowweave/expr/ExprParseException.java) | no | Expression text or binding failed parsing and type resolution. | Correct the reported condition and retry only when the operation is idempotent. | `ExprInterpreterTest` |
 | [`FrontierConflictException`](../../../rowweave-core/src/main/java/io/rowweave/incremental/FrontierConflictException.java) | no | A canonical incremental frontier identity is internally inconsistent. | Use the current artifact, attempt, epoch, fence, or schema identity; make retries idempotent and resolve the coordinator conflict. | `IncrementalFrontierContractTest` |
@@ -167,7 +167,7 @@ Source: [`rowweave-core/src/main/java/io/rowweave/cluster/ProcessCapacityExcepti
 
 ### `DurableRunSubmitException`
 
-Source: [`rowweave-core/src/main/java/io/rowweave/cluster/DurableRunSubmitException.java`](../../../rowweave-core/src/main/java/io/rowweave/cluster/DurableRunSubmitException.java). Tested evidence: `DurableCommitBarrierFailureTest`, `RealClusterJobClientDurableRunTest`.
+Source: [`rowweave-core/src/main/java/io/rowweave/cluster/DurableRunSubmitException.java`](../../../rowweave-core/src/main/java/io/rowweave/cluster/DurableRunSubmitException.java). Tested evidence: `DurableCommitBarrierFailureTest`, `ClusterJobClientDurableRunTest`.
 
 | Code | Meaning and likely cause | Corrective action |
 |---|---|---|

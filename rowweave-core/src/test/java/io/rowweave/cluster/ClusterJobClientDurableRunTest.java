@@ -55,7 +55,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class RealClusterJobClientDurableRunTest {
+class ClusterJobClientDurableRunTest {
     private static final String WORKER_HOST = "durable-client-worker";
     private static final int WORKER_PORT = 61_168;
     private static final String INCARNATION = "inc-durable-client";
@@ -75,7 +75,7 @@ class RealClusterJobClientDurableRunTest {
             try {
                 master.handler().apply(RpcMessage.registerWorker(
                         "w", WORKER_HOST, WORKER_PORT, 4, -1, INCARNATION));
-                RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+                ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
                 RunSubmission submission = new RunSubmission(
                         "run-client", "attempt-client", "publication-client", 1, 0L, 10L);
 
@@ -137,7 +137,7 @@ class RealClusterJobClientDurableRunTest {
 
     @Test
     void queryTransportOrAuthorityFailureIsNotReportedAsMissing() {
-        RealClusterJobClient unavailable = new RealClusterJobClient("127.0.0.1", 1);
+        ClusterJobClient unavailable = new ClusterJobClient("127.0.0.1", 1);
         assertThrows(RuntimeException.class, () -> unavailable.queryRun("run-unavailable"));
     }
 
@@ -149,7 +149,7 @@ class RealClusterJobClientDurableRunTest {
             return RpcMessage.durableJobResult(false, 0L, "invalid durable request",
                     io.rowweave.run.DurableRunDisposition.REJECTED_BEFORE_ACCEPTANCE);
         })) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", server.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", server.port());
             DurableRunSubmitException failure = assertThrows(
                     DurableRunSubmitException.class,
                     () -> client.submitRun(artifact(), submission("run-rejected")));
@@ -185,7 +185,7 @@ class RealClusterJobClientDurableRunTest {
                     io.rowweave.run.RunStateCodec.encodeSnapshot(succeeded),
                     ExecutionTelemetrySummaryCodec.encode(telemetry));
         })) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", server.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", server.port());
             ExecutionReport recovered = client.submitRun(
                     artifact(), submission("run-success-ack-lost"));
             assertEquals(29L, recovered.rowsOut());
@@ -225,7 +225,7 @@ class RealClusterJobClientDurableRunTest {
             queries.incrementAndGet();
             return RpcMessage.runSnapshot(RunStateCodec.encodeSnapshot(succeeded));
         })) {
-            RealClusterJobClient client = new RealClusterJobClient(() -> {
+            ClusterJobClient client = new ClusterJobClient(() -> {
                 if (lookups.getAndIncrement() == 0) {
                     throw new IllegalStateException("leader lookup outcome unavailable");
                 }
@@ -250,7 +250,7 @@ class RealClusterJobClientDurableRunTest {
             queries.incrementAndGet();
             return RpcMessage.runSnapshot(io.rowweave.run.RunStateCodec.encodeSnapshot(snapshot));
         })) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", server.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", server.port());
             DurableRunSubmitException failure = assertThrows(
                     DurableRunSubmitException.class,
                     () -> client.submitRun(artifact(), submission(snapshot.runId())));
@@ -310,7 +310,7 @@ class RealClusterJobClientDurableRunTest {
     @Test
     void unsupportedAttemptPolicyFailsBeforeLeaderLookup() {
         AtomicReference<Boolean> located = new AtomicReference<>(false);
-        RealClusterJobClient client = new RealClusterJobClient(() -> {
+        ClusterJobClient client = new ClusterJobClient(() -> {
             located.set(true);
             throw new AssertionError("leader lookup must not happen");
         });
@@ -325,7 +325,7 @@ class RealClusterJobClientDurableRunTest {
     @Test
     void nonZeroDeadlinePassesPolicyValidationAndReachesLeaderLookup() {
         AtomicInteger lookups = new AtomicInteger();
-        RealClusterJobClient client = new RealClusterJobClient(() -> {
+        ClusterJobClient client = new ClusterJobClient(() -> {
             lookups.incrementAndGet();
             throw new IllegalStateException("leader lookup reached");
         });
@@ -341,7 +341,7 @@ class RealClusterJobClientDurableRunTest {
     @Test
     void nonReconcilableOutputsFailBeforeLeaderLookup(@TempDir Path tmp) {
         AtomicInteger lookups = new AtomicInteger();
-        RealClusterJobClient client = new RealClusterJobClient(() -> {
+        ClusterJobClient client = new ClusterJobClient(() -> {
             lookups.incrementAndGet();
             throw new AssertionError("invalid durable output must not locate a leader");
         });
@@ -367,7 +367,7 @@ class RealClusterJobClientDurableRunTest {
             throws Exception {
         AtomicBoolean located = new AtomicBoolean();
         AtomicBoolean serialized = new AtomicBoolean();
-        RealClusterJobClient client = new RealClusterJobClient(() -> {
+        ClusterJobClient client = new ClusterJobClient(() -> {
             located.set(true);
             throw new AssertionError("leader lookup must not happen");
         });
@@ -376,7 +376,7 @@ class RealClusterJobClientDurableRunTest {
                 PlanNode.sink(outputMeta(), 0,
                         new HookedDurableOutput(serialized)).build()));
 
-        java.lang.reflect.Method graphEntry = RealClusterJobClient.class.getMethod(
+        java.lang.reflect.Method graphEntry = ClusterJobClient.class.getMethod(
                 "submitRun", PlanGraph.class, String.class, RunSubmission.class);
         java.lang.reflect.InvocationTargetException rejected = assertThrows(
                 java.lang.reflect.InvocationTargetException.class,
@@ -399,7 +399,7 @@ class RealClusterJobClientDurableRunTest {
                      60_000L, 0, registry, monitor);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "durable-output-worker", 8, "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             RunSubmission manifestSubmission = new RunSubmission(
                     "run-manifest-output", "attempt-manifest-output",
                     "publication-manifest-output", 1, 0L, 10L);
@@ -505,7 +505,7 @@ class RealClusterJobClientDurableRunTest {
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "durable-multi-output-worker-1", 8,
                      "127.0.0.1", master.port(), spill1)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             for (int sinkCount = 2; sinkCount <= 5; sinkCount++) {

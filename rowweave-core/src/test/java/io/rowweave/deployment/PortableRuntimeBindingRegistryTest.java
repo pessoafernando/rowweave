@@ -16,7 +16,7 @@ import io.rowweave.cluster.FixedMasterLocator;
 import io.rowweave.cluster.MasterElection;
 import io.rowweave.cluster.MasterServer;
 import io.rowweave.cluster.PreparedStageCommand;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.StageCommand;
 import io.rowweave.cluster.StageCommandCodecV2;
 import io.rowweave.cluster.WorkerServer;
@@ -245,7 +245,7 @@ class PortableRuntimeBindingRegistryTest {
                          }
                          return RpcMessage.jobResult(true, 0L, null);
                      });
-                     RealClusterJobClient client = new RealClusterJobClient(
+                     ClusterJobClient client = new ClusterJobClient(
                              new FixedMasterLocator(new Endpoint(
                                      "127.0.0.1", server.port())),
                              clusterRuntime)) {
@@ -281,8 +281,8 @@ class PortableRuntimeBindingRegistryTest {
                                          "127.0.0.1", clusterMaster.port())),
                                  temp.resolve("cluster-worker").toFile(),
                                  clusterRuntime);
-                         RealClusterJobClient clusterClient =
-                                 new RealClusterJobClient(
+                         ClusterJobClient clusterClient =
+                                 new ClusterJobClient(
                                          new FixedMasterLocator(new Endpoint(
                                                  "127.0.0.1",
                                                  clusterMaster.port())),

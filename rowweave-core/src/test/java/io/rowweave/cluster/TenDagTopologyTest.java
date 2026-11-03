@@ -148,8 +148,8 @@ class TenDagTopologyTest {
         assertEquals(nOut, base.size(), name + " output count");
         List<long[]> s2 = run(name + "-s2", 2, null, nOut, dag);
         List<long[]> s4 = run(name + "-s4", 4, null, nOut, dag);
-        List<long[]> c2 = run(name + "-c2", 2, new RealClusterJobClient("127.0.0.1", master2.port()), nOut, dag);
-        List<long[]> c3 = run(name + "-c3", 3, new RealClusterJobClient("127.0.0.1", master3.port()), nOut, dag);
+        List<long[]> c2 = run(name + "-c2", 2, new ClusterJobClient("127.0.0.1", master2.port()), nOut, dag);
+        List<long[]> c3 = run(name + "-c3", 3, new ClusterJobClient("127.0.0.1", master3.port()), nOut, dag);
         for (int i = 0; i < nOut; i++) {
             assertArrayEquals(base.get(i), s2.get(i), name + " out" + i + " single-process P2 versus P1");
             assertArrayEquals(base.get(i), s4.get(i), name + " out" + i + " single-process P4 versus P1");

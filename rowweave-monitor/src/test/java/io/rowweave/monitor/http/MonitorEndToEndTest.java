@@ -8,7 +8,7 @@ import io.rowweave.ExecutionEnvironment;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.MasterServer;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.WorkerServer;
 import io.rowweave.cluster.registry.InProcessRegistry;
 import io.rowweave.monitor.InMemoryJobMonitor;
@@ -72,7 +72,7 @@ class MonitorEndToEndTest {
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
 
             // A real groupBy job: source, keyed shuffle, sink, therefore a multi-stage DAG.
-            ExecutionEnvironment s = new ExecutionEnvironment("e2e", "e2e", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("e2e", "e2e", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("e2e.tsv");
             s.fromSource(new CollectionSource(META, rows(1600)))

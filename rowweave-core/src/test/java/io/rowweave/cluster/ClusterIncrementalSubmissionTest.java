@@ -49,7 +49,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /** Real client submits canonical intent on its dedicated route. */
-class RealClusterIncrementalSubmissionTest {
+class ClusterIncrementalSubmissionTest {
 
     @Test
     void clientRejectsSourceContractAbsentFromSignedDeployment(@TempDir Path root)
@@ -58,8 +58,8 @@ class RealClusterIncrementalSubmissionTest {
         try (RpcServer server = new RpcServer(request -> {
             observed.set(request);
             return RpcMessage.jobResult(true, 1L, null);
-        }); RealClusterJobClient client =
-                     new RealClusterJobClient("127.0.0.1", server.port())) {
+        }); ClusterJobClient client =
+                     new ClusterJobClient("127.0.0.1", server.port())) {
             assertThrows(io.rowweave.deployment.DeploymentValidationException.class,
                     () -> client.submitIncrementalRun(submission(root)));
             assertNull(observed.get());
@@ -75,7 +75,7 @@ class RealClusterIncrementalSubmissionTest {
              RpcServer server = new RpcServer(request -> {
             observed.set(request);
             return RpcMessage.jobResult(true, 17L, null);
-        }); RealClusterJobClient client = new RealClusterJobClient(
+        }); ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(
                              new Endpoint("127.0.0.1", server.port())),
                      deployments.staticRuntime())) {
@@ -106,7 +106,7 @@ class RealClusterIncrementalSubmissionTest {
                  return RpcMessage.incrementalFrontierView(
                          request.runId(),
                          IncrementalFrontierViewCodec.encode(expected));
-             }); RealClusterJobClient client = new RealClusterJobClient(
+             }); ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(
                              new Endpoint("127.0.0.1", server.port())),
                      deployments.staticRuntime())) {

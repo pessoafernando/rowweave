@@ -44,7 +44,7 @@ class MonitorCaptureTest {
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
 
-            ExecutionEnvironment s = new ExecutionEnvironment("cap", "cap", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("cap", "cap", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("cap.tsv");
             s.fromSource(new CollectionSource(META, "monitor-source", rows(1600)))
@@ -81,7 +81,7 @@ class MonitorCaptureTest {
         try (MasterServer m = new MasterServer(5000, 0,
                      new io.rowweave.cluster.registry.InProcessRegistry(), mon);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 8, "127.0.0.1", m.port(), w0)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("localviz", "localviz", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("localviz", "localviz", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(3);
             Path f = tmp.resolve("localviz.tsv");
             s.fromSource(new CollectionSource(META, rows(1600)))
@@ -108,7 +108,7 @@ class MonitorCaptureTest {
         WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
         WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1);
         try {
-            ExecutionEnvironment s = new ExecutionEnvironment("fail", "fail", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("fail", "fail", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("fail.tsv");
             s.fromSource(ClusterTestFileInput.write(

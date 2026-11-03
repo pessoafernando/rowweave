@@ -109,7 +109,7 @@ class CombineGroupTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("crc", "crc", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("crc", "crc", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("cr-c.tsv");
             s.fromSource(new CollectionSource(META, d)).combineReduceGroup(SUM_CR, 4).sinkTo(new FileSink(SUM1, f.toString()));
@@ -143,7 +143,7 @@ class CombineGroupTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("cgc", "cgc", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("cgc", "cgc", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("cg-c.tsv");
             s.fromSource(new CollectionSource(META, d)).combineGroup(SUM_C, 4).sinkTo(new FileSink(META, f.toString()));

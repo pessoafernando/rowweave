@@ -1,7 +1,7 @@
 package io.rowweave.cluster.registry.zk;
 
 import io.rowweave.cluster.JobClient;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.RegistryMasterLocator;
 import io.rowweave.artifact.PlanArtifact;
 import io.rowweave.commit.BatchSinkOutcome;
@@ -18,9 +18,9 @@ import io.rowweave.incremental.IncrementalRunSubmission;
  * A remote {@link JobClient} that finds the master through ZooKeeper, so submitting a job needs
  * only a connect string and never an address written into the caller. It builds a
  * {@link ZkServiceRegistry} and a {@link RegistryMasterLocator}, which resolves whoever is leader at
- * the moment of each submit, and delegates the call to {@link RealClusterJobClient}.
+ * the moment of each submit, and delegates the call to {@link ClusterJobClient}.
  *
- * <p>{@link RealClusterJobClient} on its own connects to a host and port that an operator already
+ * <p>{@link ClusterJobClient} on its own connects to a host and port that an operator already
  * knows. Discovering the leader instead is what a deployment with several masters needs, because a
  * change of leader then stays invisible to whoever is submitting. The connection is opened in the
  * constructor, so a connect string that does not work fails there rather than on the first submit.
@@ -40,7 +40,7 @@ import io.rowweave.incremental.IncrementalRunSubmission;
 public final class ZkRemoteJobClient implements JobClient, AutoCloseable {
 
     private final ZkServiceRegistry registry;
-    private final RealClusterJobClient delegate;
+    private final ClusterJobClient delegate;
     private final io.rowweave.deployment.DeploymentRuntime deploymentRuntime;
 
     /** Connects to a ZooKeeper quorum, for example {@code "zk1:2181,zk2:2181"}, and resolves the leader through the registry. */
@@ -53,7 +53,7 @@ public final class ZkRemoteJobClient implements JobClient, AutoCloseable {
             createdRegistry = new ZkServiceRegistry(zkConnectString);
             this.registry = createdRegistry;
             this.deploymentRuntime = createdRuntime;
-            this.delegate = new RealClusterJobClient(new RegistryMasterLocator(
+            this.delegate = new ClusterJobClient(new RegistryMasterLocator(
                     registry, createdRuntime.controlSecurity().securityMetadata()), createdRuntime);
         } catch (RuntimeException | Error failure) {
             if (createdRegistry != null) createdRegistry.close();

@@ -92,7 +92,7 @@ class RealProcessCrossShuffleTest {
     private CsvInput csv(String path, DataSchema meta) { return new CsvInput(path, meta); }
 
     /** Run one DAG on the single machine at parallelism one as the oracle, then on the real cluster at parallelism two; assert the multisets agree and cluster instances span two workers. */
-    private void assertRealClusterMatchesSingle(String name, DataSchema outMeta, Function<ExecutionEnvironment, DataSet> build) throws Exception {
+    private void assertClusterMatchesSingle(String name, DataSchema outMeta, Function<ExecutionEnvironment, DataSet> build) throws Exception {
         Path single = dir.resolve(name + "-single.tsv");
         Path clusterOut = dir.resolve(name + "-cluster.tsv");
 
@@ -138,7 +138,7 @@ class RealProcessCrossShuffleTest {
 
     @Test
     void innerJoinGroupBy() throws Exception {
-        assertRealClusterMatchesSingle("join", JOIN_GB, s ->
+        assertClusterMatchesSingle("join", JOIN_GB, s ->
                 s.fromSource(csv(ordersA, ORDER))
                         .join(s.fromSource(csv(ordersB, ORDER))).on("id")
                         .select("id", "dept", "region", "grade", "amount", "qty")
@@ -151,7 +151,7 @@ class RealProcessCrossShuffleTest {
 
     @Test
     void coGroupOnDept() throws Exception {
-        assertRealClusterMatchesSingle("cogroup", CG_OUT, s ->
+        assertClusterMatchesSingle("cogroup", CG_OUT, s ->
                 s.fromSource(csv(ordersA, ORDER))
                         .coGroup(s.fromSource(csv(supp, ORDER)), CG_FN).on("dept")
                         .filter("lc >= 1"));
@@ -163,7 +163,7 @@ class RealProcessCrossShuffleTest {
 
     @Test
     void unionGroupBy() throws Exception {
-        assertRealClusterMatchesSingle("union", UNION_GB, s ->
+        assertClusterMatchesSingle("union", UNION_GB, s ->
                 s.fromSource(csv(ordersA, ORDER))
                         .union(s.fromSource(csv(supp, ORDER)), Union.of(ORDER))
                         .partitionByHash("region")
@@ -173,7 +173,7 @@ class RealProcessCrossShuffleTest {
     // ---- Case 4: a diamond: source, two join branches, union, groupBy ----
     @Test
     void diamondJoinUnion() throws Exception {
-        assertRealClusterMatchesSingle("diamond", JOIN_GB, s -> {
+        assertClusterMatchesSingle("diamond", JOIN_GB, s -> {
             DataSet b1 = s.fromSource(csv(ordersA, ORDER))
                     .join(s.fromSource(csv(dim, DIM))).on("dept")
                     .select("id", "dept", "region", "grade", "amount", "qty")

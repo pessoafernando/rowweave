@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** /GDF4: M+5W executes and recovers one composed graph. */
 @Tag("multiprocess")
-class StreamAtomicCompositionRealClusterTest {
+class StreamAtomicCompositionClusterTest {
     private static final List<String> ROLES = Arrays.asList(
             "source", "compute-a", "compute-b", "sink-1", "sink-2");
 

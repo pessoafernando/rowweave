@@ -37,7 +37,7 @@ class FileRunExecutionEventQueryTest {
         FileRunStateStore reopened = new FileRunStateStore(root);
         try (MasterServer master = new MasterServer(
                      60_000L, 0, new FileAuthorityRegistry(reopened));
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      "127.0.0.1", master.port())) {
             RunExecutionEventPage first = client.queryRunEvents(
                     "run-file-events", 0L, 1);

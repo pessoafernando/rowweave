@@ -39,7 +39,7 @@ class ClusterJobParallelismTest {
     }
 
     private long runGroupBy(int par, MasterServer m, String name, Path out) {
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new RealClusterJobClient("127.0.0.1", m.port()));
+        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new ClusterJobClient("127.0.0.1", m.port()));
         s.setParallelism(par);
         s.fromSource(new CollectionSource(META, rows(4000)))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))

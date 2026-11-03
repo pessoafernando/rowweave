@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 /** No-listener same-JVM adapter over the durable Stream product Master. */
 final class InProcessStreamJobClient implements StreamJobClient {
     private final StreamProductJobMasterServer master;
-    private final RealClusterStreamJobClient delegate;
+    private final ClusterStreamJobClient delegate;
     private final AtomicBoolean closed = new AtomicBoolean();
 
     InProcessStreamJobClient(
@@ -28,7 +28,7 @@ final class InProcessStreamJobClient implements StreamJobClient {
                 StreamProductJobMasterServer.inProcess(
                         authorityRoot, runFactory);
         this.master = created;
-        this.delegate = new RealClusterStreamJobClient(
+        this.delegate = new ClusterStreamJobClient(
                 new InProcessStreamProductControlTransport(created));
     }
 

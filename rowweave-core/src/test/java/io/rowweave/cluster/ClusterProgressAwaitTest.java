@@ -56,7 +56,7 @@ class ClusterProgressAwaitTest {
             try (MasterServer m = new MasterServer(5000);
                  WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
                  WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-                ExecutionEnvironment s = new ExecutionEnvironment("slow", "slow", new RealClusterJobClient("127.0.0.1", m.port()));
+                ExecutionEnvironment s = new ExecutionEnvironment("slow", "slow", new ClusterJobClient("127.0.0.1", m.port()));
                 s.setParallelism(2);
                 Path f = tmp.resolve("slow.tsv");
                 s.fromSource(new CollectionSource(META, data))
@@ -87,7 +87,7 @@ class ClusterProgressAwaitTest {
         WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
         WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1);
         try {
-            ExecutionEnvironment s = new ExecutionEnvironment("dead", "dead", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("dead", "dead", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("dead.tsv");
             DataSet ds = s.fromSource(ClusterTestFileInput.write(

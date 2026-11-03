@@ -18,7 +18,7 @@ RunSubmission request = new RunSubmission(
         runId, attemptId, publicationId,
         3, deadlineEpochMillis, submittedAtMillis);
 
-try (RealClusterJobClient client = new RealClusterJobClient(masterHost, masterPort)) {
+try (ClusterJobClient client = new ClusterJobClient(masterHost, masterPort)) {
     ExecutionReport accepted = client.submitRun(artifact, request);
     RunSnapshot run = client.queryRun(runId);
     RunExecutionEventPage events = client.queryRunEvents(runId, 0L, 200);
@@ -46,5 +46,5 @@ On timeout, disconnect or Master replacement:
 Pin the exact signed release manifest in each platform deployment. A compatible epoch-1 optional revision may roll only after the N-1/N matrix passes. Unknown required capabilities, legacy Java payloads, unsigned providers, release digest drift and decimal-semantics drift must fail before Run creation. Use the [release contract](../reference/versioned-release-v1.md) and [rolling runbook](../../runbooks/rolling-upgrade-v1.md) as the deployment checklist.
 
 The method signatures, identity rules, and refusal codes above are backed by
-`RealClusterJobClientDurableRunTest`, `RealClusterBatchSinkOutcomeProtocolTest`, and
-`RealClusterQualityGateDecisionProtocolTest`.
+`ClusterJobClientDurableRunTest`, `ClusterBatchSinkOutcomeProtocolTest`, and
+`ClusterQualityGateDecisionProtocolTest`.

@@ -297,7 +297,7 @@ class StreamProductWindowDagDispatchTest {
         }
 
         StreamJobClient client() {
-            return RowWeave.createRealClusterStreamJobClient(
+            return RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", master.port());
         }
 

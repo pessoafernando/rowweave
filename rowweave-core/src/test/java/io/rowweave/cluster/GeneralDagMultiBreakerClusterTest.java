@@ -106,7 +106,7 @@ class GeneralDagMultiBreakerClusterTest {
             try (MasterServer master = new MasterServer(30_000);
                  WorkerServer ws0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
                  WorkerServer ws1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
-                ExecutionReport report = new RealClusterJobClient(
+                ExecutionReport report = new ClusterJobClient(
                         "127.0.0.1", master.port()).submitAttempt(
                         graph, "tiny-memory-telemetry");
                 long rowCount = report.rowsOut();
@@ -153,7 +153,7 @@ class GeneralDagMultiBreakerClusterTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer ws0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer ws1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
-            ExecutionReport report = new RealClusterJobClient(
+            ExecutionReport report = new ClusterJobClient(
                     "127.0.0.1", master.port()).submitAttempt(
                     graph, "multi-keyed-p" + parallelism);
             long rowCount = report.rowsOut();

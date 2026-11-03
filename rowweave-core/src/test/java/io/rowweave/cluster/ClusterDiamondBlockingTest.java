@@ -102,7 +102,7 @@ class ClusterDiamondBlockingTest {
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(60), () -> {
-                long c = runDiamond("blk-c1", new RealClusterJobClient("127.0.0.1", m.port()), countingInput(data), tmp);
+                long c = runDiamond("blk-c1", new ClusterJobClient("127.0.0.1", m.port()), countingInput(data), tmp);
                 assertEquals(oracle, c, "cluster BLOCKING diamond result matches the single-process reference");
             });
         } finally {
@@ -150,7 +150,7 @@ class ClusterDiamondBlockingTest {
              WorkerServer a0 = WorkerServer.newUnguarded("sjw0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("sjw1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(60), () -> {
-                long c = runSelfJoin("sj-c1", new RealClusterJobClient("127.0.0.1", m.port()), countingInput(data), tmp);
+                long c = runSelfJoin("sj-c1", new ClusterJobClient("127.0.0.1", m.port()), countingInput(data), tmp);
                 assertEquals(oracle, c, "cluster self-join BLOCKING result matches the single-process reference (both legs are fed, so no row is missing)");
             });
         } finally {

@@ -158,7 +158,7 @@ class ClusterCancelStageTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer w0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0tmp);
              WorkerServer w1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1tmp)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             assertThrows(RuntimeException.class, () -> client.submitToSink(graph), "a throwing source makes the submit fail fast");
             long deadline = System.currentTimeMillis() + 8000;
             while ((w0.runningStageCount() + w1.runningStageCount()) > 0

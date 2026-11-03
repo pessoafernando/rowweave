@@ -101,7 +101,7 @@ class DurableCommitBarrierFailureTest {
                      "finalize-departure-worker", 4,
                      "127.0.0.1", master.port(), spill)) {
             master.setManifestPublishHooks(null, worker::close);
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             assertEquals(1L, client.submitRun(artifact(output), submission(runId)).rowsOut());
@@ -133,7 +133,7 @@ class DurableCommitBarrierFailureTest {
                      "five-finalize-worker-1", 8,
                      "127.0.0.1", master.port(), spill1)) {
             master.setManifestPublishHooks(null, worker0::close);
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             assertEquals(5L, client.submitRun(
@@ -165,7 +165,7 @@ class DurableCommitBarrierFailureTest {
              WorkerServer worker = WorkerServer.newUnguarded(
                      "member-journal-worker", 4,
                      "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             DurableRunSubmitException failure = assertThrows(
@@ -208,7 +208,7 @@ class DurableCommitBarrierFailureTest {
                      runId + "-worker-0", 16, "127.0.0.1", master.port(), spill0);
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      runId + "-worker-1", 16, "127.0.0.1", master.port(), spill1)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             assertEquals(7L, client.submitRun(
@@ -251,7 +251,7 @@ class DurableCommitBarrierFailureTest {
              WorkerServer worker = WorkerServer.newUnguarded(
                      runId + "-worker", 16,
                      "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             DurableRunSubmitException failure = assertThrows(
@@ -301,7 +301,7 @@ class DurableCommitBarrierFailureTest {
                      runId + "-worker-0", 16, "127.0.0.1", master.port(), spill0);
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      runId + "-worker-1", 16, "127.0.0.1", master.port(), spill1)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             assertEquals(6L, client.submitRun(
@@ -344,7 +344,7 @@ class DurableCommitBarrierFailureTest {
             master.setManifestPublishHooks(() -> {
                 throw new IllegalStateException("injected pre-publish hook failure");
             }, null);
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             assertEquals(1L, client.submitRun(
@@ -376,7 +376,7 @@ class DurableCommitBarrierFailureTest {
         try (MasterServer master = new MasterServer(60_000L, 0, registry);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "succeeded-failure-worker", 4, "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
 
             RuntimeException failure = assertThrows(RuntimeException.class,
                     () -> client.submitRun(artifact(output), submission(runId)));
@@ -404,7 +404,7 @@ class DurableCommitBarrierFailureTest {
         try (MasterServer master = new MasterServer(60_000L, 0, registry);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "barrier-failure-worker", 4, "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
 
             RuntimeException failure = assertThrows(RuntimeException.class,
                     () -> client.submitRun(artifact(output), submission(runId)));
@@ -426,7 +426,7 @@ class DurableCommitBarrierFailureTest {
         try (MasterServer master = new MasterServer(60_000L, 0, registry);
              WorkerServer worker = WorkerServer.newUnguarded(
                      runId + "-worker", 4, "127.0.0.1", master.port(), spill)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
 
             assertEquals(1L, client.submitRun(artifact(output), submission(runId)).rowsOut());

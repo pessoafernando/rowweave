@@ -75,7 +75,7 @@ class SlotAdmissionTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            long n = runGroupBy(2, new RealClusterJobClient("127.0.0.1", m.port()), "adm-ok", tmp.resolve("ok.tsv"));
+            long n = runGroupBy(2, new ClusterJobClient("127.0.0.1", m.port()), "adm-ok", tmp.resolve("ok.tsv"));
             assertEquals(20, n, "admission passes and groupBy yields 20 groups");
         }
     }
@@ -87,7 +87,7 @@ class SlotAdmissionTest {
         File w0 = new File(tmp.toFile(), "w0"); w0.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 1, "127.0.0.1", m.port(), w0)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("adm-rej", "adm-rej", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("adm-rej", "adm-rej", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             s.fromSource(new CollectionSource(META, rows(4000)))
                     .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
@@ -111,7 +111,7 @@ class SlotAdmissionTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 1, "127.0.0.1", m.port(), w0)) {
             RuntimeException ex = assertThrows(RuntimeException.class, () ->
-                    runGroupBy(2, new RealClusterJobClient("127.0.0.1", m.port()),
+                    runGroupBy(2, new ClusterJobClient("127.0.0.1", m.port()),
                             "adm-off-over-cap", tmp.resolve("off-over-cap.tsv")));
             String msg = String.valueOf(ex.getMessage());
             assertTrue(msg.contains("stage assignment capacity exhausted"),
@@ -135,7 +135,7 @@ class SlotAdmissionTest {
         File w0 = new File(tmp.toFile(), "w0"); w0.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 8, "127.0.0.1", m.port(), w0)) {
-            long n = runGroupBy(2, new RealClusterJobClient("127.0.0.1", m.port()),
+            long n = runGroupBy(2, new ClusterJobClient("127.0.0.1", m.port()),
                     "adm-off-safe", tmp.resolve("off-safe.tsv"));
             assertEquals(20, n, "with Master admission off and enough Worker capacity the job completes normally");
         }
@@ -149,7 +149,7 @@ class SlotAdmissionTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", m.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", m.port());
             assertEquals(20, runGroupBy(2, client, "seq1", tmp.resolve("s1.tsv")), "job1");
             assertEquals(20, runGroupBy(2, client, "seq2", tmp.resolve("s2.tsv")), "job2 runs after the release");
         }
@@ -164,7 +164,7 @@ class SlotAdmissionTest {
             try (MasterServer m = new MasterServer(5000);
                  WorkerServer a0 = WorkerServer.newUnguarded("w0", 8, "127.0.0.1", m.port(), w0);
                  WorkerServer a1 = WorkerServer.newUnguarded("w1", 8, "127.0.0.1", m.port(), w1)) {
-                long n = runGroupBy(2, new RealClusterJobClient("127.0.0.1", m.port()), "gang", tmp.resolve("gang.tsv"));
+                long n = runGroupBy(2, new ClusterJobClient("127.0.0.1", m.port()), "gang", tmp.resolve("gang.tsv"));
                 assertEquals(20, n, "gang admission for the whole job pipelines its stages without deadlock and finishes 20 groups");
             }
         });
@@ -178,7 +178,7 @@ class SlotAdmissionTest {
         File probe = new File(tmp.toFile(), "probe"); probe.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 128, "127.0.0.1", m.port(), probe)) {
-            assertEquals(20, runGroupBy(2, new RealClusterJobClient("127.0.0.1", m.port()),
+            assertEquals(20, runGroupBy(2, new ClusterJobClient("127.0.0.1", m.port()),
                     "probe", tmp.resolve("probe.tsv")), "runs to completion with ample slots");
             PhysicalPlan plan = m.lastPhysicalPlan();
             assertNotNull(plan, "a physical plan exists");
@@ -188,14 +188,14 @@ class SlotAdmissionTest {
         File wOk = new File(tmp.toFile(), "wOk"); wOk.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", demand, "127.0.0.1", m.port(), wOk)) {
-            assertEquals(20, runGroupBy(2, new RealClusterJobClient("127.0.0.1", m.port()),
+            assertEquals(20, runGroupBy(2, new ClusterJobClient("127.0.0.1", m.port()),
                     "exact", tmp.resolve("exact.tsv")),
                     "slots == demand(" + demand + ") is exactly enough and passes because demand is not over-counted");
         }
         File wBad = new File(tmp.toFile(), "wBad"); wBad.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", demand - 1, "127.0.0.1", m.port(), wBad)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("under", "under", new RealClusterJobClient("127.0.0.1", m.port()));
+            ExecutionEnvironment s = new ExecutionEnvironment("under", "under", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             s.fromSource(new CollectionSource(META, rows(4000)))
                     .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
@@ -219,7 +219,7 @@ class SlotAdmissionTest {
             // One worker's slots are exactly enough for a single job (generous values so the first job passes; a second concurrent job waits because the ledger is full).
             try (MasterServer m = new MasterServer(5000);
                  WorkerServer a0 = WorkerServer.newUnguarded("w0", 8, "127.0.0.1", m.port(), w0)) {
-                RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", m.port());
+                ClusterJobClient client = new ClusterJobClient("127.0.0.1", m.port());
                 java.util.concurrent.ExecutorService pool = java.util.concurrent.Executors.newFixedThreadPool(2);
                 try {
                     java.util.concurrent.Future<Long> j1 = pool.submit(() ->

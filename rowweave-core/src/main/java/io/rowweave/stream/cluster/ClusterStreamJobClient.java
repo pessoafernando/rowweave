@@ -25,30 +25,30 @@ import io.rowweave.cluster.registry.ServiceRegistry;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/** Public RealCluster Stream client backed only by stable control identities. */
-public final class RealClusterStreamJobClient implements StreamJobClient {
+/** Public Cluster Stream client backed only by stable control identities. */
+public final class ClusterStreamJobClient implements StreamJobClient {
     private static final long WAIT_POLL_MILLIS = 5L;
 
     private final StreamProductControlTransport transport;
     private final AtomicBoolean closed = new AtomicBoolean();
 
-    public RealClusterStreamJobClient(String masterHost, int masterPort) {
+    public ClusterStreamJobClient(String masterHost, int masterPort) {
         this(new SocketStreamProductControlTransport(masterHost, masterPort));
     }
 
-    public RealClusterStreamJobClient(String masterHost, int masterPort,
+    public ClusterStreamJobClient(String masterHost, int masterPort,
             ControlSecurityConfig security) {
         this(new SocketStreamProductControlTransport(
                 masterHost, masterPort, security));
     }
 
     /** Creates an HA client that resolves the active Stream Master per call. */
-    public RealClusterStreamJobClient(ServiceRegistry registry,
+    public ClusterStreamJobClient(ServiceRegistry registry,
             ControlSecurityConfig security) {
         this(new RegistryStreamProductControlTransport(registry, security));
     }
 
-    RealClusterStreamJobClient(StreamProductControlTransport transport) {
+    ClusterStreamJobClient(StreamProductControlTransport transport) {
         if (transport == null) {
             throw new IllegalArgumentException(
                     "Stream product control transport is required");
@@ -298,11 +298,11 @@ public final class RealClusterStreamJobClient implements StreamJobClient {
     }
 
     private static final class JobHandle implements StreamJobHandle {
-        private final RealClusterStreamJobClient client;
+        private final ClusterStreamJobClient client;
         private final StreamJobId jobId;
         private final String artifactId;
 
-        private JobHandle(RealClusterStreamJobClient client,
+        private JobHandle(ClusterStreamJobClient client,
                 StreamJobId jobId, String artifactId) {
             this.client = client;
             this.jobId = jobId;
@@ -382,12 +382,12 @@ public final class RealClusterStreamJobClient implements StreamJobClient {
     }
 
     private static final class CancelHandle implements StreamCommandHandle {
-        private final RealClusterStreamJobClient client;
+        private final ClusterStreamJobClient client;
         private final StreamJobId jobId;
         private final StreamCommandId commandId;
         private final StreamOperationStatus initial;
 
-        private CancelHandle(RealClusterStreamJobClient client,
+        private CancelHandle(ClusterStreamJobClient client,
                 StreamJobId jobId, StreamCommandId commandId,
                 StreamOperationStatus initial) {
             this.client = client;
@@ -440,13 +440,13 @@ public final class RealClusterStreamJobClient implements StreamJobClient {
 
     private static final class CheckpointHandle
             implements StreamCheckpointHandle {
-        private final RealClusterStreamJobClient client;
+        private final ClusterStreamJobClient client;
         private final StreamJobId jobId;
         private final StreamCommandId commandId;
         private final String checkpointId;
         private final StreamOperationStatus initial;
 
-        private CheckpointHandle(RealClusterStreamJobClient client,
+        private CheckpointHandle(ClusterStreamJobClient client,
                 StreamJobId jobId, StreamCommandId commandId,
                 String checkpointId, StreamOperationStatus initial) {
             this.client = client;
@@ -508,13 +508,13 @@ public final class RealClusterStreamJobClient implements StreamJobClient {
 
     private static final class SavepointHandle
             implements StreamSavepointHandle {
-        private final RealClusterStreamJobClient client;
+        private final ClusterStreamJobClient client;
         private final StreamJobId jobId;
         private final StreamCommandId commandId;
         private final String savepointId;
         private final StreamOperationStatus initial;
 
-        private SavepointHandle(RealClusterStreamJobClient client,
+        private SavepointHandle(ClusterStreamJobClient client,
                 StreamJobId jobId, StreamCommandId commandId,
                 String savepointId, StreamOperationStatus initial) {
             this.client = client;
@@ -576,14 +576,14 @@ public final class RealClusterStreamJobClient implements StreamJobClient {
 
     private static final class RescaleHandle
             implements StreamRescaleHandle {
-        private final RealClusterStreamJobClient client;
+        private final ClusterStreamJobClient client;
         private final StreamJobId jobId;
         private final StreamCommandId commandId;
         private final String rescaleId;
         private final int targetParallelism;
         private final StreamOperationStatus initial;
 
-        private RescaleHandle(RealClusterStreamJobClient client,
+        private RescaleHandle(ClusterStreamJobClient client,
                 StreamJobId jobId, StreamCommandId commandId,
                 String rescaleId, int targetParallelism,
                 StreamOperationStatus initial) {

@@ -5,7 +5,7 @@ import io.rowweave.artifact.PlanArtifact;
 import io.rowweave.artifact.PlanArtifactCodec;
 import io.rowweave.artifact.PlanArtifactValidationException;
 import io.rowweave.cluster.JobClient;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.plan.ExecutionReport;
 import io.rowweave.plan.PlanGraph;
 import org.junit.jupiter.api.Test;
@@ -120,7 +120,7 @@ class JobSessionPlanArtifactTest {
 
         AtomicInteger lookups = new AtomicInteger();
         PlanArtifactValidationException rejected = assertThrows(PlanArtifactValidationException.class,
-                () -> new RealClusterJobClient(() -> {
+                () -> new ClusterJobClient(() -> {
                     lookups.incrementAndGet();
                     throw new AssertionError("local-only artifact must fail before Master lookup");
                 }).submit(local));

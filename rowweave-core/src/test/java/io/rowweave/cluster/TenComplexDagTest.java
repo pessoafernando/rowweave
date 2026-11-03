@@ -123,7 +123,7 @@ class TenComplexDagTest {
         long[] tP1 = new long[1], tP4 = new long[1], tC = new long[1];
         List<long[]> p1 = runQuad(name + "-s1", 1, null, nOut, dag, tP1);
         List<long[]> p4 = runQuad(name + "-s4", 4, null, nOut, dag, tP4);
-        List<long[]> c2 = runQuad(name + "-c2", 2, new RealClusterJobClient("127.0.0.1", master.port()), nOut, dag, tC);
+        List<long[]> c2 = runQuad(name + "-c2", 2, new ClusterJobClient("127.0.0.1", master.port()), nOut, dag, tC);
         assertEquals(nOut, p1.size(), name + " output count");
         for (int i = 0; i < nOut; i++) {
             assertArrayEquals(p1.get(i), p4.get(i), name + " out" + i + " single-process P4 versus single-process P1");

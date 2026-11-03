@@ -34,7 +34,7 @@ class StreamProductDocumentationTest {
         requireCurrentStreamNaming(api);
         require(api, "## StreamSession / DataStream");
         require(api, "createLocalStreamJobClient");
-        require(api, "createRealClusterStreamJobClient");
+        require(api, "createClusterStreamJobClient");
         require(api, "StreamClusterMain");
         require(api, "StreamElasticExample");
         require(api, "stopWithSavepoint");

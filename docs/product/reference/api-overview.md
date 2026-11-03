@@ -21,8 +21,9 @@ Use `withFunc` for custom functions and `sinkTo` to attach a `Sink`.
 
 ## StreamSession / DataStream
 
-Create a Stream client with `createLocalStreamJobClient`,
-`createRealClusterStreamJobClient`, or an in-process cluster client. A
+Create an owned local Stream runtime with `createLocalStreamJobClient`, or create
+a submission connection to an already running Master with
+`createClusterStreamJobClient`. A
 `StreamSession` holds schema, changelog kind, checkpoint, restart, and resource
 configuration. `DataStream` composes the closed Stream operator set.
 
@@ -37,10 +38,21 @@ node in the same task lifecycle.
 
 ## Cluster bootstrap
 
-Cross-host processes use `StreamClusterMain` with explicit Master-only or
-Worker-only roles. Examples include `StreamElasticExample`,
-`StreamAtomicCompositionExample`, and `StreamConnectorConformance`.
-`StreamConnectorConformance` is the connector qualification entry point.
+Use one verb for each lifecycle boundary:
+
+| Task | Batch | Stream |
+|---|---|---|
+| Owned single-JVM cluster | `RowWeave.startInProcessCluster` | `RowWeave.createLocalStreamJobClient` |
+| Submission connection to a running Master | `RowWeave.createClusterJobClient` | `RowWeave.createClusterStreamJobClient` |
+| Independent process roles | `io.rowweave.cluster.ClusterMain` | `RowWeave.startStreamMaster` / `RowWeave.startStreamWorker` and `StreamClusterMain` |
+| Discovery across failover | A `MasterLocator` passed to `RowWeave.createClusterJobClient` | `RowWeave.createRegistryStreamJobClient` |
+
+Methods named `start*` return owned `AutoCloseable` runtimes. Methods named
+`create*JobClient` create submission connections; closing one releases the
+connection, not the Master or Worker processes. Examples include
+`StreamElasticExample`, `StreamAtomicCompositionExample`, and
+`StreamConnectorConformance`; the last is the connector qualification entry
+point.
 
 ## Error model
 

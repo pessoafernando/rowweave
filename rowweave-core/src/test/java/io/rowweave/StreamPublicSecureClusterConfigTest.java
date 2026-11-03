@@ -41,7 +41,7 @@ class StreamPublicSecureClusterConfigTest {
                              first.endpoint(), second.endpoint()),
                      security, 0);
              StreamJobClient client =
-                     RowWeave.createRealClusterStreamJobClient(
+                     RowWeave.createClusterStreamJobClient(
                              master.host(), master.port(), security)) {
             assertEquals(security.advertisedHost(), first.endpoint().host());
             assertEquals(security.advertisedHost(), master.host());

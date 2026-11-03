@@ -322,7 +322,7 @@ class StreamConnectorProviderRegistryTest {
                          new StreamProductJobMasterServer(
                                  temp.resolve("unsigned-jobs"),
                                  snapshot -> run(starts));
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", unsignedMaster.port())) {
                 StreamControlException failure = assertThrows(
                         StreamControlException.class,
@@ -341,7 +341,7 @@ class StreamConnectorProviderRegistryTest {
                          new StreamProductJobMasterServer(
                                  temp.resolve("signed-jobs"),
                                  snapshot -> run(starts), registry);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", signedMaster.port())) {
                 assertEquals(StreamJobStatus.RUNNING,
                         client.submit(StreamSubmissionId.of("valid"), valid)

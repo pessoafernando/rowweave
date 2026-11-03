@@ -80,7 +80,7 @@ class ClusterSubmitChainTest {
 
         try (MasterServer master = new MasterServer(2000);
              WorkerServer worker = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), workerTmp)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             long rowCount = client.submitToSink(graph);
 
             assertEquals(50, rowCount, "JobResult rowCount = rows after the filter");
@@ -114,7 +114,7 @@ class ClusterSubmitChainTest {
         try (MasterServer master = new MasterServer(2000);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "file-input-worker", 32, "127.0.0.1", master.port(), workerTmp)) {
-            long rows = new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            long rows = new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             assertEquals(2L, rows);
         }
 
@@ -142,7 +142,7 @@ class ClusterSubmitChainTest {
              WorkerServer worker = WorkerServer.newUnguarded(
                      "schema-worker", 32, "127.0.0.1", master.port(), workerTmp)) {
             RuntimeException failure = assertThrows(RuntimeException.class,
-                    () -> new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
+                    () -> new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
             String messages = causeMessages(failure);
             assertTrue(messages.contains("output row width mismatch"), messages);
             assertTrue(messages.contains("expected=2"), messages);
@@ -182,7 +182,7 @@ class ClusterSubmitChainTest {
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "schema-shuffle-w1", 32, "127.0.0.1", master.port(), w1)) {
             RuntimeException failure = assertThrows(RuntimeException.class,
-                    () -> new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
+                    () -> new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
             String messages = causeMessages(failure);
             assertTrue(messages.contains("row width mismatch"), messages);
             assertTrue(messages.contains("expected=2"), messages);
@@ -231,7 +231,7 @@ class ClusterSubmitChainTest {
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "multi-w1", 32, "127.0.0.1", master.port(), w1)) {
             RuntimeException failure = assertThrows(RuntimeException.class,
-                    () -> new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
+                    () -> new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
             assertTrue(causeMessages(failure).contains("row width"), causeMessages(failure));
         }
 
@@ -273,7 +273,7 @@ class ClusterSubmitChainTest {
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "publish-w1", 32, "127.0.0.1", master.port(), w1)) {
             RuntimeException failure = assertThrows(RuntimeException.class,
-                    () -> new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
+                    () -> new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
             assertTrue(causeMessages(failure).contains("injected cluster publish failure"),
                     causeMessages(failure));
             assertEquals(0, worker0.preparedOutputActiveCount());
@@ -310,7 +310,7 @@ class ClusterSubmitChainTest {
                      "finalize-w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "finalize-w1", 32, "127.0.0.1", master.port(), w1)) {
-            long rows = new RealClusterJobClient(
+            long rows = new ClusterJobClient(
                     "127.0.0.1", master.port()).submitToSink(graph);
 
             assertEquals(4L, rows, "the rowCount of both sinks should add up");
@@ -324,7 +324,7 @@ class ClusterSubmitChainTest {
     @Test
     void submitWithNoWorkerFailsFast() {
         try (MasterServer master = new MasterServer(2000)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             PlanNode src = PlanNode.source(META, Collections.emptyList());
             PlanNode sink = PlanNode.sink(META, 0, new io.rowweave.DiscardSink(META)).build();
             PlanGraph g = new PlanGraph(Arrays.asList(src, sink));

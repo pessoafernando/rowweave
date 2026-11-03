@@ -66,7 +66,7 @@ class StreamProductGenericWindowDagDispatchTest {
                                  exchange.resolve(
                                          "generic-window-job-authority"),
                                  runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = session(client).submit(
                         StreamSubmissionId.of("generic-window-real-submit"));

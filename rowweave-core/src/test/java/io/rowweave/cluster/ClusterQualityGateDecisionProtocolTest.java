@@ -13,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /** query absence is distinct from authority and protocol failure. */
-class RealClusterQualityGateDecisionProtocolTest {
+class ClusterQualityGateDecisionProtocolTest {
 
     @Test
     @Timeout(value = 15, unit = TimeUnit.SECONDS)
@@ -36,7 +36,7 @@ class RealClusterQualityGateDecisionProtocolTest {
                             request.runId(), new byte[] {1, 2, 3});
             }
         });
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      "127.0.0.1", server.port())) {
             assertNull(client.queryQualityGateDecision("missing"));
             assertThrows(RuntimeException.class,

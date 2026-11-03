@@ -10,9 +10,9 @@ import io.rowweave.plan.PlanGraph;
 import java.io.File;
 
 /**
- * The {@code LocalCluster} facade: the local path runs the cluster architecture specialized to a
- * single JVM. One {@link MasterServer} and one {@link WorkerServer} with many slots are created in
- * the same process, and the RPC between master, worker and client is a direct in-process call,
+ * The public owned single-JVM cluster lifecycle. It runs the same cluster architecture
+ * specialized to one JVM. One {@link MasterServer} and one {@link WorkerServer} with many
+ * slots are created in the same process, and the RPC between master, worker and client is a direct in-process call,
  * with no socket and no serialization, resolved through {@link InProcessRpcRegistry} and the
  * transport factory. The data plane is entirely {@link io.rowweave.sched.LocalChannel}: with one
  * worker every stage lands on that worker, so every exchange is local. Operator execution,
@@ -28,7 +28,7 @@ public final class InProcessCluster implements JobClient, AutoCloseable {
 
     private final MasterServer master;
     private final WorkerServer worker;
-    private final RealClusterJobClient client;
+    private final ClusterJobClient client;
     private final File tmpDir;
     private final io.rowweave.deployment.DeploymentRuntime workerRuntime;
     private final java.util.concurrent.atomic.AtomicBoolean closed = new java.util.concurrent.atomic.AtomicBoolean();
@@ -95,7 +95,7 @@ public final class InProcessCluster implements JobClient, AutoCloseable {
         this.worker = createdWorker;
         this.workerRuntime = createdWorkerRuntime;
         // Client to master is in-process too: submitToSink resolves through RpcTransports.connect.
-        this.client = new RealClusterJobClient("127.0.0.1", master.port());
+        this.client = new ClusterJobClient("127.0.0.1", master.port());
     }
 
     private static File defaultTmpDir() {
@@ -210,7 +210,7 @@ public final class InProcessCluster implements JobClient, AutoCloseable {
             throw new IllegalStateException("cluster job failed: "
                     + (result == null ? "null response" : result.errorMessage()));
         }
-        return RealClusterJobClient.executionReport(result);
+        return ClusterJobClient.executionReport(result);
     }
 
     @Override

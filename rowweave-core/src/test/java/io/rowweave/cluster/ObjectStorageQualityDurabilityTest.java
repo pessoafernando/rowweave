@@ -74,7 +74,7 @@ class ObjectStorageQualityDurabilityTest {
                      "oracle-w0", 16, "127.0.0.1", master.port(), w0);
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "oracle-w1", 16, "127.0.0.1", master.port(), w1)) {
-            run(new RealClusterJobClient("127.0.0.1", master.port()),
+            run(new ClusterJobClient("127.0.0.1", master.port()),
                     "object-quality-oracle", domain, input("ledger.tsv", content));
 
             assertEquals(0, worker0.preparedOutputActiveCount());
@@ -116,7 +116,7 @@ class ObjectStorageQualityDurabilityTest {
                      "failure-w0", 16, "127.0.0.1", master.port(), w0);
              WorkerServer worker1 = WorkerServer.newUnguarded(
                      "failure-w1", 16, "127.0.0.1", master.port(), w1)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port());
             run(client, "object-quality-old", domain, input("old.tsv", oldContent));
             CommitManifest old = new ManifestFileStore(domain).latest();

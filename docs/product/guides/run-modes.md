@@ -6,8 +6,8 @@ doc-channel: default-branch
 
 Choose a mode by the process and recovery boundary you need to test. Local mode
 is the application embedding path. InProcess mode exercises cluster placement
-without sockets where a public runtime is available. Real-cluster modes separate
-Master, Worker, and Client processes and are the production deployment path.
+without sockets where a public runtime is available. Separate-process cluster modes
+split Master, Worker, and Client roles and are the production deployment path.
 
 Batch and Stream use separate clients and lifecycles. A Batch job submitted on
 a timer is not Stream execution, and no mode changes plan semantics, operator
@@ -18,32 +18,32 @@ contracts, decimal precision, or stable refusals.
 | Mode | Public entry point | Process model | Choose when |
 |---|---|---|---|
 | Local | `RowWeave.createEnvironment` with the default client | One JVM | Embedding a bounded job in an application, evaluating the API, or running a small deterministic job. |
-| InProcess cluster | `new InProcessCluster(parallelism, stateDirectory)` | Master and Worker product roles in one JVM | Testing cluster admission, placement, and whole-graph behavior without deploying separate processes. |
-| Real cluster | `RealClusterJobClient` or a registry-backed client with `io.rowweave.cluster.ClusterMain` | Separate Client, Master, and Worker JVMs | Running jobs across processes and hosts, scaling workers, or using production deployment and monitoring. |
+| InProcess cluster | `RowWeave.startInProcessCluster(parallelism, stateDirectory)` | Master and Worker product roles in one JVM | Testing cluster admission, placement, and whole-graph behavior without deploying separate processes. |
+| Cluster | `RowWeave.createClusterJobClient(...)` with `io.rowweave.cluster.ClusterMain` | Separate Client, Master, and Worker JVMs | Running jobs across processes and hosts, scaling workers, or using production deployment and monitoring. |
 
 `InProcessCluster` is `AutoCloseable`. Give its constructor a clean state
 directory and a worker-slot hint at least as large as the job parallelism. The
 runtime expands that hint to a safe local slot budget; insufficient placement
-capacity is admitted or refused by the same cluster rules as a real cluster.
+capacity is admitted or refused by the same cluster rules as a separate-process cluster.
 
 `RunModesExample` runs the same Local and InProcess graph and compares the
-result files. Its real-cluster method is explicitly a sketch: it does not start
+result files. Its cluster method is explicitly a sketch: it does not start
 Master or Worker processes.
 
-## Stream: Local / InProcess / cross-host cluster
+## Stream: Local / InProcess / separate-process cluster
 
 | Mode | Public entry point | Process model | Choose when |
 |---|---|---|---|
 | Local | `RowWeave.createLocalStreamJobClient` | Master, Worker, and authority roles in one JVM with no required listener | Embedding a Stream graph, exercising checkpoint or restore behavior, or testing a provider before cluster deployment. |
 | InProcess parity | No public application SDK type | Master and multiple Worker product roles in one JVM | Deterministic runtime parity and qualification tests. It is not an application entry point. |
-| Cross-host cluster | `RowWeave.createRealClusterStreamJobClient`, `RowWeave.startStreamMaster`, `RowWeave.startStreamWorker`, and `io.rowweave.StreamClusterMain` | Separate Master-only and Worker-only JVMs | Production Stream deployment, independent workers, durable state, savepoint, rescale, and resident CDC. |
+| Cluster | `RowWeave.createClusterStreamJobClient`, `RowWeave.startStreamMaster`, `RowWeave.startStreamWorker`, and `io.rowweave.StreamClusterMain` | Separate Master-only and Worker-only JVMs | Production Stream deployment, independent workers, durable state, savepoint, rescale, and resident CDC. |
 
 Local Stream still assembles the same portable DAG, operator task factory,
 input gates, output router, and state/time/checkpoint lifecycle as cluster
 mode. It is a single-JVM deployment of the product roles, not a separate
 interpreter.
 
-Cross-host Stream supports Master-only and Worker-only processes. A Master-only
+Separate-process Stream supports Master-only and Worker-only processes. A Master-only
 process never executes tasks; a Worker-only process does not schedule jobs.
 Fixed-endpoint and ZooKeeper discovery are deployment choices. An external
 process role requires the mTLS security profile; see
@@ -100,11 +100,11 @@ a property outside that reference.
 |---|---|---|
 | Batch Local | None required; the default in-process runtime needs only the application classpath | [First job](../quickstart/first-job.md), [configuration](../reference/configuration.md) |
 | Batch InProcess cluster | Constructor parallelism hint and a clean state directory; these are builder arguments, not properties | [Deployment](../operations/deployment.md) |
-| Batch real cluster | `rowweave.registry`, `rowweave.zk.connectString`, `rowweave.process.memoryLimitBytes`, `rowweave.worker.spill.dir` | [Deployment](../operations/deployment.md), [ZooKeeper registry](../reference/registry-zookeeper.md), [Batch process roles](../reference/configuration.md#11-batch-process-roles) |
+| Batch cluster | `rowweave.registry`, `rowweave.zk.connectString`, `rowweave.process.memoryLimitBytes`, `rowweave.worker.spill.dir` | [Deployment](../operations/deployment.md), [ZooKeeper registry](../reference/registry-zookeeper.md), [Batch process roles](../reference/configuration.md#11-batch-process-roles) |
 | Stream Local | `rowweave.monitor.enable` is optional; no listener configuration | [Stream API reference](../reference/stream-api.md), [Stream first job](../quickstart/stream-first-job.md) |
 | Stream cross-host cluster | `rowweave.stream.master.enable`, `rowweave.stream.worker.enable`, `rowweave.control.securityProfile` set to `MTLS`, registry discovery | [Deployment](../operations/deployment.md), [security](../operations/security.md), [Stream cluster and worker](../reference/configuration.md#110-stream-cluster-and-worker) |
 
-Before promotion from Local or InProcess to a real cluster, run the graph with
+Before promotion from Local or InProcess to a separate-process cluster, run the graph with
 the production sink, resource envelope, parallelism, connector deployment set,
 security profile, and recovery policy. A successful Local run does not certify
 cross-host transport, Worker capacity, durable-state ownership, or mTLS

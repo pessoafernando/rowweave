@@ -123,8 +123,8 @@ class ComplexDagQuadrantTest {
     private void assertQuadrantConsistent(String name, Dag dag) {
         long[] oracle = runQuad(name + "-s1", 1, null, dag, null);
         long[] sP4 = runQuad(name + "-s4", 4, null, dag, null);
-        long[] cP1 = runQuad(name + "-c1", 1, new RealClusterJobClient("127.0.0.1", master1.port()), dag, null);
-        long[] cP4 = runQuad(name + "-c4", 4, new RealClusterJobClient("127.0.0.1", master4.port()), dag, null);
+        long[] cP1 = runQuad(name + "-c1", 1, new ClusterJobClient("127.0.0.1", master1.port()), dag, null);
+        long[] cP4 = runQuad(name + "-c4", 4, new ClusterJobClient("127.0.0.1", master4.port()), dag, null);
         assertArrayEquals(oracle, sP4, name + " single-process P4 differs from the single-process P1 reference multiset");
         assertArrayEquals(oracle, cP1, name + " cluster P1 differs from the single-process P1 reference multiset");
         assertArrayEquals(oracle, cP4, name + " cluster P4 differs from the single-process P1 reference multiset");

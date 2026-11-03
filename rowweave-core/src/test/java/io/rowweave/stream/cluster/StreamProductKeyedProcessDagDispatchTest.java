@@ -74,7 +74,7 @@ class StreamProductKeyedProcessDagDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("process-job-authority"),
                                  runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamSession definition = session(client);
                 PlanArtifact artifact = definition.toPlanArtifact();

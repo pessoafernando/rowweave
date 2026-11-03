@@ -27,7 +27,7 @@ security profile appropriate to your deployment.
 | [`AmountRollupExample`](../../../rowweave-examples/src/main/java/io/rowweave/examples/AmountRollupExample.java) | Group decimal amounts by dimensions, order the result, and write a file with bit-for-bit round trips. | `InventoryExampleQualificationTest`. |
 | [`GroupStatExample`](../../../rowweave-examples/src/main/java/io/rowweave/examples/GroupStatExample.java) | Use a custom `GroupReduceFunction` to emit a count and full-precision total per region. | `InventoryExampleQualificationTest`. |
 | [`JoinDimEnrichExample`](../../../rowweave-examples/src/main/java/io/rowweave/examples/JoinDimEnrichExample.java) | Left-join events with a dimension table; demonstrates null-key join semantics and column pruning. | `InventoryExampleQualificationTest`. |
-| [`RunModesExample`](../../../rowweave-examples/src/main/java/io/rowweave/examples/RunModesExample.java) | Run one Batch graph in Local and InProcess cluster modes and compare result files. | `main`; the real-cluster path is a documented sketch, not an executed remote submission. |
+| [`RunModesExample`](../../../rowweave-examples/src/main/java/io/rowweave/examples/RunModesExample.java) | Run one Batch graph in Local and InProcess cluster modes and compare result files. | `main`; the cluster path is a documented sketch, not an executed remote submission. |
 
 Run the mode example with a fresh temporary directory so its result files do not
 already exist:

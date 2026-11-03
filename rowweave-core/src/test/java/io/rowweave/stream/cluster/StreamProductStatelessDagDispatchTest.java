@@ -68,7 +68,7 @@ class StreamProductStatelessDagDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("self-union-job-authority"),
                                  runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = selfUnionSession(client).submit(
                         StreamSubmissionId.of("self-union-submit"));
@@ -113,7 +113,7 @@ class StreamProductStatelessDagDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("union-job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = unionSession(client).submit(
                         StreamSubmissionId.of("union-runtime-submit"));
@@ -159,7 +159,7 @@ class StreamProductStatelessDagDispatchTest {
                                  exchange.resolve(
                                          "unaligned-union-job-authority"),
                                  runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamSession session = unionSession(client);
                 session.setCheckpointConfig(
@@ -212,7 +212,7 @@ class StreamProductStatelessDagDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("atomic-job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = atomicSession(client).submit(
                         StreamSubmissionId.of("atomic-stateless-submit"));
@@ -254,7 +254,7 @@ class StreamProductStatelessDagDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("stateless-job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = session(client).submit(
                         StreamSubmissionId.of("stateless-dag-submit"));
@@ -303,7 +303,7 @@ class StreamProductStatelessDagDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("fanout-job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = fanoutSession(client).submit(
                         StreamSubmissionId.of("stateless-fanout-submit"));

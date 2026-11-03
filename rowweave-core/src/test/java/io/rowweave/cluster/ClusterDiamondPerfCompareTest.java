@@ -130,7 +130,7 @@ class ClusterDiamondPerfCompareTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", m.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", m.port());
 
             System.setProperty("rowweave.cluster.materializeFanout", "true");
             runDiamond("warmup", client, countingInput(csv), tmp);

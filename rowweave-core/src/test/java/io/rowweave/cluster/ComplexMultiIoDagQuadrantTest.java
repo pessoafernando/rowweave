@@ -135,8 +135,8 @@ class ComplexMultiIoDagQuadrantTest {
     private void assertQuadrant(String name, int nOut, MultiIoDag dag) {
         List<long[]> oracle = runQuad(name + "-s1", 1, null, nOut, dag);
         List<long[]> sP4 = runQuad(name + "-s4", 4, null, nOut, dag);
-        List<long[]> cP1 = runQuad(name + "-c1", 1, new RealClusterJobClient("127.0.0.1", master1.port()), nOut, dag);
-        List<long[]> cP4 = runQuad(name + "-c4", 4, new RealClusterJobClient("127.0.0.1", master4.port()), nOut, dag);
+        List<long[]> cP1 = runQuad(name + "-c1", 1, new ClusterJobClient("127.0.0.1", master1.port()), nOut, dag);
+        List<long[]> cP4 = runQuad(name + "-c4", 4, new ClusterJobClient("127.0.0.1", master4.port()), nOut, dag);
         assertEquals(nOut, oracle.size(), name + " output count");
         for (int i = 0; i < nOut; i++) {
             assertArrayEquals(oracle.get(i), sP4.get(i), name + " out" + i + " single-process P4 versus the reference");

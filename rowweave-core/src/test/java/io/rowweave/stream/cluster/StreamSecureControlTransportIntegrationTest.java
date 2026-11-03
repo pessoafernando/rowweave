@@ -26,7 +26,7 @@ class StreamSecureControlTransportIntegrationTest {
                      new StreamProductJobMasterServer(root,
                              artifact -> { throw new AssertionError(); },
                              security, 0);
-             StreamJobClient client = new RealClusterStreamJobClient(
+             StreamJobClient client = new ClusterStreamJobClient(
                      security.advertisedHost(), master.port(), security)) {
             StreamControlException missing = assertThrows(
                     StreamControlException.class,
@@ -73,7 +73,7 @@ class StreamSecureControlTransportIntegrationTest {
                                  creates.incrementAndGet();
                                  throw new AssertionError();
                              }, security, 0, leader::get);
-             StreamJobClient client = new RealClusterStreamJobClient(
+             StreamJobClient client = new ClusterStreamJobClient(
                      security.advertisedHost(), master.port(), security)) {
             StreamControlException standby = assertThrows(
                     StreamControlException.class,
@@ -102,7 +102,7 @@ class StreamSecureControlTransportIntegrationTest {
                      new StreamProductJobMasterServer(store,
                              snapshot -> { throw new AssertionError(); },
                              security, 0, () -> true);
-             StreamJobClient client = new RealClusterStreamJobClient(
+             StreamJobClient client = new ClusterStreamJobClient(
                      security.advertisedHost(), master.port(), security)) {
             StreamControlException missing = assertThrows(
                     StreamControlException.class,

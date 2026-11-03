@@ -48,8 +48,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-/** public RealCluster handles use durable Master control RPC. */
-class RealClusterStreamJobClientContractTest {
+/** public Cluster handles use durable Master control RPC. */
+class ClusterStreamJobClientContractTest {
 
     @Test
     void oneJobsCheckpointCannotBlockAnotherJobsSubmission(
@@ -57,7 +57,7 @@ class RealClusterStreamJobClientContractTest {
         BlockingCheckpointRunFactory runs = new BlockingCheckpointRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle first = session("blocking-cut", client).submit(
                     StreamSubmissionId.of("blocking-cut-submit"));
@@ -92,7 +92,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory runs = new RecordingRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamSession configured = session("operator-restart", client);
             configured.setRestartPolicy(StreamRestartPolicy.fixedDelay(
@@ -124,7 +124,7 @@ class RealClusterStreamJobClientContractTest {
         runs.blockProgressAfterFailure = true;
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamSession configured = session(
                     "failed-progress-must-not-fence-recovery", client);
@@ -162,7 +162,7 @@ class RealClusterStreamJobClientContractTest {
         runs.blockCheckpoint = new CountDownLatch(1);
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle job = session(
                     "socket-status-responsive", client).submit(
@@ -217,7 +217,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory runs = new RecordingRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobClientLifecycleContract.verify(
                     client, session("network-job", client), "real-cluster");
@@ -233,7 +233,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory runs = new RecordingRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle handle = session("await-job", client).submit(
                     StreamSubmissionId.of("await-submit"));
@@ -254,7 +254,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory runs = new RecordingRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamSubmissionId submission = StreamSubmissionId.of("conflict-submit");
             session("definition-a", client).submit(submission);
@@ -274,7 +274,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory runs = new RecordingRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamSubmissionId submission =
                     StreamSubmissionId.of("submit-ack-loss");
@@ -307,7 +307,7 @@ class RealClusterStreamJobClientContractTest {
         io.rowweave.stream.api.StreamJobId jobId;
         try (StreamProductJobMasterServer first =
                      new StreamProductJobMasterServer(root, firstRuns);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", first.port())) {
             jobId = session("replacement-job", client)
                     .submit(submission).id();
@@ -316,7 +316,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory replacementRuns = new RecordingRunFactory();
         try (StreamProductJobMasterServer replacement =
                      new StreamProductJobMasterServer(root, replacementRuns);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", replacement.port())) {
             StreamJobHandle attached = client.attachSubmission(submission);
             assertEquals(jobId, attached.id());
@@ -345,7 +345,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory runs = new RecordingRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle handle = session("evidence-job", client).submit(
                     StreamSubmissionId.of("evidence-submit"));
@@ -381,7 +381,7 @@ class RealClusterStreamJobClientContractTest {
         io.rowweave.stream.api.StreamJobId jobId;
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle handle = session("sampled-evidence", client)
                     .submit(StreamSubmissionId.of("sampled-evidence-submit"));
@@ -406,7 +406,7 @@ class RealClusterStreamJobClientContractTest {
         io.rowweave.stream.api.StreamJobId jobId;
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle handle = session("terminal-evidence", client)
                     .submit(StreamSubmissionId.of("terminal-evidence-submit"));
@@ -436,7 +436,7 @@ class RealClusterStreamJobClientContractTest {
         String checkpointId;
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle job = session("checkpoint-job", client).submit(
                     StreamSubmissionId.of("checkpoint-submit"));
@@ -455,7 +455,7 @@ class RealClusterStreamJobClientContractTest {
 
         try (StreamProductJobMasterServer replacement =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", replacement.port())) {
             StreamCheckpointHandle attached =
                     client.attachCheckpoint(jobId, command);
@@ -484,7 +484,7 @@ class RealClusterStreamJobClientContractTest {
         String checkpointId;
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle job = session("checkpoint-evidence-job", client)
                     .submit(StreamSubmissionId.of(
@@ -518,7 +518,7 @@ class RealClusterStreamJobClientContractTest {
 
         try (StreamProductJobMasterServer replacement =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", replacement.port())) {
             StreamJobEvidence recovered = client.attach(jobId).evidence();
             assertEquals(checkpointId,
@@ -536,7 +536,7 @@ class RealClusterStreamJobClientContractTest {
         RecordingRunFactory runs = new RecordingRunFactory();
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle job = session("checkpoint-ack-job", client).submit(
                     StreamSubmissionId.of("checkpoint-ack-submit"));
@@ -570,7 +570,7 @@ class RealClusterStreamJobClientContractTest {
         String savepointId;
         try (StreamProductJobMasterServer master =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", master.port())) {
             StreamJobHandle job = session("savepoint-job", client).submit(
                     StreamSubmissionId.of("savepoint-submit"));
@@ -600,7 +600,7 @@ class RealClusterStreamJobClientContractTest {
 
         try (StreamProductJobMasterServer replacement =
                      new StreamProductJobMasterServer(root, runs);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      "127.0.0.1", replacement.port())) {
             StreamSavepointHandle attached =
                     client.attachSavepoint(jobId, command);

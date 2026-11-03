@@ -5,7 +5,7 @@ import io.rowweave.sched.stream.StreamEvent;
 /**
  * The data exchange channel: an upstream sends {@link StreamEvent}s, a downstream polls them, and close
  * marks the end of the stream. In-process execution uses {@link LocalChannel}, which passes object references
- * for performance. The cross-node data plane of a real cluster <b>does not go through this interface</b>,
+ * for performance. The cross-node data plane of a cluster <b>does not go through this interface</b>,
  * since it has its own shuffle block transfer path.
  *
  * <p>Contract: send is bounded by capacity and blocks when the queue is full; after close a poll drains what

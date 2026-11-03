@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /** the real client writes budgets only on ephemeral submit envelopes. */
-class RealClusterJobClientEphemeralTimeoutTest {
+class ClusterJobClientEphemeralTimeoutTest {
     private static final String EXECUTION_KEY = "rowweave.cluster.submitTimeoutMs";
     private static final String CLEANUP_KEY = "rowweave.cluster.submitCleanupGraceMs";
     private static final DataSchema META = new DataSchema(new Field("id", DataType.LongType));
@@ -38,8 +38,8 @@ class RealClusterJobClientEphemeralTimeoutTest {
         try (RpcServer server = new RpcServer(request -> {
             requests.add(request);
             return RpcMessage.jobResult(true, 0L, null);
-        }); RealClusterJobClient client =
-                     new RealClusterJobClient("127.0.0.1", server.port())) {
+        }); ClusterJobClient client =
+                     new ClusterJobClient("127.0.0.1", server.port())) {
             client.submitAttempt(rawGraph(), "attempt-budget");
             client.submitArtifactAttempt(artifact(), "publication-budget");
             client.submitRun(artifact(), new RunSubmission(

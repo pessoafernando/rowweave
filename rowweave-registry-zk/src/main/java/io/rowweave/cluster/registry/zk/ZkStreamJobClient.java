@@ -12,14 +12,14 @@ import io.rowweave.cluster.rpc.ControlSecurityConfig;
 import io.rowweave.stream.api.StreamCommandId;
 import io.rowweave.stream.api.StreamJobId;
 import io.rowweave.stream.api.StreamSubmissionId;
-import io.rowweave.stream.cluster.RealClusterStreamJobClient;
+import io.rowweave.stream.cluster.ClusterStreamJobClient;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** ZooKeeper-discovered Stream client with an independently owned session. */
 public final class ZkStreamJobClient implements StreamJobClient {
     private final ZkServiceRegistry registry;
-    private final RealClusterStreamJobClient delegate;
+    private final ClusterStreamJobClient delegate;
     private final AtomicBoolean closed = new AtomicBoolean();
 
     public ZkStreamJobClient(String zkConnectString) {
@@ -37,7 +37,7 @@ public final class ZkStreamJobClient implements StreamJobClient {
         try {
             created = new ZkServiceRegistry(zkConnectString);
             this.registry = created;
-            this.delegate = new RealClusterStreamJobClient(created, security);
+            this.delegate = new ClusterStreamJobClient(created, security);
         } catch (RuntimeException | Error failure) {
             if (created != null) created.close();
             throw failure;

@@ -1,6 +1,6 @@
 package io.rowweave.monitor.http;
 
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -110,8 +110,8 @@ public final class RealProcessCluster implements AutoCloseable {
     public int monitorPort() { return monitorPort; }
 
     /** A new JobClient bound to this cluster master, so each submit uses a fresh client as a real user would. */
-    public RealClusterJobClient newClient() {
-        return new RealClusterJobClient("127.0.0.1", masterPort);
+    public ClusterJobClient newClient() {
+        return new ClusterJobClient("127.0.0.1", masterPort);
     }
 
     /**

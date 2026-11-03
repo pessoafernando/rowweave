@@ -117,7 +117,7 @@ class GeneralDagJoinClusterTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer ws0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer ws1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
-            long rowCount = new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             List<DataRow> cluster = FileSink.read(GB, outFile.getAbsolutePath());
             assertEquals(single.size(), cluster.size(), "P=" + parallelism + " group count matches the single-process run");
             assertEquals(single.size(), rowCount, "P=" + parallelism + " JobResult rowCount");

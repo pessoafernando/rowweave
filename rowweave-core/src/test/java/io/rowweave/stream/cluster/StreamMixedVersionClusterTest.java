@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** current Worker binaries with a frozen v1 capability profile. */
 @Tag("multiprocess")
-class StreamMixedVersionRealClusterTest {
+class StreamMixedVersionClusterTest {
 
     @Test
     void currentMasterRunsV1AndKeepsV2UnplacedBeforeCompatibleWorkerRegistration(
@@ -51,7 +51,7 @@ class StreamMixedVersionRealClusterTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("mixed-version-jobs"), runs);
                  StreamJobClient client =
-                         RowWeave.createRealClusterStreamJobClient(
+                         RowWeave.createClusterStreamJobClient(
                                  "127.0.0.1", master.port())) {
                 StreamJobHandle v1 = fixedSession(client).submit(
                         StreamSubmissionId.of("mixed-version-v1"));

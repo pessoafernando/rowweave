@@ -80,7 +80,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("bounded-job-authority"),
                                  runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = session(client, true).submit(
                         StreamSubmissionId.of("bounded-m2w-submit"));
@@ -141,7 +141,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("loss-job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = session(client, true).submit(
                         StreamSubmissionId.of("bounded-loss-submit"));
@@ -194,7 +194,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                                  exchange.resolve("job-authority-no-store"),
                                  unavailable);
                  StreamJobClient rejectedClient =
-                         RowWeave.createRealClusterStreamJobClient(
+                         RowWeave.createClusterStreamJobClient(
                                  "127.0.0.1", rejectedMaster.port())) {
                 assertThrows(StreamControlException.class,
                         () -> session(rejectedClient).submit(
@@ -218,7 +218,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = session(client).submit(
                         StreamSubmissionId.of("transactional-m2w-submit"));
@@ -307,7 +307,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("job-authority"), runs);
                  StreamJobClient client =
-                         RowWeave.createRealClusterStreamJobClient(
+                         RowWeave.createClusterStreamJobClient(
                                  "127.0.0.1", master.port())) {
                 StreamSession delayed = session(client);
                 delayed.setCheckpointConfig(
@@ -373,7 +373,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
             StreamJobId jobId;
             StreamCommandId pending = StreamCommandId.of(
                     "pending-before-master-sink-loss");
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", firstMaster.port())) {
                 StreamSession configured = session(client);
                 configured.setCheckpointConfig(StreamCheckpointConfig.periodic(
@@ -417,7 +417,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                                             "127.0.0.1",
                                             port(exchange, "sink-b"))),
                             checkpointRoot));
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", replacementMaster.port())) {
                 StreamJobHandle attached = client.attach(jobId);
                 assertEquals(StreamJobStatus.RUNNING,
@@ -481,7 +481,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
             StreamJobId jobId;
             StreamCommandId pending = StreamCommandId.of(
                     "master-only-pending-cut");
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", firstMaster.port())) {
                 StreamSession configured = session(client);
                 configured.setCheckpointConfig(StreamCheckpointConfig.periodic(
@@ -510,7 +510,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                             runRoot, 2L, "master-only-2",
                             Arrays.asList(sourceEndpoint, sinkEndpoint),
                             checkpointRoot));
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", replacementMaster.port())) {
                 StreamJobHandle attached = client.attach(jobId);
                 assertEquals(StreamOperationStatus.SUCCEEDED,
@@ -562,7 +562,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
             StreamJobId jobId;
             StreamCommandId pending = StreamCommandId.of(
                     "completed-before-pointer-cut");
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", firstMaster.port())) {
                 StreamSession configured = session(client);
                 configured.setCheckpointConfig(StreamCheckpointConfig.periodic(
@@ -651,7 +651,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                             runRoot, 2L, "before-pointer-2",
                             Arrays.asList(sourceEndpoint, sinkEndpoint),
                             checkpointRoot));
-            try (StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+            try (StreamJobClient client = RowWeave.createClusterStreamJobClient(
                     "127.0.0.1", replacementMaster.port())) {
                 StreamJobHandle attached = client.attach(jobId);
                 awaitFile(exchange.resolve("transactional-source-open-2"),
@@ -713,7 +713,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("job-authority"), runs);
                  StreamJobClient client =
-                         RowWeave.createRealClusterStreamJobClient(
+                         RowWeave.createClusterStreamJobClient(
                                  "127.0.0.1", master.port())) {
                 StreamSession configured = session(client);
                 configured.setCheckpointConfig(StreamCheckpointConfig.periodic(
@@ -801,7 +801,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("job-authority"), runs);
                  StreamJobClient client =
-                         RowWeave.createRealClusterStreamJobClient(
+                         RowWeave.createClusterStreamJobClient(
                                  "127.0.0.1", master.port())) {
                 StreamSession configured = session(client);
                 configured.setCheckpointConfig(StreamCheckpointConfig.periodic(
@@ -874,7 +874,7 @@ class StreamProductTransactionalRealWorkerDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("job-authority"), runs);
                  StreamJobClient client =
-                         RowWeave.createRealClusterStreamJobClient(
+                         RowWeave.createClusterStreamJobClient(
                                  "127.0.0.1", master.port())) {
                 StreamSession configured = session(client);
                 configured.setCheckpointConfig(StreamCheckpointConfig.periodic(

@@ -94,13 +94,13 @@ class ClusterCoGroupTest {
         try (MasterServer m1 = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m1.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m1.port(), w1)) {
-            long[] c1 = run("cg-c1", 1, new RealClusterJobClient("127.0.0.1", m1.port()), left, right, tmp);
+            long[] c1 = run("cg-c1", 1, new ClusterJobClient("127.0.0.1", m1.port()), left, right, tmp);
             assertArrayEquals(oracle, c1, "cluster P1 coGroup differs from the single-process reference multiset");
         }
         try (MasterServer m2 = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m2.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m2.port(), w1)) {
-            long[] c2 = run("cg-c2", 2, new RealClusterJobClient("127.0.0.1", m2.port()), left, right, tmp);
+            long[] c2 = run("cg-c2", 2, new ClusterJobClient("127.0.0.1", m2.port()), left, right, tmp);
             assertArrayEquals(oracle, c2, "cluster P2 coGroup differs from the single-process reference multiset");
         }
     }

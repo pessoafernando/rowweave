@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Worker for the local path: real cluster roles running as threads in one JVM. It runs one
+ * Worker for the local path: cluster roles running as threads in one JVM. It runs one
  * {@link StagePlan} sub-plan. Each placeholder source is bound, per {@link StageBoundary}, to the
  * {@link RowStream} of an inbound shuffle channel, with no list materialised, and execution pushes
  * through {@link PushDagExecutor#executeLinearBound} to the stage's only outlet: an intermediate

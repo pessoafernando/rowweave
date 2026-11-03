@@ -130,7 +130,7 @@ with another supported `Sink` implementation or provider.
 
 ## Next steps
 
-* Compare Local, InProcess, and real-cluster execution in
+* Compare Local, InProcess, and cluster execution in
   [run modes](../guides/run-modes.md).
 * Check supported operators and stable refusals in the
   [capability matrix](../reference/capability-matrix.md).

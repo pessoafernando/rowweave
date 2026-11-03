@@ -60,7 +60,7 @@ class ClusterOutputCapabilityTest {
         PlanGraph graph = duplicateFileDestinationGraph(tmp.resolve("duplicate.tsv"));
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> new RealClusterJobClient(() -> {
+                () -> new ClusterJobClient(() -> {
                     lookups.incrementAndGet();
                     throw new AssertionError("duplicate destination must not locate or contact a Master");
                 }).submit(graph));
@@ -93,7 +93,7 @@ class ClusterOutputCapabilityTest {
         };
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> new RealClusterJobClient(locator).submitToSink(graph(new CollectingSink(META))));
+                () -> new ClusterJobClient(locator).submitToSink(graph(new CollectingSink(META))));
 
         assertEquals(0, lookups.get());
         assertTrue(error.getMessage().contains("SINK node 1"));
@@ -108,7 +108,7 @@ class ClusterOutputCapabilityTest {
                 META, tmp.resolve("manifest-domain").toString(), "ledger");
 
         AssertionError reachedLookup = assertThrows(AssertionError.class,
-                () -> new RealClusterJobClient(() -> {
+                () -> new ClusterJobClient(() -> {
                     lookups.incrementAndGet();
                     throw new AssertionError("manifest connector passed client capability validation");
                 }).submit(graph(output)));
@@ -131,7 +131,7 @@ class ClusterOutputCapabilityTest {
         PlanGraph graph = new PlanGraph(Arrays.asList(source, valid, invalid));
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> new RealClusterJobClient(locator).submit(graph));
+                () -> new ClusterJobClient(locator).submit(graph));
 
         assertEquals(0, lookups.get());
         assertTrue(error.getMessage().contains("SINK node 2"));
@@ -146,7 +146,7 @@ class ClusterOutputCapabilityTest {
         PlanGraph graph = new PlanGraph(Arrays.asList(source, legacySink));
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> new RealClusterJobClient(() -> {
+                () -> new ClusterJobClient(() -> {
                     lookups.incrementAndGet();
                     throw new AssertionError("legacy sink must not contact a Master");
                 }).submitToSink(graph));
@@ -166,7 +166,7 @@ class ClusterOutputCapabilityTest {
         PlanGraph graph = new PlanGraph(Arrays.asList(source, file, print));
 
         IllegalArgumentException error = assertThrows(IllegalArgumentException.class,
-                () -> new RealClusterJobClient(() -> {
+                () -> new ClusterJobClient(() -> {
                     lookups.incrementAndGet();
                     throw new AssertionError("irreversible graph must not contact a Master");
                 }).submit(graph));

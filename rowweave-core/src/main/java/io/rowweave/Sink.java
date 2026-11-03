@@ -70,7 +70,7 @@ public interface Sink extends AutoCloseable, java.io.Serializable {
     /**
      * Whether this Sink can write at the <b>Worker tail</b> (FileSink/DbOutput=true; they hold external storage and
      * each Worker shard writes independently). <b>An in-memory collecting Sink (CollectingSink)= false</b> - it collects into client
-     * memory, which does not hold on a cluster (the data is on the Worker and the client receives nothing), so it is local only. A real cluster submission checks this capability before the RPC, and the Master
+     * memory, which does not hold on a cluster (the data is on the Worker and the client receives nothing), so it is local only. A cluster submission checks this capability before the RPC, and the Master
      * checks the original submission once more; false fails fast, and there is no client-collect fallback path.
      */
     default boolean isWorkerWritable() {

@@ -49,7 +49,7 @@ class StreamProductKeyedCoProcessDagDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("broadcast-job-authority"),
                                  runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamSession session =
                         StreamProductKeyedCoProcessPlanAdmissionTest

@@ -255,8 +255,8 @@ terminal receipt and locator closure, safe orphan cleanup, bounded blocking
 behavior, and fresh handle rebuild. Source authority:
 [`DurableBatchSinkProviderConformance`](../../../rowweave-core/src/test/java/io/rowweave/sink/DurableBatchSinkProviderConformance.java).
 Tested by `DurableBatchSinkProviderConformanceRedTest`,
-`ProviderRealClusterConformanceHarness`, and
-`SignedProviderRealClusterTest`.
+`ProviderClusterConformanceHarness`, and
+`SignedProviderClusterTest`.
 
 The pipeline authority-store SPI must implement durable compare-and-set,
 canonical authority records, visibility fencing, idempotent replay, and

@@ -34,13 +34,13 @@ import java.nio.file.Paths;
 import java.util.UUID;
 
 /**
- * The {@link JobClient} of a real cluster: it submits a plan graph to the master over RPC,
+ * The {@link JobClient} of a cluster: it submits a plan graph to the master over RPC,
  * blocks for the job result and returns the row count. No data comes back, because the sink
  * worker writes the sink locally and the client receives a control signal only.<p>This differs
  * from the in-process client, which runs a pipeline executor directly: here the client connects
  * to a real master process and speaks the control plane RPC.
  */
-public final class RealClusterJobClient implements JobClient, AutoCloseable {
+public final class ClusterJobClient implements JobClient, AutoCloseable {
 
     /** Submit remains synchronous; aligns the ephemeral server budget and client wait. */
     private static final int SUBMIT_CONNECT_TIMEOUT_MS = 5_000;
@@ -60,22 +60,22 @@ public final class RealClusterJobClient implements JobClient, AutoCloseable {
     private final int ephemeralSubmitReadTimeoutMs;
     private final int controlReadTimeoutMs;
 
-    public RealClusterJobClient(String masterHost, int masterPort) {
+    public ClusterJobClient(String masterHost, int masterPort) {
         this(new FixedMasterLocator(new Endpoint(masterHost, masterPort)));
     }
 
-    public RealClusterJobClient(MasterLocator locator) {
+    public ClusterJobClient(MasterLocator locator) {
         this(locator, io.rowweave.deployment.DeploymentRuntime.fromSystemProperties(
                 io.rowweave.cluster.rpc.ControlSecurityConfig.fromSystemProperties()), true);
     }
 
-    public RealClusterJobClient(
+    public ClusterJobClient(
             MasterLocator locator,
             io.rowweave.deployment.DeploymentRuntime deploymentRuntime) {
         this(locator, deploymentRuntime, false);
     }
 
-    private RealClusterJobClient(
+    private ClusterJobClient(
             MasterLocator locator,
             io.rowweave.deployment.DeploymentRuntime deploymentRuntime,
             boolean ownsDeploymentRuntime) {
@@ -138,7 +138,7 @@ public final class RealClusterJobClient implements JobClient, AutoCloseable {
                          connectMaster(leader, ephemeralSubmitReadTimeoutMs)) {
                 SubmitOutcome outcome = toMaster.callScoped(RpcMessage.submitJob(
                         planBytes, attemptId, submitTimeoutPolicy.budget()),
-                        RealClusterJobClient::consumeSubmitOutcome);
+                        ClusterJobClient::consumeSubmitOutcome);
                 return outcome.requireReport();
             }
         } finally {
@@ -147,7 +147,7 @@ public final class RealClusterJobClient implements JobClient, AutoCloseable {
     }
 
     /**
-     * A real cluster must deliver the artifact envelope to the master, and may not degrade here
+     * A cluster must deliver the artifact envelope to the master, and may not degrade here
      * to the older submit.
      */
     @Override
@@ -187,7 +187,7 @@ public final class RealClusterJobClient implements JobClient, AutoCloseable {
                          connectMaster(leader, ephemeralSubmitReadTimeoutMs)) {
                 SubmitOutcome outcome = toMaster.callScoped(RpcMessage.submitPlanArtifact(
                                 artifactBytes, publicationId, submitTimeoutPolicy.budget()),
-                        RealClusterJobClient::consumeSubmitOutcome);
+                        ClusterJobClient::consumeSubmitOutcome);
                 return outcome.requireReport();
             }
         } finally {
@@ -800,7 +800,7 @@ public final class RealClusterJobClient implements JobClient, AutoCloseable {
     }
 
     /**
-     * A real cluster submits the whole graph in a single call: one execution of an environment
+     * A cluster submits the whole graph in a single call: one execution of an environment
      * is one complete plan graph, and the client neither inspects its shape nor splits it per
      * sink. Stage orchestration, materializing a fan-out and converging on failure all happen
      * on the master alone, which builds the execution graph over the complete plan, including a

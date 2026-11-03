@@ -64,7 +64,7 @@ class MasterIncrementalPreparationTest {
                      io.rowweave.monitor.JobMonitorRegistry.NOOP,
                      ((ArtifactRepositoryProvider) registry).artifactRepository(),
                      masterRuntime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), masterRuntime)) {
             IncrementalRunSubmission submission = submission(root);
@@ -106,7 +106,7 @@ class MasterIncrementalPreparationTest {
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())),
                      root.resolve("worker").toFile(), workerRuntime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), masterRuntime)) {
             IncrementalRunSubmission submission = submission(
@@ -170,7 +170,7 @@ class MasterIncrementalPreparationTest {
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())),
                      root.resolve("worker").toFile(), workerRuntime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), masterRuntime)) {
             IncrementalRunSubmission submission = submission(root, 1);
@@ -219,7 +219,7 @@ class MasterIncrementalPreparationTest {
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())),
                      root.resolve("worker").toFile(), workerRuntime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), masterRuntime)) {
             IncrementalRunSubmission submission = submission(root);

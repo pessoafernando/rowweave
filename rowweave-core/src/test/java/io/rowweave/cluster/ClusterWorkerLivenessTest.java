@@ -43,7 +43,7 @@ class ClusterWorkerLivenessTest {
             Path output = tmp.resolve("healthy.tsv");
             ExecutionEnvironment session = new ExecutionEnvironment(
                     "healthy-after-loss", "healthy-after-loss",
-                    new RealClusterJobClient("127.0.0.1", master.port()));
+                    new ClusterJobClient("127.0.0.1", master.port()));
             session.setParallelism(1);
             session.fromSource(new CollectionSource(META, rows))
                     .sinkTo(new FileSink(META, output.toString()));

@@ -58,7 +58,7 @@ class StreamProductAsyncWaitDagDispatchTest {
                          new StreamProductJobMasterServer(
                                  exchange.resolve("async-wait-job-authority"),
                                  runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamJobHandle job = session(client).submit(
                         StreamSubmissionId.of("async-wait-real-submit"));

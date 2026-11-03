@@ -52,7 +52,7 @@ class MasterEphemeralOutputDeadlineTest {
         try (MasterServer master = new MasterServer(10_000L);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "lease-worker", 8, "127.0.0.1", master.port(), spill);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      "127.0.0.1", master.port())) {
             DataRow row = new DataRow(1);
             row.set(0, 17);
@@ -95,7 +95,7 @@ class MasterEphemeralOutputDeadlineTest {
              WorkerServer worker = WorkerServer.newUnguarded(
                      "output-deadline-worker", 8, "127.0.0.1",
                      master.port(), spill);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      "127.0.0.1", master.port())) {
             long started = System.nanoTime();
             RuntimeException failure = assertThrows(RuntimeException.class,
@@ -163,7 +163,7 @@ class MasterEphemeralOutputDeadlineTest {
             String cleanupKey = "rowweave.cluster.submitCleanupGraceMs";
             String previousTimeout = System.setProperty(timeoutKey, "5000");
             String previousCleanup = System.setProperty(cleanupKey, "1000");
-            try (RealClusterJobClient client = new RealClusterJobClient(
+            try (ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", master.port())) {
                 assertEquals(1L, client.submitToSink(healthyGraph()),
                         "the disconnected submit must release stage and slot ownership");

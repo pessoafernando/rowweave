@@ -238,7 +238,7 @@ are declared before allocation. See
 
 ## Run-mode parity
 
-Local, InProcess, and real-cluster Batch modes execute the same plan graph,
+Local, InProcess, and cluster Batch modes execute the same plan graph,
 operator implementations, join strategy, decimal policy, and row semantics.
 They differ in process placement, resource ownership, sink reachability, and
 diagnostics. A result readable by a client-side collection is not evidence of

@@ -1,19 +1,57 @@
 package io.rowweave;
 
 /**
- * The entry factory of the RowWeave engine: it creates an {@link ExecutionEnvironment}.
+ * The entry factory for RowWeave Batch and Stream execution.
+ *
+ * <p>Lifecycle methods follow one vocabulary: {@code create*JobClient} creates a submission
+ * connection, while {@code start*} returns an owned runtime lifecycle. An owned runtime is
+ * {@link AutoCloseable} and closing it stops the roles created for that object.
  */
 public final class RowWeave {
 
     private RowWeave() {
     }
 
+    /** Creates a Batch environment using the process-wide embedded cluster runtime. */
     public static ExecutionEnvironment createEnvironment(String name) {
         return new ExecutionEnvironment(name, name);
     }
 
+    /** Creates a named Batch environment using the process-wide embedded cluster runtime. */
     public static ExecutionEnvironment createEnvironment(String jobName, String jobTitle) {
         return new ExecutionEnvironment(jobName, jobTitle);
+    }
+
+    /** Creates a Batch environment bound to an explicit client. */
+    public static ExecutionEnvironment createEnvironment(
+            String jobName, String jobTitle, io.rowweave.cluster.JobClient jobClient) {
+        return new ExecutionEnvironment(jobName, jobTitle, jobClient);
+    }
+
+    /** Starts an owned Batch Master/Worker lifecycle entirely in one JVM. */
+    public static io.rowweave.cluster.InProcessCluster startInProcessCluster(
+            int parallelism, java.io.File stateDirectory) {
+        return new io.rowweave.cluster.InProcessCluster(parallelism, stateDirectory);
+    }
+
+    /** Starts an owned monitored Batch Master/Worker lifecycle entirely in one JVM. */
+    public static io.rowweave.cluster.InProcessCluster startInProcessCluster(
+            int parallelism, java.io.File stateDirectory,
+            io.rowweave.monitor.JobMonitorRegistry monitor) {
+        return new io.rowweave.cluster.InProcessCluster(
+                parallelism, stateDirectory, monitor);
+    }
+
+    /** Creates a Batch submission connection to a fixed cluster Master endpoint. */
+    public static io.rowweave.cluster.ClusterJobClient createClusterJobClient(
+            String masterHost, int masterPort) {
+        return new io.rowweave.cluster.ClusterJobClient(masterHost, masterPort);
+    }
+
+    /** Creates a Batch submission connection using explicit Master discovery. */
+    public static io.rowweave.cluster.ClusterJobClient createClusterJobClient(
+            io.rowweave.cluster.MasterLocator masterLocator) {
+        return new io.rowweave.cluster.ClusterJobClient(masterLocator);
     }
 
     public static StreamSession createStreamSession(String name) {
@@ -31,20 +69,20 @@ public final class RowWeave {
     }
 
     /** Creates the cluster-first Stream product client for a Stream Master endpoint. */
-    public static StreamJobClient createRealClusterStreamJobClient(
+    public static StreamJobClient createClusterStreamJobClient(
             String masterHost, int masterPort) {
         return new io.rowweave.monitor.MonitoredStreamJobClient(
-                new io.rowweave.stream.cluster.RealClusterStreamJobClient(
+                new io.rowweave.stream.cluster.ClusterStreamJobClient(
                         masterHost, masterPort),
                 io.rowweave.monitor.MonitorRuntime.shared());
     }
 
     /** Creates a Stream client using an explicit LOOPBACK or mTLS identity. */
-    public static StreamJobClient createRealClusterStreamJobClient(
+    public static StreamJobClient createClusterStreamJobClient(
             String masterHost, int masterPort,
             io.rowweave.cluster.rpc.ControlSecurityConfig security) {
         return new io.rowweave.monitor.MonitoredStreamJobClient(
-                new io.rowweave.stream.cluster.RealClusterStreamJobClient(
+                new io.rowweave.stream.cluster.ClusterStreamJobClient(
                         masterHost, masterPort, security),
                 io.rowweave.monitor.MonitorRuntime.shared());
     }
@@ -54,7 +92,7 @@ public final class RowWeave {
             io.rowweave.cluster.registry.ServiceRegistry registry,
             io.rowweave.cluster.rpc.ControlSecurityConfig security) {
         return new io.rowweave.monitor.MonitoredStreamJobClient(
-                new io.rowweave.stream.cluster.RealClusterStreamJobClient(
+                new io.rowweave.stream.cluster.ClusterStreamJobClient(
                         registry, security),
                 io.rowweave.monitor.MonitorRuntime.shared());
     }

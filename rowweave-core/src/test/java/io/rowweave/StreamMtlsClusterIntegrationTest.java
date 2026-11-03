@@ -119,7 +119,7 @@ class StreamMtlsClusterIntegrationTest {
                      root.resolve("master-state"), Arrays.asList(
                              sourceWorker.endpoint(), sinkWorker.endpoint()),
                      masterSecurity, 0);
-             StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+             StreamJobClient client = RowWeave.createClusterStreamJobClient(
                      master.host(), master.port(), clientSecurity)) {
             StreamJobHandle job = session(client).submit(
                     StreamSubmissionId.of("mtls-submit"));

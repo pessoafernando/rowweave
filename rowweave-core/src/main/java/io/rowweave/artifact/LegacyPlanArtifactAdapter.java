@@ -158,7 +158,7 @@ public final class LegacyPlanArtifactAdapter {
 
     public static PlanGraph unwrapValidated(PlanArtifact artifact) {
         // LocalJobClient does not go through the control RPC, so the zero-serialization path for a large in-JVM CollectionSource is kept,
-        // while artifact metadata is still checked against the original graph. Master and RealCluster both call the explicit
+        // while artifact metadata is still checked against the original graph. Master and Cluster both call the explicit
         // trust-context overload and never take this local-reference shortcut.
         if (artifact != null && artifact.localPayloadReference() instanceof PlanGraph) {
             if (artifact.payloadFormat() == PlanArtifact.PayloadFormat.LOCAL_ATTACHED_PLAN_GRAPH) {

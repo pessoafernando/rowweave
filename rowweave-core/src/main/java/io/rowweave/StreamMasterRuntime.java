@@ -293,12 +293,12 @@ public final class StreamMasterRuntime implements AutoCloseable {
 
     public StreamJobClient createJobClient() {
         requireOpen();
-        return RowWeave.createRealClusterStreamJobClient(host(), port());
+        return RowWeave.createClusterStreamJobClient(host(), port());
     }
 
     public StreamJobClient createJobClient(ControlSecurityConfig security) {
         requireOpen();
-        return RowWeave.createRealClusterStreamJobClient(host(), port(), security);
+        return RowWeave.createClusterStreamJobClient(host(), port(), security);
     }
 
     @Override public void close() {

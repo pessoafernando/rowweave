@@ -333,7 +333,7 @@ class StreamCheckpointLifecycleContractTest {
         try (StreamProductJobMasterServer first =
                      new StreamProductJobMasterServer(root, firstRuns);
              StreamJobClient client =
-                     RowWeave.createRealClusterStreamJobClient(
+                     RowWeave.createClusterStreamJobClient(
                              "127.0.0.1", first.port())) {
             jobId = session("responsive-recovery", client, false)
                     .submit(StreamSubmissionId.of(
@@ -347,7 +347,7 @@ class StreamCheckpointLifecycleContractTest {
         try (StreamProductJobMasterServer replacement =
                      new StreamProductJobMasterServer(root, replacementRuns);
              StreamJobClient client =
-                     RowWeave.createRealClusterStreamJobClient(
+                     RowWeave.createClusterStreamJobClient(
                              "127.0.0.1", replacement.port())) {
             try {
                 assertTrue(replacementRuns.startEntered.await(
@@ -432,7 +432,7 @@ class StreamCheckpointLifecycleContractTest {
         try (StreamProductJobMasterServer replacement =
                      StreamProductJobMasterServer.inProcess(
                              root, replacementRuns);
-             StreamJobClient client = new RealClusterStreamJobClient(
+             StreamJobClient client = new ClusterStreamJobClient(
                      new InProcessStreamProductControlTransport(
                              replacement))) {
             try {

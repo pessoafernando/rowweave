@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class RealClusterRunCancellationTest {
+class ClusterRunCancellationTest {
 
     @Test
     void eachCallReresolvesLeaderAndReturnsValidatedAuthorityResult() {
@@ -27,7 +27,7 @@ class RealClusterRunCancellationTest {
                     RunStatus.CANCELING, 5L));
         })) {
             AtomicInteger lookups = new AtomicInteger();
-            RealClusterJobClient client = new RealClusterJobClient(() -> {
+            ClusterJobClient client = new ClusterJobClient(() -> {
                 lookups.incrementAndGet();
                 return new Endpoint("127.0.0.1", server.port());
             });
@@ -42,7 +42,7 @@ class RealClusterRunCancellationTest {
     @Test
     void malformedArgumentsFailBeforeLeaderLookup() {
         AtomicInteger lookups = new AtomicInteger();
-        RealClusterJobClient client = new RealClusterJobClient(() -> {
+        ClusterJobClient client = new ClusterJobClient(() -> {
             lookups.incrementAndGet();
             throw new AssertionError("invalid cancellation must not locate leader");
         });
@@ -68,7 +68,7 @@ class RealClusterRunCancellationTest {
     private static void assertClientFailure(
             java.util.function.Function<RpcMessage, RpcMessage> response) {
         try (RpcServer server = new RpcServer(response)) {
-            RealClusterJobClient client = new RealClusterJobClient(
+            ClusterJobClient client = new ClusterJobClient(
                     "127.0.0.1", server.port());
             assertThrows(RuntimeException.class,
                     () -> client.cancelRun("run", "request"));

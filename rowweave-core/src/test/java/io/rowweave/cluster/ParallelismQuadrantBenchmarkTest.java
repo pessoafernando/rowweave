@@ -71,7 +71,7 @@ class ParallelismQuadrantBenchmarkTest {
         for (int i = 0; i < iters; i++) {
             File out = tmpOut();
             long t = System.nanoTime();
-            new RealClusterJobClient("127.0.0.1", masterPort)
+            new ClusterJobClient("127.0.0.1", masterPort)
                     .submitToSink(shardedGraph(new FileSink(GB_REGION, out.getAbsolutePath())));
             best = Math.min(best, (System.nanoTime() - t) / 1_000_000);
             out.delete();

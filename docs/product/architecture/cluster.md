@@ -89,7 +89,7 @@ binding changes artifact identity, so an artifact intended for a different
 deployment set cannot be silently reused.
 
 Source authorities:
-[`RealClusterJobClient`](../../../rowweave-core/src/main/java/io/rowweave/cluster/RealClusterJobClient.java)
+[`ClusterJobClient`](../../../rowweave-core/src/main/java/io/rowweave/cluster/ClusterJobClient.java)
 and
 [`MasterServer`](../../../rowweave-core/src/main/java/io/rowweave/cluster/MasterServer.java).
 Tested by `DeploymentArtifactBindingTest#bindingAddsCanonicalRequiredFeatureAndChangesArtifactIdentity`
@@ -203,7 +203,7 @@ target deployment mode.
 Source authority:
 [`InProcessCluster`](../../../rowweave-core/src/main/java/io/rowweave/cluster/InProcessCluster.java).
 Tested by `StreamRealProcessClusterTest#independentSourceAndSinkWorkerJvmsExchangeOnlyOverTcp`
-and `ClusterConcurrentJobsTest#concurrentJobsOnRealClusterAvailabilityAndThroughput`.
+and `ClusterConcurrentJobsTest#concurrentJobsOnClusterAvailabilityAndThroughput`.
 
 ## Failure isolation and shutdown
 

@@ -290,7 +290,7 @@ part of the deployment, not because a caller asserted it.
   and [`DurableCommitBarrierFailureTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/DurableCommitBarrierFailureTest.java):
   group publish and abort driven through every failure interleaving.
 - [`ClusterManifestCommitTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/ClusterManifestCommitTest.java)
-  and [`RealClusterBatchSinkOutcomeProtocolTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/RealClusterBatchSinkOutcomeProtocolTest.java):
+  and [`ClusterBatchSinkOutcomeProtocolTest`](../../../rowweave-core/src/test/java/io/rowweave/cluster/ClusterBatchSinkOutcomeProtocolTest.java):
   atomic-group visibility and the outcome protocol across processes.
 - [`ManifestProcessCrashRecoveryTest`](../../../rowweave-core/src/test/java/io/rowweave/commit/ManifestProcessCrashRecoveryTest.java)
   and [`ManifestCommitOutcomeTest`](../../../rowweave-core/src/test/java/io/rowweave/commit/ManifestCommitOutcomeTest.java):

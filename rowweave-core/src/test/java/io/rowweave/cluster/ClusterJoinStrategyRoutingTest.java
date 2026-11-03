@@ -57,7 +57,7 @@ class ClusterJoinStrategyRoutingTest {
                      "strategy-w0", 32, "127.0.0.1", master.port(), w0tmp);
              WorkerServer w1 = WorkerServer.newUnguarded(
                      "strategy-w1", 32, "127.0.0.1", master.port(), w1tmp)) {
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             assertStrategy(client, left, right, "HASH", "HASH", expected, 2, tmp, events);
             assertStrategy(client, left, right, "SORT_MERGE", "SORT_MERGE", expected, 2, tmp, events);
             assertStrategy(client, left, right, null, "AUTO", expected, 2, tmp, events);

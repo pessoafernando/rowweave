@@ -117,7 +117,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(60), () -> {
                 ExecutionEnvironment s = new ExecutionEnvironment("mix-c1", "mix-c1",
-                        new RealClusterJobClient("127.0.0.1", m.port()));
+                        new ClusterJobClient("127.0.0.1", m.port()));
                 s.setParallelism(1);
                 buildMixedDag(s, countingInput(data), tmp, "cluster");
             });
@@ -152,7 +152,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(60), () -> {
                 ExecutionEnvironment s = new ExecutionEnvironment("mix-c2", "mix-c2",
-                        new RealClusterJobClient("127.0.0.1", m.port()));
+                        new ClusterJobClient("127.0.0.1", m.port()));
                 s.setParallelism(2);
                 buildMixedDag(s, countingInput(data), tmp, "cluster2");
             });
@@ -188,7 +188,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
                 ExecutionEnvironment s = new ExecutionEnvironment("mix-boom", "mix-boom",
-                        new RealClusterJobClient("127.0.0.1", m.port()));
+                        new ClusterJobClient("127.0.0.1", m.port()));
                 s.setParallelism(1);
                 assertThrows(RuntimeException.class,
                         () -> buildMixedDag(s, boom, tmp, "boom"),

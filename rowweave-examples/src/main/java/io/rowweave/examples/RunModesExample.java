@@ -24,7 +24,7 @@ import java.util.List;
  * <ol>
   * <li>Local (default): {@code RowWeave.createEnvironment(...)} reuses the in-process, port-free Master+Worker runtime.</li>
   * <li>In-process cluster: inject {@link InProcessCluster} for isolated Master+Worker lifecycles in one JVM.</li>
-  * <li>Real cluster: inject {@code RealClusterJobClient(masterIp, port)} or {@code ZkRemoteJobClient(zk)} after starting separate processes;
+  * <li>Cluster: inject {@code ClusterJobClient(masterIp, port)} or {@code ZkRemoteJobClient(zk)} after starting separate processes;
   * {@link #clusterModeSketch()} shows the code but does not execute it.</li>
  * </ol>
  *
@@ -67,7 +67,7 @@ public final class RunModesExample {
         /** Isolated in-process cluster: inject InProcessCluster for same-JVM Master+Worker and AutoCloseable lifecycle. */
     public static void runInProcessCluster(List<DataRow> details, String outputPath, File tmpDir) {
                 // The worker-slot hint must be at least the requested parallelism; P=2, so 4 is sufficient.
-        try (InProcessCluster cluster = new InProcessCluster(4, tmpDir)) {
+        try (InProcessCluster cluster = RowWeave.startInProcessCluster(4, tmpDir)) {
             ExecutionEnvironment session = new ExecutionEnvironment("run-modes-inproc", "run-modes-inproc", cluster);
             session.setParallelism(2);
                         buildAndExecute(session, details, outputPath);
@@ -75,10 +75,10 @@ public final class RunModesExample {
     }
 
     /**
-          * Real-cluster SDK sketch; this method does not execute because it requires separate cluster processes.
+          * Separate-process cluster SDK sketch; start those roles before using the connection.
      * <pre>{@code
           * // Fixed Master IP:
-     * JobClient client = new RealClusterJobClient("192.168.1.10", 19000);
+     * JobClient client = new ClusterJobClient("192.168.1.10", 19000);
           * // Or multi-Master HA with a ZooKeeper connection string; requires rowweave-registry-zk on the classpath:
      * // JobClient client = new ZkRemoteJobClient("zk1:2181,zk2:2181,zk3:2181");
           * ExecutionEnvironment session = new ExecutionEnvironment("job", "job", client);
@@ -90,7 +90,7 @@ public final class RunModesExample {
      * }</pre>
      */
     public static void clusterModeSketch() {
-                // Documentation only: start real-cluster Master/Worker with ClusterMain; see deployment docs.
+                // Documentation only: start cluster Master/Worker with ClusterMain; see deployment docs.
     }
 
         /** Convenience factory for one detail row. */

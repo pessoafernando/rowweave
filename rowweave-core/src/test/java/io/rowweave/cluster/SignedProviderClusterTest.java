@@ -29,12 +29,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** signed provider must cross the actual client/Master/Worker control path. */
-class SignedProviderRealClusterTest {
+class SignedProviderClusterTest {
     private static final DataSchema META = new DataSchema(
             new Field("id", DataType.IntegerType));
 
     @Test
-    void signedProviderCommitsThroughRealClusterControlPath(@TempDir Path tmp)
+    void signedProviderCommitsThroughClusterControlPath(@TempDir Path tmp)
             throws Exception {
         Files.createDirectories(tmp.resolve("deployment"));
         SignedAdversarialProviderFixture.Session session =
@@ -54,7 +54,7 @@ class SignedProviderRealClusterTest {
                      "signed-provider-worker", 4,
                      new FixedMasterLocator(new Endpoint("127.0.0.1", master.port())),
                      spill.toFile(), runtime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint("127.0.0.1", master.port())),
                      runtime)) {
             DataRow first = new DataRow(1);
@@ -114,7 +114,7 @@ class SignedProviderRealClusterTest {
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())),
                      spill.toFile(), runtime);
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new FixedMasterLocator(new Endpoint(
                              "127.0.0.1", master.port())), runtime)) {
             assertTamperedPublicQuery(client, master,
@@ -130,7 +130,7 @@ class SignedProviderRealClusterTest {
     }
 
     private static void assertTamperedPublicQuery(
-            RealClusterJobClient client, MasterServer master, Path output,
+            ClusterJobClient client, MasterServer master, Path output,
             String runId, String markerValue, String expectedDetail)
             throws Exception {
         java.util.concurrent.CountDownLatch decided =
@@ -211,7 +211,7 @@ class SignedProviderRealClusterTest {
              MasterElection replacementElection = new MasterElection(
                      registry, new Endpoint(
                              "127.0.0.1", replacement.port()));
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new RegistryMasterLocator(registry), runtime)) {
             first.bindLeadership(firstElection);
             replacement.bindLeadership(replacementElection);
@@ -350,7 +350,7 @@ class SignedProviderRealClusterTest {
                      registry.artifactRepository(), runtime, authority);
              MasterElection election = new MasterElection(
                      registry, new Endpoint("127.0.0.1", master.port()));
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      new RegistryMasterLocator(registry), runtime)) {
             master.bindLeadership(election);
             election.start();

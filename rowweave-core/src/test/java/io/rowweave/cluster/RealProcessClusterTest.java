@@ -321,7 +321,7 @@ class RealProcessClusterTest {
                     clusterSource,
                     PlanNode.unary("groupBySum", GB, 0).listParam("keys", Arrays.asList("k")).param("measure", "amt").build(),
                     PlanNode.sink(GB, 1, output).build()));
-            long rowCount = new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
 
             List<DataRow> cluster = FileSink.read(GB, outFile.getAbsolutePath());
             assertEquals(KEYS, rowCount, "JobResult rowCount");
@@ -385,7 +385,7 @@ class RealProcessClusterTest {
                     source, converted,
                     PlanNode.sink(outputMeta, 1,
                             new FileSink(outputMeta, output.toString())).build()), 4);
-            long rowCount = new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
 
             List<String> actual = new ArrayList<>();
             for (DataRow row : FileSink.read(outputMeta, output.toString())) {
@@ -453,7 +453,7 @@ class RealProcessClusterTest {
                     source, checked,
                     PlanNode.sink(meta, 1,
                             new FileSink(meta, output.toString())).build()), 4);
-            long rowCount = new RealClusterJobClient(
+            long rowCount = new ClusterJobClient(
                     "127.0.0.1", masterPort).submitToSink(graph);
 
             List<String> actual = new ArrayList<>();
@@ -524,7 +524,7 @@ class RealProcessClusterTest {
                     source, checked,
                     PlanNode.sink(meta, 1,
                             new FileSink(meta, output.toString())).build()), 4);
-            long rowCount = new RealClusterJobClient(
+            long rowCount = new ClusterJobClient(
                     "127.0.0.1", masterPort).submitToSink(graph);
 
             List<String> actual = new ArrayList<>();
@@ -597,7 +597,7 @@ class RealProcessClusterTest {
             Path rejectedPath = tmp.resolve("classification-rejected.tsv");
             ExecutionEnvironment session = new ExecutionEnvironment(
                     "classification-multiprocess", "classification multiprocess",
-                    new RealClusterJobClient("127.0.0.1", masterPort));
+                    new ClusterJobClient("127.0.0.1", masterPort));
             session.setParallelism(4);
             io.rowweave.DataSet source = session.fromSource(splitA, splitB)
                     .uid("ledger.source");
@@ -676,7 +676,7 @@ class RealProcessClusterTest {
                     "-Drowweave.worker.host=127.0.0.1");
             worker0 = launch(workerArgs, "WORKER_READY=", 30_000, new StringBuilder());
             worker1 = launch(workerArgs, "WORKER_READY=", 30_000, new StringBuilder());
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", masterPort);
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", masterPort);
 
             QualitySnapshot p1 = runObjectQuality(
                     client, 1, meta, partA, partB, tmp.resolve("object-quality-p1"));
@@ -884,7 +884,7 @@ class RealProcessClusterTest {
             PlanGraph graph = new PlanGraph(Arrays.asList(
                     clusterSource, combine,
                     PlanNode.sink(META, 1, new FileSink(META, output.toString())).build()), 4);
-            long rowCount = new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
             List<DataRow> cluster = FileSink.read(META, output.toString());
 
             assertEquals(single.size(), rowCount);
@@ -957,7 +957,7 @@ class RealProcessClusterTest {
                     PlanNode.sink(ORDER_META, 1,
                             new FileSink(ORDER_META, outFile.getAbsolutePath())).build()
             ), 4);
-            long rowCount = new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
             List<DataRow> cluster = FileSink.read(ORDER_META, outFile.getAbsolutePath());
 
             assertEquals(single.size(), rowCount);
@@ -971,7 +971,7 @@ class RealProcessClusterTest {
     }
 
     @Test
-    void orderByRealClusterDiskQuotaFailureDoesNotCommitOutput(@TempDir Path tmp) throws Exception {
+    void orderByClusterDiskQuotaFailureDoesNotCommitOutput(@TempDir Path tmp) throws Exception {
         Path spillBase = tmp.toRealPath();
         String padding = new String(new char[1024]).replace('\0', 'x');
         List<DataRow> rows = new ArrayList<>();
@@ -1017,7 +1017,7 @@ class RealProcessClusterTest {
                     PlanNode.sink(ORDER_META, 1,
                             new FileSink(ORDER_META, output.toString())).build()), 4);
             RuntimeException failure = assertThrows(RuntimeException.class,
-                    () -> new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph));
+                    () -> new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph));
 
             assertTrue(failure.getMessage().contains("SPILL_JOB_QUOTA_EXCEEDED"),
                     failure.getMessage());
@@ -1083,7 +1083,7 @@ class RealProcessClusterTest {
                     clusterSource, top,
                     PlanNode.sink(ORDER_META, 1,
                             new FileSink(ORDER_META, outFile.getAbsolutePath())).build()), 4);
-            long rowCount = new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
             List<DataRow> cluster = FileSink.read(ORDER_META, outFile.getAbsolutePath());
 
             assertEquals(5_000, rowCount);
@@ -1134,7 +1134,7 @@ class RealProcessClusterTest {
             Path reduceFile = tmp.resolve("real-reduce.tsv");
             Path coGroupFile = tmp.resolve("real-cogroup.tsv");
             Path joinFile = tmp.resolve("real-smj.tsv");
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", masterPort);
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", masterPort);
             long reduceCount = client.submitToSink(reduceGraph(leftRows, reduceFile, 4));
             long coGroupCount = client.submitToSink(coGroupGraph(leftRows, rightRows, coGroupFile, 4));
             long joinCount = client.submitToSink(joinGraph(joinLeft, joinRight, joinFile, 4));
@@ -1183,7 +1183,7 @@ class RealProcessClusterTest {
             worker1 = launch(workerArgs, "WORKER_READY=", 30_000,
                     new StringBuilder(), worker1Log);
 
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", masterPort);
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", masterPort);
             assertProcessStrategy(client, left, right, "HASH", "HASH", expected, tmp,
                     worker0Log, worker1Log);
             assertProcessStrategy(client, left, right, "SORT_MERGE", "SORT_MERGE", expected, tmp,
@@ -1198,7 +1198,7 @@ class RealProcessClusterTest {
     }
 
     private static void assertProcessStrategy(
-            RealClusterJobClient client, List<DataRow> left, List<DataRow> right,
+            ClusterJobClient client, List<DataRow> left, List<DataRow> right,
             String hint, String strategy, List<String> expected, Path tmp,
             List<String> worker0Log, List<String> worker1Log) {
         Path output = tmp.resolve("process-join-" + strategy + ".tsv");
@@ -1268,7 +1268,7 @@ class RealProcessClusterTest {
             Path reduceFile = tmp.resolve("real-byte-reduce.tsv");
             Path joinFile = tmp.resolve("real-byte-smj.tsv");
             Path coGroupFile = tmp.resolve("real-byte-cogroup.tsv");
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", masterPort);
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", masterPort);
             long combineCount = client.submitToSink(wideCombineGraph(combineRows, combineFile, 4));
             long reduceCount = client.submitToSink(wideReduceGraph(combineRows, reduceFile, 4));
             long joinCount = client.submitToSink(wideJoinGraph(joinLeft, joinRight, joinFile, 4));
@@ -1316,7 +1316,7 @@ class RealProcessClusterTest {
             worker1 = launch(workerArgs, "WORKER_READY=", 30_000, new StringBuilder());
 
             Path output = tmp.resolve("real-demand-unary.tsv");
-            long rowCount = new RealClusterJobClient("127.0.0.1", masterPort)
+            long rowCount = new ClusterJobClient("127.0.0.1", masterPort)
                     .submitToSink(wideUnaryBreakerGraph(rows, output, 4));
             assertEquals(expected.size(), rowCount);
             assertEquals(expected, readRows(WIDE_GROUPED, output));
@@ -1564,7 +1564,7 @@ class RealProcessClusterTest {
     }
 
     @Test
-    void groupBySumPerfSingleVsRealCluster(@TempDir Path tmp) throws Exception {
+    void groupBySumPerfSingleVsCluster(@TempDir Path tmp) throws Exception {
         List<DataRow> rows = rows();
         PlanNode clusterSource = fileSource(tmp.resolve("perf-gb-source.tsv"), META, rows);
         PlanNode gbNode = PlanNode.unary("groupBySum", GB, 0)
@@ -1598,12 +1598,12 @@ class RealProcessClusterTest {
             PlanGraph graph = new PlanGraph(Arrays.asList(
                     clusterSource, gbNode, PlanNode.sink(GB, 1, output).build()));
 
-            new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
+            new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph);
             File outFile2 = tmp.resolve("perf-gb2.tsv").toFile();
             PlanGraph graph2 = new PlanGraph(Arrays.asList(
                     clusterSource, gbNode, PlanNode.sink(GB, 1, new FileSink(GB, outFile2.getAbsolutePath())).build()));
             t = System.nanoTime();
-            long rc = new RealClusterJobClient("127.0.0.1", masterPort).submitToSink(graph2);
+            long rc = new ClusterJobClient("127.0.0.1", masterPort).submitToSink(graph2);
             long clusterMs = (System.nanoTime() - t) / 1_000_000;
             assertEquals(KEYS, rc, "the cluster produces every group");
 

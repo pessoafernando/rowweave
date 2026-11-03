@@ -57,7 +57,7 @@ class StreamProductResidentCdcRealWorkerDispatchTest {
             try (StreamProductJobMasterServer master =
                          new StreamProductJobMasterServer(
                                  exchange.resolve("cdc-job-authority"), runs);
-                 StreamJobClient client = RowWeave.createRealClusterStreamJobClient(
+                 StreamJobClient client = RowWeave.createClusterStreamJobClient(
                          "127.0.0.1", master.port())) {
                 StreamSession session = session(client);
                 PlanArtifact artifact = session.toPlanArtifact();

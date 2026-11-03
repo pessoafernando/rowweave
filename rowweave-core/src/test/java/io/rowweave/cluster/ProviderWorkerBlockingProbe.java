@@ -86,13 +86,13 @@ public final class ProviderWorkerBlockingProbe {
                 new FixedMasterLocator(new Endpoint(
                         "127.0.0.1", createdMaster.port())), spill.toFile(),
                 runtime);
-        RealClusterJobClient createdClient = manifestBackend
-                ? new RealClusterJobClient("127.0.0.1", createdMaster.port())
-                : new RealClusterJobClient(new FixedMasterLocator(new Endpoint(
+        ClusterJobClient createdClient = manifestBackend
+                ? new ClusterJobClient("127.0.0.1", createdMaster.port())
+                : new ClusterJobClient(new FixedMasterLocator(new Endpoint(
                 "127.0.0.1", createdMaster.port())), runtime);
         try (MasterServer master = createdMaster;
              WorkerServer worker = createdWorker;
-             RealClusterJobClient client = createdClient) {
+             ClusterJobClient client = createdClient) {
             if (manifestBackend) worker.blockProviderActionForTesting(action);
             String runId = "blocking-provider-" + action;
             java.util.concurrent.CountDownLatch queryReady =

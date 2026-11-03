@@ -190,7 +190,7 @@ class MuxFanoutProcessCertificationTest {
 
             long[][] cluster = runJob("mux-fanout-cluster",
                     new ExecutionEnvironment("mux-fanout-cluster", "mux-fanout-cluster",
-                            new RealClusterJobClient("127.0.0.1", masterPort)),
+                            new ClusterJobClient("127.0.0.1", masterPort)),
                     inputA, inputB, tmp.resolve("cluster-plain.tsv"),
                     tmp.resolve("cluster-agg.tsv"));
 

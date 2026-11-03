@@ -559,7 +559,7 @@ class S3SignedDualWorkerClusterIT {
                     clientIdentity, trustStore, authz)
                     .withDeploymentSetId(deploymentSetId);
             try (StreamJobClient client =
-                         RowWeave.createRealClusterStreamJobClient(
+                         RowWeave.createClusterStreamJobClient(
                                  masterEndpoint.substring(0, separator),
                                  Integer.parseInt(masterEndpoint.substring(
                                          separator + 1)), clientSecurity)) {

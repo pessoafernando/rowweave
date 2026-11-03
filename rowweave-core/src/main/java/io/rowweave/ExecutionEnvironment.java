@@ -72,7 +72,7 @@ public final class ExecutionEnvironment {
      * shuffle runs in parallel (router to keyed-op x P to a merge). Every keyed stage uses this one P, a fixed value that never greedily expands (determinism).
  *
      * <p>P is a <b>Job property</b>: {@link #toPlanGraph()} compiles it into {@link PlanGraph#parallelism()}, and both
-     * the default local path and a real cluster <b>read it from the graph</b> ({@code MasterServer} reads
+     * the default local path and a cluster <b>read it from the graph</b> ({@code MasterServer} reads
      * {@code graph.parallelism()} as the desired P). So this method <b>takes effect both locally and on a cluster</b>,
      * and P travels to the Workers with the serialized graph. (When the cluster has too few slots, the effective P may be lowered via {@code rowweave.cluster.downgrade}; the result multiset never changes.)
      */

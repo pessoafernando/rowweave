@@ -42,7 +42,7 @@ class RunExecutionEventFailoverTest {
         MasterServer replacementMaster = electionA.isLeader() ? masterB : masterA;
         MasterElection replacementElection = electionA.isLeader() ? electionB : electionA;
 
-        try (RealClusterJobClient client = new RealClusterJobClient(
+        try (ClusterJobClient client = new ClusterJobClient(
                 new RegistryMasterLocator(registry))) {
             RunExecutionEventPage before = client.queryRunEvents(
                     "run-ha-events", 0L, 1);

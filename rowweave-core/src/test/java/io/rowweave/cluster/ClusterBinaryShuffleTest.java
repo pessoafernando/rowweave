@@ -76,7 +76,7 @@ class ClusterBinaryShuffleTest {
              WorkerServer w0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0tmp);
              WorkerServer w1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1tmp)) {
 
-            RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+            ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             long rowCount = client.submitToSink(graph);
 
             List<DataRow> got = FileSink.read(JOIN, outFile.getAbsolutePath());
@@ -112,7 +112,7 @@ class ClusterBinaryShuffleTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer w0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0tmp);
              WorkerServer w1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1tmp)) {
-            long rowCount = new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             List<DataRow> got = FileSink.read(JOIN, outFile.getAbsolutePath());
             assertEquals(oracle.size(), rowCount);
             assertEquals(oracle.size(), got.size());
@@ -137,7 +137,7 @@ class ClusterBinaryShuffleTest {
 
         try (MasterServer master = new MasterServer(5000);
              WorkerServer w0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0tmp)) {
-            long rowCount = new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             List<DataRow> got = FileSink.read(JOIN, outFile.getAbsolutePath());
             assertEquals(3, oracle.size());
             assertEquals(oracle.size(), rowCount);

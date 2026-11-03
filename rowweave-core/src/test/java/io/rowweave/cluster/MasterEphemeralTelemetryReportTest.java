@@ -123,7 +123,7 @@ class MasterEphemeralTelemetryReportTest {
                             .listParam("keys", Collections.singletonList("v")).build(),
                     PlanNode.sink(meta, 1, new DiscardSink(meta)).build()), 2);
             Future<io.rowweave.plan.ExecutionReport> submitted = threads.submit(() -> {
-                try (RealClusterJobClient client = new RealClusterJobClient(
+                try (ClusterJobClient client = new ClusterJobClient(
                         "127.0.0.1", master.port())) {
                     return client.submitAttempt(graph, "ordered-monitor-attempt");
                 }

@@ -103,7 +103,7 @@ class ClusterSourceShardingTest {
         }
         Path outPath = dir.resolve("shard-out.tsv");
         io.rowweave.FileSink out = new io.rowweave.FileSink(GB, outPath.toString());
-        RealClusterJobClient client = new RealClusterJobClient("127.0.0.1", master.port());
+        ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
         client.submitToSink(groupBySumGraph(shards(rows, 3), out));
         long gotTotal = 0;
         for (DataRow r : io.rowweave.FileSink.read(GB, outPath.toString())) {

@@ -14,7 +14,7 @@ import io.rowweave.DataRow;
 import io.rowweave.artifact.LegacyPlanArtifactAdapter;
 import io.rowweave.cluster.MasterElection;
 import io.rowweave.cluster.Endpoint;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.RegistryMasterLocator;
 import io.rowweave.cluster.rpc.ControlSecurityConfig;
 import io.rowweave.commit.SchemaFingerprint;
@@ -295,7 +295,7 @@ class ZkClusterProcessTest {
                  ZkServiceRegistry clientRegistry = new ZkServiceRegistry(connect)) {
                 RegistryMasterLocator locator = new RegistryMasterLocator(
                         clientRegistry, control.securityMetadata());
-                try (RealClusterJobClient client = new RealClusterJobClient(locator, runtime)) {
+                try (ClusterJobClient client = new ClusterJobClient(locator, runtime)) {
                     Path source = tmp.resolve("zk-mtls-source.tsv");
                     writeRows(source);
                     Path before = tmp.resolve("zk-mtls-before.tsv");

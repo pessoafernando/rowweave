@@ -72,7 +72,7 @@ class ClusterConcurrentJobsTest {
 
     private long[] runJob(String name, int masterPort, Path dir) {
         Path f = dir.resolve(name + ".tsv");
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new RealClusterJobClient("127.0.0.1", masterPort));
+        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new ClusterJobClient("127.0.0.1", masterPort));
         s.fromSource(input())
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
                 .sinkTo(new FileSink(GB, f.toString()));
@@ -81,7 +81,7 @@ class ClusterConcurrentJobsTest {
     }
 
     @Test
-    void concurrentJobsOnRealClusterAvailabilityAndThroughput(@TempDir Path tmp) throws Exception {
+    void concurrentJobsOnClusterAvailabilityAndThroughput(@TempDir Path tmp) throws Exception {
         File w0 = tmp.resolve("w0").toFile(); w0.mkdirs();
         File w1 = tmp.resolve("w1").toFile(); w1.mkdirs();
         try (MasterServer master = new MasterServer(5000);
@@ -92,7 +92,7 @@ class ClusterConcurrentJobsTest {
             long[] oracle = runJob("oracle", port, tmp);
             assertEquals(KEYS, oracle[0], "groupBySum group count = KEYS");
 
-            System.out.println("\n=== concurrent multi-job on a real cluster (N rows per job=" + N + ", 2 threaded workers, ExecutionEnvironment plus RealClusterJobClient)===");
+            System.out.println("\n=== concurrent multi-job on a real cluster (N rows per job=" + N + ", 2 threaded workers, ExecutionEnvironment plus ClusterJobClient)===");
             System.out.printf("%-6s %-8s %-12s %-14s %-12s %-10s%n",
                     "jobsJ", "ok", "serial ms", "wall ms", "gain", "outcome");
 

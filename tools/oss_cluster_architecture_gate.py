@@ -32,7 +32,7 @@ SOURCES = {
     "StreamClusterMain.java": "rowweave-core/src/main/java/io/rowweave/StreamClusterMain.java",
     "ServiceRegistry.java": "rowweave-core/src/main/java/io/rowweave/cluster/registry/ServiceRegistry.java",
     "ControlSecurityConfig.java": "rowweave-core/src/main/java/io/rowweave/cluster/rpc/ControlSecurityConfig.java",
-    "RealClusterJobClient.java": "rowweave-core/src/main/java/io/rowweave/cluster/RealClusterJobClient.java",
+    "ClusterJobClient.java": "rowweave-core/src/main/java/io/rowweave/cluster/ClusterJobClient.java",
     "MasterServer.java": "rowweave-core/src/main/java/io/rowweave/cluster/MasterServer.java",
     "ExecutionGraphBuilder.java": "rowweave-core/src/main/java/io/rowweave/cluster/ExecutionGraphBuilder.java",
     "PhysicalPlan.java": "rowweave-core/src/main/java/io/rowweave/cluster/PhysicalPlan.java",
@@ -86,7 +86,7 @@ REQUIRED_TEST_METHODS = {
         "independentSourceAndSinkWorkerJvmsExchangeOnlyOverTcp",
     ],
     "ClusterConcurrentJobsTest": [
-        "concurrentJobsOnRealClusterAvailabilityAndThroughput",
+        "concurrentJobsOnClusterAvailabilityAndThroughput",
     ],
     "ClusterFailFastTest": ["leftSourceThrowsFailsFastNoHang"],
 }

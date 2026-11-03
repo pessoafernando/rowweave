@@ -118,9 +118,9 @@ class FunctionClusterCoverageTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded(name + "w0", 4, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded(name + "w1", 4, "127.0.0.1", m.port(), w1)) {
-            long[] c1 = run(name + "-c1", 1, new RealClusterJobClient("127.0.0.1", m.port()), outMeta, scene, tmp);
+            long[] c1 = run(name + "-c1", 1, new ClusterJobClient("127.0.0.1", m.port()), outMeta, scene, tmp);
             assertArrayEquals(single, c1, name + " cluster P1 versus the single-process run");
-            long[] c2 = run(name + "-c2", 2, new RealClusterJobClient("127.0.0.1", m.port()), outMeta, scene, tmp);
+            long[] c2 = run(name + "-c2", 2, new ClusterJobClient("127.0.0.1", m.port()), outMeta, scene, tmp);
             assertArrayEquals(single, c2, name + " cluster P2 versus the single-process run");
         }
     }

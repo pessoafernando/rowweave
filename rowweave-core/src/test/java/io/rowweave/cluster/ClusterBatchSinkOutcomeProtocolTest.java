@@ -14,7 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /** malformed Sink outcome generations must fail closed at the client. */
-class RealClusterBatchSinkOutcomeProtocolTest {
+class ClusterBatchSinkOutcomeProtocolTest {
 
     @Test
     @Timeout(value = 15, unit = TimeUnit.SECONDS)
@@ -30,7 +30,7 @@ class RealClusterBatchSinkOutcomeProtocolTest {
                     request.runId(), "COMMITTED", -1L, identity,
                     "MANIFEST_VISIBLE_VERIFIED");
         });
-             RealClusterJobClient client = new RealClusterJobClient(
+             ClusterJobClient client = new ClusterJobClient(
                      "127.0.0.1", server.port())) {
 
             assertThrows(RuntimeException.class,

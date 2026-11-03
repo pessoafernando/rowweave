@@ -42,7 +42,7 @@ class StreamRegistryHaClientTest {
             elections[1] = election(registry, security, second.port());
             elections[0].start();
             elections[1].start();
-            try (StreamJobClient client = new RealClusterStreamJobClient(
+            try (StreamJobClient client = new ClusterStreamJobClient(
                     registry, security)) {
                 assertMissing(client, "before-failover");
                 elections[0].close();

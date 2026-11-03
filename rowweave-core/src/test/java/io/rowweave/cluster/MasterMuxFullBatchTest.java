@@ -74,7 +74,7 @@ class MasterMuxFullBatchTest {
             master.handler().apply(RpcMessage.registerWorker(
                     "mux-worker", "127.0.0.1", fakeWorker.port(), 8, 19000));
             java.util.concurrent.CompletableFuture<Void> submit = java.util.concurrent.CompletableFuture.runAsync(
-                    () -> new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
+                    () -> new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph));
             assertTrue(allEntered.await(1, TimeUnit.SECONDS),
                     "sources and sinks across logical stages must all enter before any ACK; remaining="
                             + allEntered.getCount() + " roles=" + roles);

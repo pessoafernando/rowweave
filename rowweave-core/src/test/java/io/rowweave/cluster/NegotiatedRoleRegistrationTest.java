@@ -76,7 +76,7 @@ class NegotiatedRoleRegistrationTest {
                         registered.dataPlaneRegistration(), hello('b')));
                 assertTrue(schedulableWorkers(master).isEmpty(),
                         "assignment lookup must reject a registry hello that was not negotiated");
-                try (RealClusterJobClient client = new RealClusterJobClient(
+                try (ClusterJobClient client = new ClusterJobClient(
                         new FixedMasterLocator(new Endpoint(
                                 "127.0.0.1", master.port())), masterRuntime)) {
                     assertNull(client.queryRun("missing-run"));

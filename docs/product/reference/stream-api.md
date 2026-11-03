@@ -18,9 +18,9 @@ set is on [public API inventory](api-inventory.md).
 ## Creating a session
 
 `RowWeave.createStreamSession(String)` at
-`rowweave-core/src/main/java/io/rowweave/RowWeave.java:19` is the single-argument
-form, `createStreamSession(String, String)` at `:23` adds a display title, and
-the client-carrying form at `:27` binds a `StreamJobClient` so the session can
+`rowweave-core/src/main/java/io/rowweave/RowWeave.java:57` is the single-argument
+form, `createStreamSession(String, String)` at `:61` adds a display title, and
+the client-carrying form at `:65` binds a `StreamJobClient` so the session can
 submit. `StreamSession` itself is declared at
 `rowweave-core/src/main/java/io/rowweave/StreamSession.java:17`, and its two
 constructors at `:47` and `:51` are package-private: the factory is the only
@@ -72,9 +72,9 @@ compilable, so a topology defect is reported before a wiring defect.
 
 A cross-host process role is admitted only under the `MTLS` control profile;
 see [security model](../operations/security.md). The client factories are
-`createLocalStreamJobClient` at `RowWeave.java:180` and `:196`,
-`createRealClusterStreamJobClient` at `:34` and `:43`, and
-`createRegistryStreamJobClient` at `:53`.
+`createLocalStreamJobClient` at `RowWeave.java:218` and `:234`,
+`createClusterStreamJobClient` at `:72` and `:81`, and
+`createRegistryStreamJobClient` at `:98`.
 
 ## DataStream operators
 

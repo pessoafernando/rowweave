@@ -3,10 +3,13 @@ package io.rowweave.cluster;
 import io.rowweave.plan.PlanGraph;
 
 /**
- * Local deployment: a single JVM holding {@link Master} plus workers as threads, implementing
- * {@linkJobClient}. The architecture is the three roles of a real distributed cluster, with a
- * worker being athread rather than a process.
+ * Legacy direct-plan runner retained for older tests and explicit diagnostics.
+ *
+ * @deprecated It does not own an AutoCloseable Master/Worker lifecycle and does not run the
+ *     unified embedded cluster path. Use the default {@code RowWeave.createEnvironment(...)}
+ *     or {@code RowWeave.startInProcessCluster(...)}.
  */
+@Deprecated
 public final class LocalCluster implements JobClient {
 
     private final Master master;

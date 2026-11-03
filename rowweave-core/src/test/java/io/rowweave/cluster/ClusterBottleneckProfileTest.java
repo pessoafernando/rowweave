@@ -72,14 +72,14 @@ class ClusterBottleneckProfileTest {
             int port = master.port();
             for (int i = 0; i < 3; i++) {
                 File out = File.createTempFile("prof-warm-", ".tsv");
-                new RealClusterJobClient("127.0.0.1", port).submitToSink(
+                new ClusterJobClient("127.0.0.1", port).submitToSink(
                         chain(ordersCsv, new FileSink(GB_REGION, out.getAbsolutePath())));
                 out.delete();
             }
             long t1 = System.nanoTime();
             for (int i = 0; i < iters; i++) {
                 File out = File.createTempFile("prof-cl-", ".tsv");
-                nc = new RealClusterJobClient("127.0.0.1", port).submitToSink(
+                nc = new ClusterJobClient("127.0.0.1", port).submitToSink(
                         chain(ordersCsv, new FileSink(GB_REGION, out.getAbsolutePath())));
                 out.delete();
             }

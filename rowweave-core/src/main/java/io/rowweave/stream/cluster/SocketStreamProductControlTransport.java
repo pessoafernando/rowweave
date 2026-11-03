@@ -60,7 +60,7 @@ final class SocketStreamProductControlTransport
         } catch (IOException | RuntimeException failure) {
             throw new StreamControlException(
                     StreamControlException.Code.TRANSPORT_FAILURE,
-                    "RealCluster Stream control RPC failed", failure);
+                    "Cluster Stream control RPC failed", failure);
         }
     }
 

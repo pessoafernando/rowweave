@@ -9,7 +9,7 @@ import io.rowweave.DataRow;
 import io.rowweave.cluster.Endpoint;
 import io.rowweave.cluster.MasterElection;
 import io.rowweave.cluster.MasterServer;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.RegistryMasterLocator;
 import io.rowweave.cluster.WorkerServer;
 import io.rowweave.commit.ManifestCommitOutcome;
@@ -103,7 +103,7 @@ class ZkManifestLeaderFailoverTest {
         final MasterElection electionA;
         final MasterElection electionB;
         final WorkerServer worker;
-        final RealClusterJobClient client;
+        final ClusterJobClient client;
 
         Fixture(Path tmp) throws Exception {
             zk = new TestingServer(true);
@@ -127,7 +127,7 @@ class ZkManifestLeaderFailoverTest {
             worker = WorkerServer.newUnguarded(
                     "manifest-ha-worker", 16,
                     new RegistryMasterLocator(workerRegistry), spill);
-            client = new RealClusterJobClient(new RegistryMasterLocator(clientRegistry));
+            client = new ClusterJobClient(new RegistryMasterLocator(clientRegistry));
             long deadline = System.currentTimeMillis() + 5_000L;
             while (registryA.worker("manifest-ha-worker") == null
                     && System.currentTimeMillis() < deadline) {

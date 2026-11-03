@@ -100,7 +100,7 @@ class BigDataClusterVsSingleTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer ws0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer ws1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
-            long rowCount = new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             List<DataRow> cluster = FileSink.read(GB, outFile.getAbsolutePath());
             assertEquals(KEYS, single.size(), "single-process group count");
             assertEquals(single.size(), cluster.size(), "cluster group count matches the single-process run");
@@ -144,7 +144,7 @@ class BigDataClusterVsSingleTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer ws0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer ws1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
-            new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             List<DataRow> cluster = FileSink.read(jm, outFile.getAbsolutePath());
             assertEquals(N, single.size(), "single-process join row count");
             assertEquals(single.size(), cluster.size(), "cluster join row count matches the single-process run");
@@ -175,7 +175,7 @@ class BigDataClusterVsSingleTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer ws0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer ws1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
-            new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             List<DataRow> cluster = FileSink.read(dout, outFile.getAbsolutePath());
             assertEquals(KEYS, single.size(), "single-process distinct key count");
             assertEquals(single.size(), cluster.size(), "cluster distinct count matches the single-process run");
@@ -200,7 +200,7 @@ class BigDataClusterVsSingleTest {
         File w0 = tmp.resolve("fw0").toFile(); w0.mkdirs();
         try (MasterServer master = new MasterServer(5000);
              WorkerServer ws0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0)) {
-            long rowCount = new RealClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
+            long rowCount = new ClusterJobClient("127.0.0.1", master.port()).submitToSink(graph);
             assertEquals(expected, rowCount, "WHOLE_GRAPH filter cluster row count matches the single-process expectation");
         }
     }

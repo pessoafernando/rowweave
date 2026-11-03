@@ -114,7 +114,7 @@ class ZkIncrementalClusterExecutionTest {
                          "retry-worker-1", 8,
                          new RegistryMasterLocator(workerRegistry1), spill1,
                          workerRuntime);
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new RegistryMasterLocator(clientRegistry), masterRuntime)) {
                 awaitWorkers(master, 2);
                 IncrementalRunSubmission submission = submission(
@@ -200,7 +200,7 @@ class ZkIncrementalClusterExecutionTest {
                          "cancel-worker-1", 8,
                          new RegistryMasterLocator(workerRegistry1), spill1,
                          workerRuntime);
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new RegistryMasterLocator(clientRegistry), masterRuntime)) {
                 awaitWorkers(master, 2);
                 IncrementalRunSubmission submission = submission(
@@ -291,7 +291,7 @@ class ZkIncrementalClusterExecutionTest {
                          "replacement-worker-1", 8,
                          new RegistryMasterLocator(workerRegistry1), spill1,
                          workerRuntime);
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new RegistryMasterLocator(clientRegistry), masterRuntime)) {
                 awaitWorkers(masterA, 2);
                 IncrementalRunSubmission submission = submission(root);
@@ -369,7 +369,7 @@ class ZkIncrementalClusterExecutionTest {
                          "incremental-worker-1", 8,
                          new RegistryMasterLocator(workerRegistry1), spill1,
                          workerRuntime);
-                 RealClusterJobClient client = new RealClusterJobClient(
+                 ClusterJobClient client = new ClusterJobClient(
                          new RegistryMasterLocator(clientRegistry), masterRuntime)) {
                 awaitWorkers(master, 2);
                 IncrementalRunSubmission submission = submission(root);
@@ -445,7 +445,7 @@ class ZkIncrementalClusterExecutionTest {
                          "parity-worker-1", 8,
                          new RegistryMasterLocator(workerRegistry1), spill1,
                          workerRuntime);
-                 RealClusterJobClient clusterClient = new RealClusterJobClient(
+                 ClusterJobClient clusterClient = new ClusterJobClient(
                          new RegistryMasterLocator(clientRegistry), masterRuntime)) {
                 awaitWorkers(master, 2);
                 IncrementalSourceProvider localProvider = workerRuntime
@@ -618,7 +618,7 @@ class ZkIncrementalClusterExecutionTest {
     }
 
     private static Map<String, String> runClusterParity(
-            ParityScenario scenario, RealClusterJobClient client,
+            ParityScenario scenario, ClusterJobClient client,
             IncrementalAuthorityGateway authority) throws Exception {
         IncrementalRunSubmission snapshot = scenario.normal(
                 IncrementalRunMode.SNAPSHOT_V1, "snapshot-trigger",

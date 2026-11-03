@@ -1,6 +1,6 @@
 package io.rowweave.sink;
 
-import io.rowweave.cluster.ProviderRealClusterConformanceHarness;
+import io.rowweave.cluster.ProviderClusterConformanceHarness;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,8 +21,8 @@ final class ProviderConformanceBackend implements DurableSinkConformanceBackend 
     @Override
     public DurableSinkConformanceObservation run(
             DurableSinkConformanceScenario scenario) throws Exception {
-        ProviderRealClusterConformanceHarness.ScenarioEvidence evidence =
-                ProviderRealClusterConformanceHarness.runScenario(
+        ProviderClusterConformanceHarness.ScenarioEvidence evidence =
+                ProviderClusterConformanceHarness.runScenario(
                         manifestBackend, workspace, scenario);
         return new DurableSinkConformanceObservation(
                 scenario, evidence.outcome(), evidence.events(),

@@ -10,7 +10,7 @@ import io.rowweave.ExecutionEnvironment;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.JobClient;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.ops.ParallelGroupByAgg;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -91,7 +91,7 @@ class SplitAwarePerformanceBaselineTest {
                     "-Drowweave.memory.bytes=268435456");
             worker0 = launch(workerArgs, "WORKER_READY=", new StringBuilder());
             worker1 = launch(workerArgs, "WORKER_READY=", new StringBuilder());
-            RealClusterJobClient cluster = new RealClusterJobClient("127.0.0.1", masterPort);
+            ClusterJobClient cluster = new ClusterJobClient("127.0.0.1", masterPort);
 
             // One warm-up per quadrant, and a warm-up result is still held to the same correctness check.
             assertEquals(oracle, runOnce(work, parts, 1, null, "warm-local-p1").rows);

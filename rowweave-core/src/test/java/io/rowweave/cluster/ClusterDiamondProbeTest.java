@@ -91,7 +91,7 @@ class ClusterDiamondProbeTest {
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             org.junit.jupiter.api.Assertions.assertTimeoutPreemptively(java.time.Duration.ofSeconds(60), () -> {
-                long c1 = runDiamond("probe-c1", 1, new RealClusterJobClient("127.0.0.1", m.port()), countingInput(data), tmp);
+                long c1 = runDiamond("probe-c1", 1, new ClusterJobClient("127.0.0.1", m.port()), countingInput(data), tmp);
                 assertEquals(oracle, c1, "cluster P1 diamond result matches the single-process reference (no deadlock, correct)");
             });
         }

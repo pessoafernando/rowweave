@@ -134,7 +134,7 @@ class ClusterJoinFanoutTwoSinkTest {
              WorkerServer worker0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer worker1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(15), () ->
-                    runJoinRejoin("cluster-rejoin", new RealClusterJobClient("127.0.0.1", master.port()),
+                    runJoinRejoin("cluster-rejoin", new ClusterJobClient("127.0.0.1", master.port()),
                             leftRows, rightRows, tmp));
         }
         assertEquals(oracle, multisetLines(tmp.resolve("cluster-rejoin.tsv")),
@@ -160,7 +160,7 @@ class ClusterJoinFanoutTwoSinkTest {
              WorkerServer worker0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", master.port(), w0);
              WorkerServer worker1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(15), () ->
-                    runJoinRejoin("cluster-empty-rejoin", new RealClusterJobClient("127.0.0.1", master.port()),
+                    runJoinRejoin("cluster-empty-rejoin", new ClusterJobClient("127.0.0.1", master.port()),
                             leftRows, rightRows, tmp));
         }
         assertEquals(Collections.emptyList(), multisetLines(tmp.resolve("cluster-empty-rejoin.tsv")),
@@ -185,7 +185,7 @@ class ClusterJoinFanoutTwoSinkTest {
              WorkerServer worker1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
             master.setObjectReuse(false);
             assertTimeoutPreemptively(Duration.ofSeconds(15), () ->
-                    runSideBranch("cluster-side", new RealClusterJobClient("127.0.0.1", master.port()),
+                    runSideBranch("cluster-side", new ClusterJobClient("127.0.0.1", master.port()),
                             leftRows, rightRows, tmp));
         }
         assertEquals(oracleJoin, multisetLines(tmp.resolve("cluster-side-join.tsv")),
@@ -229,7 +229,7 @@ class ClusterJoinFanoutTwoSinkTest {
              WorkerServer worker1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), w1)) {
             master.setObjectReuse(objectReuse);
             assertTimeoutPreemptively(Duration.ofSeconds(15), () ->
-                    run("cluster-" + suffix, new RealClusterJobClient("127.0.0.1", master.port()),
+                    run("cluster-" + suffix, new ClusterJobClient("127.0.0.1", master.port()),
                             leftRows, rightRows, tmp, parallelism, graph));
         }
 

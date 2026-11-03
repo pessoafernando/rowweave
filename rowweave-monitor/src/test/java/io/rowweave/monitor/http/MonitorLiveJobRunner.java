@@ -10,7 +10,7 @@ import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.MasterServer;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.cluster.WorkerServer;
 import io.rowweave.cluster.registry.InProcessRegistry;
 import io.rowweave.monitor.InMemoryJobMonitor;
@@ -92,7 +92,7 @@ public final class MonitorLiveJobRunner {
             while (!Thread.currentThread().isInterrupted()) {
                 try {
                     ExecutionEnvironment s = new ExecutionEnvironment("live" + n, "full_op_dag_" + (n++),
-                            new RealClusterJobClient("127.0.0.1", m.port()));
+                            new ClusterJobClient("127.0.0.1", m.port()));
                     s.setParallelism(2);
                     File f = new File(dir, "out" + n + ".tsv");
                     // A full-operator DAG: filter, select, slow map, join with dim, select, addFields, removeFields,

@@ -211,7 +211,7 @@ def render_functional_view(types: dict[str, PublicType]) -> list[str]:
             "Execution clients and process entry points",
             [
                 "io.rowweave.cluster.InProcessCluster",
-                "io.rowweave.cluster.RealClusterJobClient",
+                "io.rowweave.cluster.ClusterJobClient",
                 "io.rowweave.cluster.ClusterMain",
                 "io.rowweave.StreamClusterMain",
                 "io.rowweave.StreamMasterRuntime",

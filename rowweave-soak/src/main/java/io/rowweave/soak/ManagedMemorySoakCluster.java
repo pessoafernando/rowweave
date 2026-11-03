@@ -1,7 +1,7 @@
 package io.rowweave.soak;
 
 import io.rowweave.cluster.ClusterMain;
-import io.rowweave.cluster.RealClusterJobClient;
+import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.plan.ExecutionReport;
 
 import java.io.File;
@@ -19,7 +19,7 @@ final class ManagedMemorySoakCluster implements AutoCloseable {
     private final ManagedMemorySoakConfig config;
     private final Path roleRoot;
     private final List<RoleProcess> roles = new ArrayList<>();
-    private RealClusterJobClient client;
+    private ClusterJobClient client;
 
     private ManagedMemorySoakCluster(ManagedMemorySoakConfig config,
                                     Path roleRoot) {
@@ -42,7 +42,7 @@ final class ManagedMemorySoakCluster implements AutoCloseable {
             for (int i = 0; i < config.workerCount; i++) {
                 cluster.launchWorker(i, masterPort);
             }
-            cluster.client = new RealClusterJobClient(
+            cluster.client = new ClusterJobClient(
                     "127.0.0.1", masterPort);
             return cluster;
         } catch (Throwable failure) {

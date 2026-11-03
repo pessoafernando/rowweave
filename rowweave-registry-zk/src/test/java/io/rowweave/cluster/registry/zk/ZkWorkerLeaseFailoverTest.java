@@ -87,7 +87,7 @@ class ZkWorkerLeaseFailoverTest {
     private static void runJob(Path output, ZkServiceRegistry clientRegistry) {
         ParallelGroupByAgg agg = ParallelGroupByAgg.of(META, "k").sum("amt");
         ExecutionEnvironment session = new ExecutionEnvironment("lease-ha", "lease-ha",
-                new io.rowweave.cluster.RealClusterJobClient(new RegistryMasterLocator(clientRegistry)));
+                new io.rowweave.cluster.ClusterJobClient(new RegistryMasterLocator(clientRegistry)));
         session.setParallelism(2);
         session.fromSource(new CollectionSource(META, rows()))
                 .groupBy(agg)

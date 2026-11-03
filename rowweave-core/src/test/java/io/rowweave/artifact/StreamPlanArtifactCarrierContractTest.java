@@ -188,8 +188,8 @@ class StreamPlanArtifactCarrierContractTest {
 
         java.util.concurrent.atomic.AtomicInteger masterLookups =
                 new java.util.concurrent.atomic.AtomicInteger();
-        try (io.rowweave.cluster.RealClusterJobClient client =
-                     new io.rowweave.cluster.RealClusterJobClient(() -> {
+        try (io.rowweave.cluster.ClusterJobClient client =
+                     new io.rowweave.cluster.ClusterJobClient(() -> {
                          masterLookups.incrementAndGet();
                          throw new AssertionError("Stream reached Master lookup");
                      })) {

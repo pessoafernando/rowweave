@@ -97,7 +97,7 @@ ceiling that applies to sources applies here: defaults at
 ## Worker-writable and exclusive destinations
 
 `isWorkerWritable()` defaults to `false` at
-`rowweave-core/src/main/java/io/rowweave/Sink.java:76`. A real cluster
+`rowweave-core/src/main/java/io/rowweave/Sink.java:76`. A cluster
 submission checks it before the RPC and the Master checks the submitted graph
 again, so a memory-only sink fails fast rather than silently producing an empty
 result; there is no client-collect fallback.

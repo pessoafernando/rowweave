@@ -19,8 +19,8 @@ public type or method reachable from a published artifact.
 
 [`RowWeave`](../../../rowweave-core/src/main/java/io/rowweave/RowWeave.java)
 is the static factory. `createEnvironment(String name)` at
-`rowweave-core/src/main/java/io/rowweave/RowWeave.java:11` is the single-argument
-form; `createEnvironment(String jobName, String jobTitle)` at `:15` is the form
+`rowweave-core/src/main/java/io/rowweave/RowWeave.java:16` is the single-argument
+form; `createEnvironment(String jobName, String jobTitle)` at `:21` is the form
 that carries a display title. Both return an `ExecutionEnvironment` with no
 injected client, so a submission goes to the process-wide shared in-process
 runtime.
