@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Logging configuration for isolated process tests.
+  The pattern includes MDC jobId/stageId so distributed investigation can trace one chain by job and stage.
+  Levels: root=INFO and cluster orchestration=INFO. Use -Dlogback.cluster.level=DEBUG for more detail.
+-->
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>  <!-- stderr keeps stdout available for the ClusterMain readiness protocol. -->
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] %logger{28} [job=%X{jobId:-–} stage=%X{stageId:-–}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="io.rowweave.cluster" level="${logback.cluster.level:-INFO}"/>
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

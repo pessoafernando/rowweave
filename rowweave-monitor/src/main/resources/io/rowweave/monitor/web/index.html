@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RowWeave Runtime Monitor</title>
+<style>
+:root {
+  color-scheme:light; --bg:#f5f7fa; --panel:#ffffff; --panel2:#eaf0f7; --border:#ccd5e0;
+  --text:#202936; --dim:#536274; --accent:#245bd5; --run:#245bd5; --ok:#137345;
+  --fail:#b42332; --idle:#69798b; --ready:#815600; --run-bg:#eaf0ff; --ok-bg:#e8f5ed;
+  --fail-bg:#fff0f1; --ready-bg:#fff4d8; --shadow:none; --radius:6px;
+}
+body[data-theme="dark"] {
+  color-scheme:dark; --bg:#14191f; --panel:#1c232c; --panel2:#26313e; --border:#435166;
+  --text:#eef2f8; --dim:#b1bed0; --accent:#89afff; --run:#89afff; --ok:#72d5a3;
+  --fail:#ff939a; --idle:#a6b4c7; --ready:#edca80; --run-bg:#243757; --ok-bg:#1c3b2c;
+  --fail-bg:#4a2831; --ready-bg:#44391f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;display:flex;flex-direction:column;height:100dvh;overflow:hidden;font-variant-numeric:tabular-nums}
+button,input,select{font:inherit;color:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.55}
+button,input,select{border:1px solid var(--border);border-radius:var(--radius);background:var(--panel)}
+button{min-height:36px;padding:6px 12px}button:hover:not(:disabled){background:var(--panel2)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px} [hidden]{display:none!important}
+header{display:flex;align-items:center;gap:12px;padding:12px 20px;background:var(--panel);border-bottom:1px solid var(--border);flex-wrap:wrap;z-index:2}
+header h1{font-size:16px;font-weight:600;white-space:nowrap}header h1 span{color:var(--accent)}
+nav{display:flex;gap:4px}nav button{border-color:transparent;background:transparent;color:var(--dim);font-weight:600}
+nav button.active{color:var(--accent);background:var(--run-bg)}
+.refresh-controls{margin-left:auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.refresh-controls .theme{padding:6px 8px}
+.live{white-space:nowrap;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--dim)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--idle);flex:none}.live[data-state="live"] .dot{background:var(--ok)}
+.live[data-state="disconnected"] .dot{background:var(--fail)}.live[data-state="paused"] .dot{background:var(--ready)}
+#connectionNotice{padding:8px 20px;background:var(--ready-bg);color:var(--ready);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;gap:12px}
+#connectionNotice button{flex:none}.view{display:none;flex:1;min-height:0}.view.active{display:flex}.layout.view.active{display:grid}
+.layout{grid-template-columns:264px minmax(0,1fr)}.col{min-width:0;min-height:0}.jobs{border-right:1px solid var(--border);display:flex;flex-direction:column;background:var(--panel)}
+.jobs-head{padding:16px;border-bottom:1px solid var(--border)}.jobs-head h2{font-size:16px;font-weight:600;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}.jobs-head h2 span{color:var(--dim);font-size:13px;font-weight:400}
+.search-label{display:block;color:var(--dim);font-size:13px;margin-bottom:4px}.job-controls{display:grid;gap:8px}.job-controls input,.job-controls select{width:100%;min-width:0;min-height:38px;padding:6px 8px}
+#jobList{overflow:auto;flex:1}.job{display:block;text-align:left;width:100%;border:0;border-bottom:1px solid var(--border);border-left:3px solid transparent;border-radius:0;padding:12px 16px;background:var(--panel)}
+.job.sel{background:var(--run-bg);border-left-color:var(--accent)}.job .row1{display:flex;gap:8px;align-items:center}.job .name{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}.job .id{color:var(--dim);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.job-meta{color:var(--dim);font-size:13px;margin-top:6px}
+.badge,.pill{font-size:12px;font-weight:600;padding:2px 8px;border-radius:4px;white-space:nowrap;display:inline-block}
+.b-READY,.b-SUBMITTED,.b-RECOVERING{color:var(--ready);background:var(--ready-bg)}.b-RUNNING{color:var(--run);background:var(--run-bg)}.b-FINISHED,.b-STOPPED_WITH_SAVEPOINT{color:var(--ok);background:var(--ok-bg)}.b-FAILED{color:var(--fail);background:var(--fail-bg)}.b-CANCELED,.b-CANCELLING{color:var(--dim);background:var(--panel2)}
+.dagwrap{display:flex;flex-direction:column;overflow:hidden}#jobSummary{position:sticky;top:0;z-index:3;background:var(--panel);border-bottom:1px solid var(--border);padding:16px 20px;min-height:100px;flex:none}.job-heading{display:flex;gap:12px;align-items:center;min-width:0}.job-heading h2{flex:1;font-size:20px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.job-heading .failure-link{margin-left:auto;flex:none;color:var(--fail)}.summary-meta{display:flex;flex-wrap:wrap;gap:8px 24px;color:var(--dim);margin-top:8px}.summary-meta strong{font-weight:600;color:var(--text)}
+.bar{display:flex;align-items:center;gap:8px;padding:8px 20px;border-bottom:1px solid var(--border);background:var(--panel);flex-wrap:wrap;flex:none}.bar .t{font-weight:600;margin-right:4px}.bar .sub{color:var(--dim);font-size:13px}.zoom{display:flex;align-items:center;gap:4px;margin-left:auto}.zbtn{min-width:36px}.zoom output{min-width:48px;text-align:center;color:var(--dim)}
+#dagview{flex:1;overflow:hidden;position:relative;cursor:grab;min-height:200px;touch-action:none;background-image:radial-gradient(var(--border) .65px,transparent .65px);background-size:16px 16px}#dagview.panning{cursor:grabbing}.graph-help{font-size:12px;color:var(--dim);padding:6px 20px;background:var(--panel);border-top:1px solid var(--border);flex:none;display:flex;justify-content:space-between;gap:12px}.chlegend{display:flex;gap:12px}.chlegend span:before{content:"";display:inline-block;width:16px;margin-right:4px;border-top:2px solid var(--idle);vertical-align:middle}.chlegend .local:before{border-color:var(--ok)}.chlegend .mixed:before{border-color:var(--ready);border-top-style:dashed}.chlegend .materialized:before{border-color:var(--accent);border-top-style:dotted}
+#stagePanel{border-top:1px solid var(--border);background:var(--panel);height:280px;min-height:100px;max-height:55vh;overflow:auto;flex:none}#stagePanel.collapsed{display:none}#panelResizer{height:8px;cursor:ns-resize;background:var(--panel2)}#panelResizer:hover{background:var(--border)}
+.detail-tabs{display:flex;gap:4px;padding:0 16px;border-bottom:1px solid var(--border);background:var(--panel);overflow-x:auto;position:sticky;top:0;z-index:2}.detail-tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;color:var(--dim);white-space:nowrap;min-height:44px}.detail-tabs button.active{border-bottom-color:var(--accent);color:var(--accent);font-weight:600}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 16px;border-bottom:1px solid var(--border)}.panel-title{font-size:16px;font-weight:600}.panel-sub{font-size:13px;color:var(--dim)}.table-scroll{overflow:auto;max-width:100%}table{width:100%;border-collapse:collapse}th,td{font-size:14px;padding:10px 16px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap}th{font-weight:600;color:var(--dim);background:var(--panel)}td.wrap{white-space:normal;min-width:180px}tr.selected td{background:var(--run-bg)}.stage-link{border-color:transparent;padding:4px 8px;color:var(--accent);min-height:32px}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}.sgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px 24px;padding:16px}.kv{display:flex;justify-content:space-between;gap:16px;min-width:0}.kv .k{color:var(--dim);flex:none}.kv .v{overflow-wrap:anywhere;text-align:right}.kv .err{color:var(--fail)}.box{padding:16px;border-bottom:1px solid var(--border)}.box h3{font-size:16px;font-weight:600;margin-bottom:12px}.box .kv{padding:4px 0}
+.metric-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;padding:16px}.metric{background:var(--panel2);padding:12px;border-radius:6px}.metric .n{font-size:20px;font-weight:600}.metric .l{font-size:13px;color:var(--dim);margin-top:4px}.section{padding:12px 16px;font-weight:600;color:var(--dim)}.exception{margin:12px 16px;padding:12px 16px;border-left:3px solid var(--fail);background:var(--fail-bg)}.exception .where{font-weight:600;color:var(--fail)}.exception .message{margin-top:8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre-wrap;overflow-wrap:anywhere}.exception button{margin-top:8px}
+.empty,.hint{padding:24px;color:var(--dim);font-size:14px}.empty strong{display:block;color:var(--text);font-size:16px;font-weight:600;margin-bottom:8px}.empty button{margin-top:12px}.landing{flex:1;overflow:auto;padding:24px}.page-title{font-size:22px;font-weight:600;margin-bottom:8px}.page-intro{color:var(--dim);margin-bottom:24px}.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--panel);margin-bottom:24px}.card{border:0;border-right:1px solid var(--border);border-radius:0;background:var(--panel);padding:20px;text-align:left}.card:last-child{border-right:0}.card .num{font-size:28px;font-weight:600;line-height:1.2}.card .label{margin-top:4px;color:var(--dim)}.card.failed .num{color:var(--fail)}.page{background:var(--panel);border:1px solid var(--border);border-radius:8px;overflow:auto}.page h2,.page h3{padding:16px;font-size:16px;font-weight:600}.recent-job{display:flex;align-items:center;width:100%;text-align:left;gap:12px;border:0;border-top:1px solid var(--border);border-radius:0;padding:12px 16px}.recent-job .name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.recent-job .when{color:var(--dim);font-size:13px}.worker{display:flex;gap:12px;padding:8px 0;align-items:center;flex-wrap:wrap}.worker .waddr{color:var(--dim)}.wdot{width:8px;height:8px;border-radius:50%;background:var(--idle)}.worker.alive .wdot{background:var(--ok)}.alive{color:var(--ok)}.dead{color:var(--dim)}
+.node{cursor:pointer;outline:none}.node rect{rx:8;stroke-width:1.5;fill:var(--panel);stroke:var(--idle);filter:drop-shadow(0 1px 2px rgba(0,0,0,.07))}.node.sel rect,.node:focus-visible rect{stroke:var(--accent);stroke-width:3}.node .stripe{stroke:none;opacity:.9}.n-READY .stripe{fill:var(--ready)}.n-RUNNING .stripe{fill:var(--run)}.n-FINISHED .stripe{fill:var(--ok)}.n-FAILED .stripe{fill:var(--fail)}.node .title{fill:var(--text);font-size:14px;font-weight:600}.node .role,.node .meta{fill:var(--dim);font-size:12px}.node .nsep{stroke:var(--border);stroke-width:1}.node .nsep.dash{stroke-dasharray:3 3}.edge{stroke:var(--idle);stroke-width:2;fill:none;marker-end:url(#arrow);transition:opacity .15s}.edge.ch-local{stroke:var(--ok)}.edge.ch-mixed{stroke:var(--ready);stroke-dasharray:6 4}.edge.ch-materialized{stroke:var(--accent);stroke-dasharray:2 3;stroke-width:3}.edge.hl{stroke-width:3.5}.edge.dim{opacity:.18}.n-READY rect{stroke:var(--ready);stroke-dasharray:4 3}.n-RUNNING rect{stroke:var(--run)}.n-FINISHED rect{stroke:var(--ok)}.n-FAILED rect{stroke:var(--fail);stroke-width:2}.n-FAILED .role{fill:var(--fail)}
+@media(prefers-reduced-motion:no-preference){.edge.flow{stroke-dasharray:6 4;animation:dagflow .9s linear infinite}}
+@keyframes dagflow{to{stroke-dashoffset:-10}}
+@media(max-width:1100px){header{gap:8px 16px}header h1{margin-right:auto}.refresh-controls{margin-left:0}nav{order:3;width:100%;overflow-x:auto}.layout{grid-template-columns:228px minmax(0,1fr)}.bar .sub{display:none}.chlegend{display:none}}
+@media(max-width:680px){body{font-size:14px}header{padding:8px 12px}header h1{font-size:16px}.refresh-controls{width:100%;justify-content:space-between}.live{flex:1}nav{gap:0}nav button{padding:6px 10px}button,input,select{min-height:44px}#connectionNotice{padding:8px 12px;font-size:13px}.layout.view.active{display:flex;flex-direction:column}.jobs{flex:none;border-right:0;border-bottom:1px solid var(--border);max-height:184px}.jobs-head{padding:8px 12px}.jobs-head h2,.search-label{display:none}.job-controls{grid-template-columns:minmax(0,1fr) 116px;gap:8px}.job-controls input,.job-controls select{min-height:44px}#jobList{display:flex;overflow:auto;min-height:80px}.job{flex:none;width:265px;padding:8px 12px;border-bottom:0;border-right:1px solid var(--border)}.job-meta{margin-top:4px}.job .id{display:none}.job .empty{padding:8px 12px}.dagwrap{flex:1;overflow-y:auto}#jobSummary{padding:12px;min-height:90px}.job-heading{gap:8px;flex-wrap:wrap}.job-heading h2{font-size:16px;flex:1}.job-heading .failure-link{min-height:36px;padding:4px 8px}.summary-meta{gap:4px 16px;font-size:13px}.bar{padding:8px 12px;gap:8px}.bar .t{display:none}.zoom{margin-left:0;flex:1;justify-content:flex-start}.zbtn{min-width:44px}.zoom output{min-width:42px}.graph-help{padding:6px 12px;font-size:12px}#dagview{min-height:250px;flex:1 0 250px}#stagePanel{height:280px;max-height:none;flex:none}.detail-tabs{padding:0 8px}.detail-tabs button{padding:8px 12px}.panel-head{padding:12px;align-items:flex-start;flex-wrap:wrap}.sgrid{grid-template-columns:1fr;padding:12px}.landing{padding:16px}.cards{grid-template-columns:repeat(2,minmax(0,1fr));margin-bottom:16px}.card{padding:16px;border-bottom:1px solid var(--border)}.card:nth-child(2n){border-right:0}.card:nth-child(n+3){border-bottom:0}.recent-job{padding:12px}.recent-job .when{display:none}.page-title{font-size:22px}.page-intro{margin-bottom:16px}th,td{padding:8px 12px}.stage-link{min-height:44px}.empty,.hint{padding:16px}.node .title{font-size:14px}}
+.narrow-label{display:none}
+@media(max-width:680px){header{position:relative}header h1{padding-right:64px}.refresh-controls{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:8px}.refresh-controls .theme{position:absolute;right:12px;top:8px}.live{white-space:normal;font-size:12px}.wide-label{display:none}.narrow-label{display:inline}.bar #detailsToggle{margin-left:auto}.zoom{flex:none}.bar{gap:4px}.zoom button{padding:6px 8px;min-width:44px}.zoom output{min-width:38px}.graph-help>span:first-child{white-space:normal;font-size:13px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <h1><span>RowWeave</span> Monitor</h1>
+  <nav aria-label="Monitor sections">
+    <button data-view="overview" class="active" onclick="showView('overview')">Overview</button>
+    <button data-view="jobs" onclick="showView('jobs')">Jobs</button>
+    <button data-view="workers" onclick="showView('workers')">Workers</button>
+    <button data-view="retention" onclick="showView('retention')">Retention</button>
+    <button data-view="config" onclick="showView('config')">Config</button>
+  </nav>
+  <div class="refresh-controls">
+    <span class="live" id="connectionState" data-state="loading" aria-live="off"><span class="dot"></span><span id="lstat">Connecting…</span></span>
+    <button id="pauseUpdates" onclick="toggleUpdates()" aria-pressed="false" title="Pause dashboard updates; running jobs are unaffected">Pause</button>
+    <button id="refreshNow" onclick="tick(true)" title="Fetch a fresh monitor snapshot">Refresh</button>
+    <button class="theme" id="themeToggle" onclick="toggleTheme()" aria-label="Use dark theme">Dark</button>
+  </div>
+</header>
+<div id="connectionNotice" role="status" hidden><span id="connectionMessage"></span><button onclick="tick(true)">Retry now</button></div>
+<section id="view-overview" class="view active"><div class="landing">
+  <h2 class="page-title">Runtime overview</h2><p class="page-intro">Explore retained jobs and the latest worker observations.</p>
+  <div class="cards" id="overviewCards"><div class="empty">Loading runtime snapshot…</div></div>
+  <div class="page"><h2>Recent jobs</h2><div id="recentJobs"><div class="empty">Loading jobs…</div></div></div>
+</div></section>
+<section id="view-workers" class="view"><div class="landing"><div class="page"><h2>Workers</h2><div id="workerTable"></div></div></div></section>
+<section id="view-retention" class="view"><div class="landing"><div class="page" id="retentionPage"><h2>Retention and recovery</h2></div></div></section>
+<section id="view-config" class="view"><div class="landing"><div class="page" id="configPage"><h2>Configuration</h2></div></div></section>
+<section class="layout view" id="view-jobs" aria-label="Job explorer">
+  <aside class="col jobs" aria-label="Jobs">
+    <div class="jobs-head"><h2>Jobs <span id="jobCount"></span></h2><div class="job-controls">
+      <div><label class="search-label" for="jobSearch">Find a job</label><input id="jobSearch" type="search" placeholder="Search name or ID" aria-label="Search jobs by name or ID" oninput="renderJobs(jobsCache)"></div>
+      <div><label class="search-label" for="jobFilter">State</label><select id="jobFilter" onchange="renderJobs(jobsCache)" aria-label="Filter jobs by state">
+        <option value="">All states</option><option value="RUNNING">Running</option><option value="FAILED">Failed</option><option value="FINISHED">Finished</option><option value="READY">Ready</option><option value="CANCELED">Canceled</option><option value="STOPPED_WITH_SAVEPOINT">Saved</option>
+      </select></div>
+    </div></div>
+    <div id="jobList"><div class="empty">Loading jobs…</div></div>
+  </aside>
+  <main class="col dagwrap">
+    <div id="jobSummary"><div class="hint">Select a job to explore its execution graph.</div></div>
+    <div class="bar" role="toolbar" aria-label="Graph controls">
+      <span class="t">Execution graph</span>
+      <span class="zoom">
+        <button class="zbtn" onclick="zoomBy(.8)" aria-label="Zoom out">−</button>
+        <output id="zoomLevel" aria-label="Graph zoom">100%</output>
+        <button class="zbtn" onclick="zoomBy(1.25)" aria-label="Zoom in">+</button>
+        <button id="fitGraph" onclick="resetView()" aria-label="Fit graph"><span class="wide-label">Fit graph</span><span class="narrow-label" aria-hidden="true">Fit</span></button>
+        <button id="resetGraph" onclick="resetLayout()" title="Restore node positions and readable zoom">Reset</button>
+      </span>
+      <button id="detailsToggle" onclick="toggleDetails()" aria-controls="stagePanel" aria-expanded="true">Hide details</button>
+    </div>
+    <div id="dagview" tabindex="0" role="region" aria-label="Live execution graph" aria-describedby="graphHelp"><div class="empty"><strong>Explore a job</strong>Select a job from the list. Its running stages and row counts will appear here.</div></div>
+    <div class="graph-help" id="graphHelp"><span>Drag to pan · Scroll to zoom · Select a node for details</span><span class="chlegend"><span class="local">Local</span><span class="mixed">Mixed</span><span>Remote</span><span class="materialized">Materialized</span></span></div>
+    <div id="stagePanel">
+      <div id="panelResizer" role="separator" tabindex="0" aria-label="Resize details" aria-orientation="horizontal" aria-valuemin="100" aria-valuemax="560" aria-valuenow="280"></div>
+      <div class="detail-tabs" role="tablist" aria-label="Job details">
+        <button id="tab-table" role="tab" aria-controls="detailBody" onclick="showDetailTab('table')">Stages</button>
+        <button id="tab-stage" role="tab" aria-controls="detailBody" onclick="showDetailTab('stage')">Node details</button>
+        <button id="tab-metrics" role="tab" aria-controls="detailBody" onclick="showDetailTab('metrics')">Metrics</button>
+        <button id="tab-exceptions" role="tab" aria-controls="detailBody" onclick="showDetailTab('exceptions')">Exceptions</button>
+        <button id="tab-job" role="tab" aria-controls="detailBody" onclick="showDetailTab('job')">Job info</button>
+      </div>
+      <div id="detailBody" role="tabpanel" aria-labelledby="tab-table"><div class="hint">Select a job to view runtime details.</div></div>
+    </div>
+  </main>
+</section>
+
+<script>
+"use strict";
+const SVGNS = "http://www.w3.org/2000/svg";
+let selectedJobId=null, selectedStageIdx=null, jobsCache=[];
+let curJob=null;                       // Details for the selected job.
+let view={x:0,y:0,k:1};                // Pan x/y and zoom k.
+let nodeOffset={};                     // Manual node drag offsets by index.
+let activeDetailTab="table", activeView="overview";
+const detailTabs=["table","stage","metrics","exceptions","job"];
+let detailsCollapsed=matchMedia("(max-width:680px)").matches;
+let paused=false, polling=false, lastSuccess=0, observationEpoch=0;
+let detailSequence=0, detailController=null, tickController=null, pointerBusy=false;
+let jobExpired=false,hasSnapshot=false;
+const pageSnapshots={},pageRequests={};
+function replaceHTML(element,html){
+ const key=element.contains(document.activeElement)?document.activeElement.dataset.focusKey:null;
+ if(element.innerHTML!==html)element.innerHTML=html;
+ if(key)[...element.querySelectorAll('[data-focus-key]')].find(n=>n.dataset.focusKey===key)?.focus({preventScroll:true});
+}
+
+function prettyState(state){ return String(state||"Unknown").toLowerCase().replaceAll("_"," ").replace(/^./,c=>c.toUpperCase()); }
+function updateConnection(state){
+  const effective=state==="live"&&paused?"paused":state;
+  const status=document.getElementById("connectionState"); status.dataset.state=effective;
+  document.getElementById("lstat").textContent=(effective==="live"?"Live":effective==="paused"?"Updates paused":effective==="disconnected"?"Disconnected":"Connecting…")+(lastSuccess?" · updated "+fmtTime(lastSuccess):"");
+  const stale=effective==="disconnected";
+  document.getElementById("connectionNotice").hidden=!stale;
+  document.getElementById("connectionMessage").textContent=lastSuccess?"Connection lost. Showing the last successful snapshot; automatic retries continue.":"Monitor unavailable. Check the connection or retry.";
+}
+async function getJSON(path, signal){
+  const controller=new AbortController(), timeout=setTimeout(()=>controller.abort(),8000);
+  const abort=()=>controller.abort();
+  if(signal){ if(signal.aborted) controller.abort(); else signal.addEventListener("abort",abort,{once:true}); }
+  try { const response=await fetch(path,{cache:"no-store",signal:controller.signal});
+    if(!response.ok){ const error=new Error("Monitor request failed"); error.status=response.status; throw error; }
+    return await response.json();
+  } finally {clearTimeout(timeout); if(signal) signal.removeEventListener("abort",abort);}
+}
+function toggleUpdates(){
+  paused=!paused; observationEpoch++;
+  if(tickController) tickController.abort(); if(detailController) detailController.abort();
+  document.getElementById("pauseUpdates").textContent=paused?"Resume":"Pause";
+  document.getElementById("pauseUpdates").setAttribute("aria-pressed",String(paused));
+  updateConnection(paused?"paused":"loading"); if(!paused) tick(true);
+}
+function syncDetailTabs(){
+  detailTabs.forEach(name=>{const button=document.getElementById("tab-"+name), active=name===activeDetailTab;
+    button.classList.toggle("active",active);button.setAttribute("aria-selected",String(active));button.tabIndex=active?0:-1;
+  });
+  document.getElementById("detailBody").setAttribute("aria-labelledby","tab-"+activeDetailTab);
+}
+function toggleDetails(force){
+  detailsCollapsed=force===undefined?!detailsCollapsed:!force;
+  document.getElementById("stagePanel").classList.toggle("collapsed",detailsCollapsed);
+  document.getElementById("detailsToggle").textContent=detailsCollapsed?"Show details":"Hide details";
+  document.getElementById("detailsToggle").setAttribute("aria-expanded",String(!detailsCollapsed));
+}
+function clearJobFilters(){document.getElementById("jobSearch").value="";document.getElementById("jobFilter").value="";renderJobs(jobsCache);}
+function openJobs(state=""){clearJobFilters();document.getElementById("jobFilter").value=state;showView("jobs");renderJobs(jobsCache);}
+
+
+function esc(s){ return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+
+
+function fmtTime(ms){ if(!ms) return "—"; const d=new Date(ms); return d.toLocaleTimeString(); }
+function fmtDur(a,b){ if(!a) return "—"; const end=b||Date.now(); const s=(end-a)/1000; return s<1?Math.round(end-a)+"ms":s.toFixed(1)+"s"; }
+// Input rows are processed rows; output rows are produced rows.
+function inNum(x){ return x.inputRows || 0; }
+function outNum(x){ return x.outputRows || 0; }
+// A breaker is soaking when processed > output and still running; GroupBy/Sort consume upstream before emitting.
+function isSoaking(x){ return x.state==="RUNNING" && inNum(x)>0 && outNum(x)===0; }
+// Compact graph/instance display: processed -> output, with soaking visible at a glance.
+function rowsIO(x){ return inNum(x)+"→"+outNum(x); }
+
+// Humanize operator type IDs; use the last meaningful operator as the node title.
+const OP_NAMES={source:"Source",filter:"Filter",select:"Select",selectByIndex:"Select",map:"Map",flatMap:"FlatMap",
+  join:"Join",coGroup:"CoGroup",union:"Union",groupBy:"GroupBy",sum:"Sum",count:"Count",max:"Max",min:"Min",
+  reduceGroup:"ReduceGroup",combineGroup:"CombineGroup",combineReduceGroup:"CombineReduce",distinct:"Distinct",
+  orderBy:"Sort",top:"Top",addFields:"AddFields",removeFields:"RemoveFields",partitionByHash:"Partition",sink:"Output"};
+function streamOperatorTitle(chain){
+ const match=/^([A-Z_]+) \(.+\)$/.exec(chain||'');
+ return match?match[1].toLowerCase().replaceAll('_',' ').replace(/^./,c=>c.toUpperCase()):null;
+}
+function opTitle(opChain){
+  if(streamOperatorTitle(opChain))return streamOperatorTitle(opChain);
+  if(!opChain) return "Stage";
+  const parts=opChain.split(">").filter(x=>x&&x!=="source");
+  const last=parts.length?parts[parts.length-1]:opChain.split(">")[0];
+  return OP_NAMES[last]||last;
+}
+// Convert opChain to display names, omitting the source placeholder. Chains have multiple operators.
+// A source-only stage displays Source instead of the Stage fallback.
+function opChainOps(opChain){
+  if(streamOperatorTitle(opChain))return [streamOperatorTitle(opChain)];
+  if(!opChain) return ["Stage"];
+  const parts=opChain.split(">").filter(x=>x&&x!=="source");
+  const names=parts.map(t=>OP_NAMES[t]||t);
+  return names.length?names:["Source"];
+}
+
+function selectJob(jobId){
+  if(jobId===selectedJobId&&curJob){showView("jobs",false);return;}
+  selectedJobId=jobId;selectedStageIdx=null;curJob=null;jobExpired=false;
+  nodeOffset={};view={x:0,y:0,k:1};dagSig=null;activeDetailTab="table";
+  showView("jobs",false);history.replaceState(null,"","#jobs/"+encodeURIComponent(jobId));
+  document.getElementById("jobSummary").innerHTML='<div class="hint">Loading job snapshot…</div>';
+  document.getElementById("dagview").innerHTML='<div class="empty">Loading execution graph…</div>';
+  syncDetailTabs();renderDetail(null);renderJobs(jobsCache);loadDag(jobId,true);
+}
+function renderJobs(jobs){
+  jobsCache=jobs;const el=document.getElementById("jobList");
+  const search=document.getElementById("jobSearch").value.trim().toLowerCase(),filter=document.getElementById("jobFilter").value;
+  const shown=jobs.filter(j=>(!filter||j.state===filter)&&(!search||(j.name+" "+j.jobId).toLowerCase().includes(search))).slice().sort((a,b)=>b.submitTime-a.submitTime);
+  document.getElementById("jobCount").textContent=shown.length+" / "+jobs.length;
+  if(!shown.length){el.innerHTML=jobs.length?'<div class="empty"><strong>No matching jobs</strong>Try another name or state.<br><button onclick="clearJobFilters()">Clear filters</button></div>':'<div class="empty"><strong>No jobs observed yet</strong>Submit a job through your application to see its execution here.</div>';return;}
+  el.querySelectorAll('.empty').forEach(n=>n.remove());
+  const existing=new Map([...el.querySelectorAll('.job')].map(n=>[n.dataset.jobId,n]));
+  shown.forEach((j,index)=>{
+    let d=existing.get(j.jobId);
+    if(!d){d=document.createElement("button");d.type="button";d.dataset.jobId=j.jobId;d.onclick=()=>selectJob(j.jobId);}
+    d.className="job"+(j.jobId===selectedJobId?" sel":"");d.setAttribute("aria-pressed",String(j.jobId===selectedJobId));d.setAttribute("aria-label",j.name+", "+prettyState(j.state));d.title=j.name+" · "+j.jobId;
+    const html='<div class="row1"><span class="name">'+esc(j.name)+'</span><span class="badge b-'+esc(j.state)+'">'+esc(prettyState(j.state))+'</span></div><div class="id">'+esc(j.jobId)+'</div><div class="job-meta">'+j.stageCount+' stages · '+fmtDur(j.submitTime,j.endTime)+(j.downgraded?' · P '+j.desiredP+' → '+j.effectiveP:'')+'</div>';
+    if(d.innerHTML!==html)d.innerHTML=html;
+    if(el.children[index]!==d)el.insertBefore(d,el.children[index]||null);existing.delete(j.jobId);
+  });existing.forEach(n=>n.remove());
+}
+
+
+function renderWorkers(ws){window.workerCache=ws;}
+function workerInfo(){
+  const workers=window.workerCache||[];
+  return workers.length?workers.map(w=>'<div class="worker '+(w.alive?'alive':'dead')+'"><span class="wdot"></span><strong>'+esc(w.workerId)+'</strong><span class="waddr">'+esc(w.host)+':'+w.port+' · '+w.slots+' slots · '+(w.alive?'Alive':'Offline')+'</span></div>').join(""):'<div class="hint">No worker snapshot is published by this monitor. Check the job instances for placement.</div>';
+}
+function showFailures(){showDetailTab("exceptions");if(matchMedia('(max-width:680px)').matches)document.getElementById('stagePanel').scrollIntoView({block:'nearest'});}
+function failureCount(job){return (job.error?1:0)+(job.stages||[]).reduce((n,s)=>n+(s.error?1:0)+(s.instances||[]).filter(i=>i.error).length,0);}
+function renderJobSummary(job){
+ const stages=job.stages||[],failed=failureCount(job),finished=stages.filter(s=>s.state==="FINISHED").length;
+ const input=stages.filter(s=>s.role==="SOURCE").reduce((n,s)=>n+inNum(s),0),output=stages.filter(s=>s.role==="SINK").reduce((n,s)=>n+outNum(s),0);
+ replaceHTML(document.getElementById("jobSummary"),'<div class="job-heading"><h2 title="'+esc(job.name)+'">'+esc(job.name)+'</h2><span class="badge b-'+esc(job.state)+'">'+esc(prettyState(job.state))+'</span>'+((failed||job.state==="FAILED")?'<button class="failure-link" data-focus-key="job-failures" onclick="showFailures()">View failures'+(failed?' ('+failed+')':'')+'</button>':'')+'</div><div class="summary-meta"><span>Elapsed <strong>'+fmtDur(job.submitTime,job.endTime)+'</strong></span><span>Stages <strong>'+finished+' / '+stages.length+' finished</strong></span><span>Rows <strong>'+input.toLocaleString()+' in → '+output.toLocaleString()+' out</strong></span></div>');
+ document.getElementById("tab-exceptions").textContent='Exceptions'+(failed?' ('+failed+')':'');
+}
+
+
+// Job metadata stays available alongside the live graph.
+function renderJobStats(j){
+  const kv=(k,v,cls)=>'<div class="kv"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+esc(v)+'</span></div>';
+  const sink=j.batchSink;
+  let sinkBox="";
+  if(sink){
+    const profiles=[...new Set(sink.capabilityProfiles||[])].join(", ");
+    const prefixes=(sink.descriptorDigestPrefixes||[]);
+    const shown=prefixes.slice(0,8).join(" ")+(prefixes.length>8?" +"+(prefixes.length-8):"");
+    sinkBox='<div class="box"><h3>Batch Sink</h3>'+kv("Sinks",sink.sinkCount)+
+      kv("Profile",profiles)+kv("Commit domain",sink.commitDomainDisposition)+
+      kv("Descriptor digest",shown)+
+      kv("Locator closures",sink.locatorClosureCount+" / "+sink.sinkCount)+
+      kv("Outcome",sink.outcomeState||"—")+'</div>';
+  }
+  return '<div class="box">'+
+    kv("Name",j.name)+kv("Job ID",j.jobId)+kv("State",prettyState(j.state))+kv("Started",fmtTime(j.submitTime))+
+    kv("Duration",fmtDur(j.submitTime,j.endTime))+kv("Stages",j.stages.length)+
+    // Parallelism; downgraded values show desired -> effective.
+    (j.desiredP?kv("Parallelism",j.downgraded?(j.desiredP+'→'+j.effectiveP+' (downgraded)'):(''+j.effectiveP),j.downgraded?"err":""):"")+
+    (j.error?kv("Error",j.error,"err"):"")+'</div>'+sinkBox;
+}
+// Stage statistics below the graph in a grid layout.
+function showDetailTab(tab){
+  const changed=activeDetailTab!==tab;activeDetailTab=tab;syncDetailTabs();toggleDetails(true);renderDetail(curJob);if(changed)document.getElementById("stagePanel").scrollTop=0;
+}
+
+function channelSummary(stage){
+  const channels=stage.inputChannels||[];
+  const inputs=stage.inputs||[];
+  if(!inputs.length) return "source";
+  return inputs.map((input,index)=>input+":"+(channels[index]||"remote")).join(" ");
+}
+
+function renderDetail(job){
+  const target=document.getElementById("detailBody"), scroll=document.getElementById("stagePanel").scrollTop;
+  const focus=target.contains(document.activeElement)?document.activeElement.getAttribute("data-focus-key"):null;
+  renderDetailContent(job);
+  if(focus) [...target.querySelectorAll('[data-focus-key]')].find(n=>n.dataset.focusKey===focus)?.focus({preventScroll:true});
+  document.getElementById("stagePanel").scrollTop=scroll;
+}
+function renderDetailContent(job){
+  if(!job){
+    document.getElementById("detailBody").innerHTML='<div class="hint">Select a job to view runtime details</div>';
+    return;
+  }
+  const target=document.getElementById("detailBody");
+  if(activeDetailTab==="stage"){
+    const selected=(job.stages||[]).find(x=>x.index===selectedStageIdx);
+    if(!selected){
+      target.innerHTML='<div class="hint">Click a DAG node for stage and instance details</div>';
+    } else {
+      renderNodeStats(selected);
+    }
+  } else if(activeDetailTab==="table"){
+    renderStageTable(job,target);
+  } else if(activeDetailTab==="metrics"){
+    renderMetrics(job,target);
+  } else if(activeDetailTab==="job"){
+    target.innerHTML=renderJobStats(job)+'<div class="box"><h3>Workers</h3>'+workerInfo()+'</div>';
+  } else {
+    renderExceptions(job,target);
+  }
+}
+
+function renderStageTable(job,target){
+ const rows=(job.stages||[]).map(stage=>[
+   '<button class="stage-link" data-focus-key="stage-'+stage.index+'" data-stage-index="'+stage.index+'">#'+stage.index+' · '+esc(opTitle(stage.opChain))+'</button>',
+   '<span class="badge b-'+esc(stage.state)+'">'+esc(prettyState(stage.state))+'</span>',
+   Number(inNum(stage)).toLocaleString(),Number(outNum(stage)).toLocaleString(),esc(fmtDur(stage.startTime,stage.endTime)),
+   esc(stage.parallelism||1),esc(stage.workerId||"—"),esc(channelSummary(stage)),stage.error?'<span class="wrap">'+esc(stage.error)+'</span>':'—']);
+ target.innerHTML='<div class="panel-head"><span class="panel-title">Stages</span><span class="panel-sub">Select a stage to locate it in the graph.</span></div>'+table(["Stage / operator","State","Input rows","Output rows","Duration","Parallelism","Worker","Channels","Error"],rows);
+ target.querySelectorAll('[data-stage-index]').forEach(button=>{button.onclick=()=>selectStage(Number(button.dataset.stageIndex),true);button.closest('tr').classList.toggle('selected',Number(button.dataset.stageIndex)===selectedStageIdx);});
+}
+
+function metricCard(label,value){
+  return '<div class="metric"><div class="n">'+esc(value)+'</div><div class="l">'+esc(label)+'</div></div>';
+}
+
+function renderMetrics(job,target){
+  const stages=job.stages||[];
+  const inputRows=stages.filter(s=>s.role==="SOURCE").reduce((sum,s)=>sum+inNum(s),0);
+  const outputRows=stages.filter(s=>s.role==="SINK").reduce((sum,s)=>sum+outNum(s),0);
+  const telemetry=job.executionTelemetry;
+  const stream=job.stream;
+  let html='<div class="panel-head"><span class="panel-title">Job metrics</span>'+
+    '<span class="panel-sub">latest runtime snapshot</span></div><div class="metric-grid">'+
+    metricCard("Input rows",Number(inputRows).toLocaleString())+
+    metricCard("Output rows",Number(outputRows).toLocaleString())+
+    metricCard("Running stages",stages.filter(x=>x.state==="RUNNING").length)+
+    metricCard("Finished stages",stages.filter(x=>x.state==="FINISHED").length)+
+    metricCard("Failed stages",stages.filter(x=>x.state==="FAILED").length)+'</div>';
+  if(telemetry){
+    const measured=telemetry.resourceCoverage==="COMPLETE"||telemetry.resourceCoverage==="PARTIAL";
+    html+='<div class="section">Execution telemetry</div><div class="metric-grid">'+
+      metricCard("Resource coverage",telemetry.resourceCoverage)+
+      (measured?metricCard("Managed peak",Number(telemetry.managedPeakReservedBytes||0).toLocaleString()+" B")+
+        metricCard("Managed acquired",Number(telemetry.managedAcquiredBytes||0).toLocaleString()+" B")+
+        metricCard("Spill runs",Number(telemetry.spillRunCount||0).toLocaleString())+
+        metricCard("Spill written",Number(telemetry.spillLogicalBytesWritten||0).toLocaleString()+" B")
+        :metricCard("Managed peak","—")+metricCard("Managed acquired","—")+
+         metricCard("Spill runs","—")+metricCard("Spill written","—"))+
+      metricCard("Budget status",telemetry.budgetStatus)+'</div>';
+  }
+  if(stream){
+    const progress=stream.lifetime||{};
+    html+='<div class="section">Stream progress</div><div class="metric-grid">'+
+      metricCard("Checkpoints",Number(progress.completedCheckpoints||0).toLocaleString())+
+      metricCard("Watermark",progress.operatorWatermark===undefined?"—":Number(progress.operatorWatermark).toLocaleString())+
+      metricCard("Records read",Number(progress.recordsRead||0).toLocaleString())+
+      metricCard("Records written",Number(progress.recordsWritten||0).toLocaleString())+
+      metricCard("Backpressure",Number(progress.backpressuredMillis||0).toLocaleString()+" ms")+
+      metricCard("CDC phase",progress.cdcPhase||"—")+'</div>';
+  }
+  target.innerHTML=html;
+}
+
+function renderExceptions(job,target){
+  const failures=[];
+  if(job.error) failures.push({where:"Job "+job.jobId,message:job.error});
+  (job.stages||[]).forEach(stage=>{
+    if(stage.error) failures.push({stage:stage.index,where:"Stage #"+stage.index+" · "+stage.opChain,message:stage.error});
+    (stage.instances||[]).forEach(instance=>{
+      if(instance.error) failures.push({stage:stage.index,where:"Stage #"+stage.index+" instance #"+instance.i,message:instance.error});
+    });
+  });
+  target.innerHTML='<div class="panel-head"><span class="panel-title">Exceptions</span>'+
+    '<span class="panel-sub">'+failures.length+' recent failures</span></div>'+
+    (failures.length?failures.map(item=>'<div class="exception"><div class="where">'+esc(item.where)+'</div><div class="message">'+esc(item.message)+'</div>'+(item.stage!==undefined?'<button data-focus-key="failure-'+item.stage+'" data-locate-stage="'+item.stage+'">Locate stage #'+item.stage+'</button>':'')+'</div>').join("")
+      :'<div class="hint">No failures reported in this snapshot.</div>');
+  target.querySelectorAll('[data-locate-stage]').forEach(button=>button.onclick=()=>selectStage(Number(button.dataset.locateStage),true));
+}
+
+function renderNodeStats(s){
+  const kv=(k,v,cls)=>'<div class="kv"><span class="k">'+k+'</span><span class="v'+(cls?' '+cls:'')+'">'+esc(v)+'</span></div>';
+  const par=s.parallelism||1;
+  const instanceRows=(s.instances||[]).map(instance=>[
+    "#"+instance.i,
+    '<span class="badge sm b-'+esc(instance.state)+'">'+esc(instance.state)+'</span>',
+    esc(instance.worker||"—"),Number(instance.inputRows||0).toLocaleString(),
+    Number(instance.outputRows||0).toLocaleString(),esc(fmtDur(instance.startTime,instance.endTime))]);
+  const instanceTable=instanceRows.length
+    ? '<div class="section">Instances</div>'+table(["Instance","State","Worker","Input","Output","Duration"],instanceRows)
+    : "";
+  document.getElementById("detailBody").innerHTML=
+    '<div class="panel-head"><span class="panel-title">'+esc(opTitle(s.opChain))+' · Stage #'+s.index+'</span><span class="panel-sub">'+par+' instance'+(par===1?'':'s')+'</span></div>'+
+    '<div class="sgrid">'+
+    kv("Operator chain",s.opChain)+kv("State",prettyState(s.state))+
+    (s.sourceSplitCount?kv("Source splits",s.sourceSplitCount+" · "+s.sourceReplayMode+
+      " · "+s.sourceDescriptorDigestPrefix):"")+
+    kv("Processed",inNum(s)+" rows"+(isSoaking(s)?" · no output yet":""))+kv("Output",outNum(s)+" rows")+
+    kv("Started",fmtTime(s.startTime))+kv("Duration",fmtDur(s.startTime,s.endTime))+
+    kv("Upstream stages",(s.inputs&&s.inputs.length)?s.inputs.join(", "):"(source)")+
+    (s.error?kv("Error",s.error,"err"):"")+'</div>'+instanceTable;
+}
+
+// ===== SVG DAG: layered layout with drag, pan, and zoom =====
+// Dynamic node height: header, one cell per operator, and row-count footer.
+const NW=196,HGAP=48,VGAP=24,PADX=16,PADY=16;
+const NODE_HEAD=44, OP_ROW=24, NODE_FOOT=28; // Header/operator/footer heights.
+function nodeHeight(s){ return NODE_HEAD + opChainOps(s.opChain).length*OP_ROW + NODE_FOOT; }
+let layoutPos={}, dagW=0, dagH=0;
+
+function computeLayout(stages){
+  const byIdx={}; stages.forEach(s=>byIdx[s.index]=s);
+  const depth={}; function d(i){ if(depth[i]!=null)return depth[i]; const s=byIdx[i];
+    if(!s||!s.inputs||!s.inputs.length)return depth[i]=0; let m=0; s.inputs.forEach(p=>m=Math.max(m,d(p)+1)); return depth[i]=m; }
+  stages.forEach(s=>d(s.index));
+  const layers={}; stages.forEach(s=>{(layers[depth[s.index]]=layers[depth[s.index]]||[]).push(s);});
+  const maxL=Math.max(...Object.keys(layers).map(Number));
+  const layerTotal=l=>(layers[l]||[]).reduce((t,s)=>t+nodeHeight(s),0)+Math.max(0,(layers[l]||[]).length-1)*VGAP;
+  const maxTotal=Math.max(...Array.from({length:maxL+1},(_,l)=>layerTotal(l)));
+  const mid=maxTotal/2;
+  layoutPos={};
+  for(let l=0;l<=maxL;l++){
+    const arr=layers[l]||[];
+    if(l>0){
+      const centers={};
+      arr.forEach(s=>{
+        const ins=(s.inputs||[]).filter(p=>depth[p]===l-1&&layoutPos[p]);
+        centers[s.index]=ins.length?ins.reduce((t,p)=>t+layoutPos[p].y+nodeHeight(byIdx[p])/2,0)/ins.length:mid;
+      });
+      arr.sort((a,b)=>centers[a.index]-centers[b.index]);
+    }
+    let y=mid-layerTotal(l)/2;
+    arr.forEach(s=>{ const h=nodeHeight(s); layoutPos[s.index]={x:PADX+l*(NW+HGAP),y:y,h:h}; y+=h+VGAP; });
+  }
+  dagW=PADX*2+(maxL+1)*NW+maxL*HGAP;
+  let minTop=Infinity,maxBot=-Infinity;
+  Object.values(layoutPos).forEach(p=>{minTop=Math.min(minTop,p.y);maxBot=Math.max(maxBot,p.y+p.h);});
+  dagH=maxBot-minTop+PADY*2;
+}
+
+function nodeXY(idx){ const p=layoutPos[idx]; const o=nodeOffset[idx]||{dx:0,dy:0}; return {x:p.x+o.dx,y:p.y+o.dy,h:p.h}; }
+
+function renderDag(job){
+  curJob=job;
+  renderJobSummary(job);
+  const focusedStage=document.activeElement?.dataset.idx;
+  const stages=job.stages||[];
+  const view_el=document.getElementById("dagview");
+  if(!stages.length){ view_el.innerHTML='<div class="empty">No stages</div>'; return; }
+  computeLayout(stages);
+
+  const svg=document.createElementNS(SVGNS,"svg");
+  svg.setAttribute("width","100%"); svg.setAttribute("height","100%"); svg.id="dagsvg";
+  svg.innerHTML='<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#9aa5b1"/></marker></defs>';
+  const g=document.createElementNS(SVGNS,"g"); g.id="dagg"; svg.appendChild(g);
+
+  // Edges use each dynamically sized node center.
+  const running=stages.filter(s=>s.state==="RUNNING").map(s=>s.index);
+  stages.forEach(s=>{ (s.inputs||[]).forEach((p,ei)=>{ if(!layoutPos[p]||!layoutPos[s.index])return;
+    const a=nodeXY(p),b=nodeXY(s.index); const x1=a.x+NW,y1=a.y+a.h/2,x2=b.x,y2=b.y+b.h/2,mx=(x1+x2)/2;
+    const ch=(s.inputChannels||[])[ei]||"remote"; // Color edges by channel type.
+    const flows=running.includes(p)||running.includes(s.index);
+    const path=document.createElementNS(SVGNS,"path"); path.setAttribute("class","edge ch-"+ch+(flows?" flow":"")); path.dataset.edge=p+"-"+s.index;
+    path.setAttribute("d","M"+x1+","+y1+" C"+mx+","+y1+" "+mx+","+y2+" "+x2+","+y2); g.appendChild(path); }); });
+
+  // Nodes are multi-operator chain boxes: header, vertically stacked operators, and box-level input/output counts.
+  stages.forEach(s=>{ const p=nodeXY(s.index); const ng=document.createElementNS(SVGNS,"g");
+    ng.setAttribute("class","node n-"+s.state+(s.index===selectedStageIdx?" sel":"")); ng.dataset.idx=s.index;
+    ng.setAttribute("transform","translate("+p.x+","+p.y+")");
+    ng.setAttribute("tabindex","0");ng.setAttribute("role","button");ng.setAttribute("aria-pressed",String(s.index===selectedStageIdx));
+    ng.setAttribute("aria-label","Stage "+s.index+", "+opTitle(s.opChain)+", "+prettyState(s.state)+", "+inNum(s)+" input rows, "+outNum(s)+" output rows");
+    const tooltip=document.createElementNS(SVGNS,"title");tooltip.textContent=s.opChain;ng.appendChild(tooltip);
+    const ops=opChainOps(s.opChain);
+    const par=s.parallelism||1;
+    const rect=document.createElementNS(SVGNS,"rect"); rect.setAttribute("width",NW); rect.setAttribute("height",p.h); ng.appendChild(rect);
+    const stripe=document.createElementNS(SVGNS,"rect"); stripe.setAttribute("class","stripe"); stripe.setAttribute("x",2); stripe.setAttribute("y",4); stripe.setAttribute("width",3); stripe.setAttribute("height",p.h-8); stripe.setAttribute("rx",1.5); ng.appendChild(stripe);
+    // Single-operator stages use the operator name; multi-operator chains use Chain, followed by index and parallelism.
+    ng.appendChild(txt(10,19,"#"+s.index+" ×"+par,"title"));
+    ng.appendChild(txt(10,36,prettyState(s.state),"role"));
+    const dur=txt(NW-8,19,fmtDur(s.startTime,s.endTime),"meta duration"); dur.setAttribute("text-anchor","end"); ng.appendChild(dur);
+    // Header separator.
+    ng.appendChild(hline(NODE_HEAD-4));
+    // One vertical cell per operator; thin separators and arrows show chain flow.
+    ops.forEach((name,i)=>{ const oy=NODE_HEAD+i*OP_ROW+14;
+      if(i>0) ng.appendChild(hline(NODE_HEAD+i*OP_ROW-3,true));
+      const label=(ops.length>1&&i<ops.length-1)?name+" ->":name;
+      const text=txt(10,oy,label.length>24?label.slice(0,23)+"…":label,"title");
+      const title=document.createElementNS(SVGNS,"title");title.textContent=label;text.appendChild(title);
+      ng.appendChild(text); });
+    // Footer separator and box-level row counts from chain input to chain output.
+    const footY=NODE_HEAD+ops.length*OP_ROW;
+    ng.appendChild(hline(footY));
+    ng.appendChild(txt(10,footY+16,rowsIO(s)+" rows"+(isSoaking(s)?" · no output yet":""),"meta"));
+    enableDrag(ng,s.index);
+    ng.addEventListener("pointerenter",()=>highlightEdges(s.index,true));
+    ng.addEventListener("pointerleave",()=>highlightEdges(s.index,false));
+    g.appendChild(ng); });
+
+  view_el.innerHTML=""; view_el.appendChild(svg);
+  applyTransform();
+  if(focusedStage) document.querySelector('.node[data-idx="'+focusedStage+'"]')?.focus({preventScroll:true});
+  renderDetail(job);
+
+  function txt(x,y,t,cls){ const e=document.createElementNS(SVGNS,"text"); e.setAttribute("x",x); e.setAttribute("y",y);
+    if(cls)e.setAttribute("class",cls); e.textContent=t; return e; }
+  // Horizontal separators inside a node; dashed between operators and solid for header/footer.
+  function hline(y,dashed){ const e=document.createElementNS(SVGNS,"line"); e.setAttribute("x1",0); e.setAttribute("x2",NW);
+    e.setAttribute("y1",y); e.setAttribute("y2",y); e.setAttribute("class",dashed?"nsep dash":"nsep"); return e; }
+}
+function highlightEdges(idx,on){
+  document.querySelectorAll(".edge").forEach(pe=>{
+    const [f,t]=pe.dataset.edge.split("-").map(Number); const hit=on&&(f===idx||t===idx);
+    pe.classList.toggle("hl",hit); pe.classList.toggle("dim",on&&!hit); });
+}
+
+function applyTransform(){
+ const g=document.getElementById("dagg");if(g)g.setAttribute("transform","translate("+view.x+","+view.y+") scale("+view.k+")");
+ document.getElementById("zoomLevel").textContent=Math.round(view.k*100)+"%";
+}
+function resetView(minimumScale=0){
+ const canvas=document.getElementById("dagview");if(!curJob?.stages.length)return;
+ const positions=curJob.stages.map(s=>nodeXY(s.index)),minX=Math.min(...positions.map(p=>p.x)),minY=Math.min(...positions.map(p=>p.y));
+ const width=Math.max(...positions.map(p=>p.x+NW))-minX,height=Math.max(...positions.map(p=>p.y+p.h))-minY;
+ const fit=Math.min(1,(canvas.clientWidth-32)/width,(canvas.clientHeight-32)/height),k=Math.max(.1,minimumScale,fit);
+ view={k,x:minimumScale?16-minX*k:(canvas.clientWidth-width*k)/2-minX*k,y:Math.max(16,(canvas.clientHeight-height*k)/2)-minY*k};applyTransform();
+}
+function zoomBy(f,point){
+ const canvas=document.getElementById("dagview"),x=point?point.x:canvas.clientWidth/2,y=point?point.y:canvas.clientHeight/2;
+ const k=Math.max(.1,Math.min(3,view.k*f)),ratio=k/view.k;view={k,x:x-(x-view.x)*ratio,y:y-(y-view.y)*ratio};applyTransform();
+}
+function resetLayout(){if(!curJob)return;nodeOffset={};renderDag(curJob);resetView(.8);}
+function selectStage(idx,center=false){
+ const stage=curJob?.stages.find(s=>s.index===idx);if(!stage)return;
+ selectedStageIdx=idx;document.getElementById("stagePanel").scrollTop=0;document.querySelectorAll('.node').forEach(n=>{const active=Number(n.dataset.idx)===idx;n.classList.toggle('sel',active);n.setAttribute('aria-pressed',String(active));});
+ showDetailTab('stage');
+ if(center){const canvas=document.getElementById('dagview'),p=nodeXY(idx);view.k=Math.max(.8,Math.min(1.25,view.k));view.x=canvas.clientWidth/2-(p.x+NW/2)*view.k;view.y=canvas.clientHeight/2-(p.y+p.h/2)*view.k;applyTransform();document.querySelector('.node[data-idx="'+idx+'"]')?.focus({preventScroll:true});}
+ if(matchMedia('(max-width:680px)').matches)document.getElementById('stagePanel').scrollIntoView({block:'nearest'});
+}
+function enableDrag(ng,idx){
+ let moved=false;
+ ng.addEventListener('pointerdown',e=>{
+  if(e.button!==0)return;e.stopPropagation();pointerBusy=true;moved=false;
+  const sx=e.clientX,sy=e.clientY,offset=nodeOffset[idx]||{dx:0,dy:0};
+  const move=event=>{const dx=event.clientX-sx,dy=event.clientY-sy;if(Math.hypot(dx,dy)>4)moved=true;if(moved){nodeOffset[idx]={dx:offset.dx+dx/view.k,dy:offset.dy+dy/view.k};redrawPositions();}};
+  const up=()=>{pointerBusy=false;document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up);};
+  document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);
+ });
+ ng.addEventListener('click',e=>{e.stopPropagation();if(!moved)selectStage(idx);});
+ ng.addEventListener('keydown',e=>{
+  const nodes=[...document.querySelectorAll('.node')],at=nodes.indexOf(ng);let next;
+  if(e.key==='Enter'||e.key===' '){e.preventDefault();e.stopPropagation();selectStage(idx,true);return;}
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')next=nodes[(at+1)%nodes.length];
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')next=nodes[(at+nodes.length-1)%nodes.length];
+  if(e.key==='Home')next=nodes[0];if(e.key==='End')next=nodes[nodes.length-1];
+  if(next){e.preventDefault();e.stopPropagation();selectStage(Number(next.dataset.idx),true);}
+ });
+}
+
+
+// After node dragging, update position without rebuilding the graph.
+function redrawPositions(){ if(!curJob) return;
+  (curJob.stages||[]).forEach(s=>{ const p=nodeXY(s.index);
+    const n=document.querySelector('.node[data-idx="'+s.index+'"]'); if(n) n.setAttribute("transform","translate("+p.x+","+p.y+")"); });
+  document.querySelectorAll(".edge").forEach(pe=>{ const [f,t]=pe.dataset.edge.split("-").map(Number);
+    if(!layoutPos[f]||!layoutPos[t])return; const a=nodeXY(f),b=nodeXY(t);
+    const x1=a.x+NW,y1=a.y+a.h/2,x2=b.x,y2=b.y+b.h/2,mx=(x1+x2)/2;
+    pe.setAttribute("d","M"+x1+","+y1+" C"+mx+","+y1+" "+mx+","+y2+" "+x2+","+y2); });
+}
+
+// Pointer and keyboard graph navigation keep the same viewport model.
+(function(){const canvas=document.getElementById('dagview');let pan=false,px,py,vx,vy;
+ canvas.addEventListener('pointerdown',e=>{if(e.button!==0)return;pan=true;pointerBusy=true;canvas.classList.add('panning');px=e.clientX;py=e.clientY;vx=view.x;vy=view.y;});
+ document.addEventListener('pointermove',e=>{if(pan){view.x=vx+e.clientX-px;view.y=vy+e.clientY-py;applyTransform();}});
+ const end=()=>{pan=false;pointerBusy=false;canvas.classList.remove('panning');};document.addEventListener('pointerup',end);document.addEventListener('pointercancel',end);
+ canvas.addEventListener('wheel',e=>{e.preventDefault();const box=canvas.getBoundingClientRect();zoomBy(e.deltaY<0?1.1:1/1.1,{x:e.clientX-box.left,y:e.clientY-box.top});},{passive:false});
+ canvas.addEventListener('keydown',e=>{if(e.target!==canvas)return;const moves={ArrowLeft:[40,0],ArrowRight:[-40,0],ArrowUp:[0,40],ArrowDown:[0,-40]};if(moves[e.key]){e.preventDefault();view.x+=moves[e.key][0];view.y+=moves[e.key][1];applyTransform();}if(e.key==='+'||e.key==='='){e.preventDefault();zoomBy(1.25);}if(e.key==='-'){e.preventDefault();zoomBy(.8);}if(e.key==='Home'){e.preventDefault();resetView();}});
+})();
+(function(){const separator=document.getElementById('panelResizer'),panel=document.getElementById('stagePanel');
+ const resize=height=>{height=Math.max(100,Math.min(560,height));panel.style.height=height+'px';separator.setAttribute('aria-valuenow',height);};
+ separator.addEventListener('keydown',e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){e.preventDefault();resize(panel.offsetHeight+(e.key==='ArrowUp'?24:-24));}});
+ separator.addEventListener('pointerdown',e=>{e.preventDefault();const sy=e.clientY,height=panel.offsetHeight;const move=ev=>resize(height+sy-ev.clientY);const up=()=>{document.removeEventListener('pointermove',move);document.removeEventListener('pointerup',up);document.removeEventListener('pointercancel',up);};document.addEventListener('pointermove',move);document.addEventListener('pointerup',up);document.addEventListener('pointercancel',up);});
+})();
+document.querySelector('.detail-tabs').addEventListener('keydown',e=>{
+ const buttons=[...document.querySelectorAll('.detail-tabs button')],at=buttons.indexOf(document.activeElement);let next;
+ if(e.key==='ArrowRight')next=buttons[(at+1)%buttons.length];if(e.key==='ArrowLeft')next=buttons[(at+buttons.length-1)%buttons.length];if(e.key==='Home')next=buttons[0];if(e.key==='End')next=buttons[buttons.length-1];
+ if(next){e.preventDefault();showDetailTab(next.id.slice(4));next.focus();}
+});
+function showView(name,route=true){
+ if(!['overview','jobs','workers','retention','config'].includes(name))name='overview';activeView=name;
+ document.querySelectorAll('.view').forEach(el=>el.classList.toggle('active',el.id==='view-'+name));
+ document.querySelectorAll('nav button').forEach(el=>{const active=el.dataset.view===name;el.classList.toggle('active',active);if(active)el.setAttribute('aria-current','page');else el.removeAttribute('aria-current');});
+ if(route)history.replaceState(null,'','#'+name+(name==='jobs'&&selectedJobId?'/'+encodeURIComponent(selectedJobId):''));
+ if(name==='overview')renderOverview();if(name==='workers')renderWorkerTable(window.workerCache||[]);if(name==='retention')renderRetention();if(name==='config')renderConfig();
+}
+function themeSetting(value){try{if(value!==undefined)localStorage.setItem('rowweave-monitor-theme',value);return localStorage.getItem('rowweave-monitor-theme');}catch(e){return null;}}
+function applyTheme(theme){document.body.dataset.theme=theme;const dark=theme==='dark';document.getElementById('themeToggle').textContent=dark?'Light':'Dark';document.getElementById('themeToggle').setAttribute('aria-label',dark?'Use light theme':'Use dark theme');}
+function toggleTheme(){const theme=document.body.dataset.theme==='dark'?'light':'dark';themeSetting(theme);applyTheme(theme);}
+applyTheme(themeSetting()||(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+function renderOverview(){
+ if(!hasSnapshot){document.getElementById('overviewCards').innerHTML='<div class="empty">Loading runtime snapshot…</div>';return;}
+ const counts=[['All jobs',jobsCache.length,''],['Running',jobsCache.filter(j=>j.state==='RUNNING').length,'RUNNING'],['Finished',jobsCache.filter(j=>j.state==='FINISHED').length,'FINISHED'],['Failed',jobsCache.filter(j=>j.state==='FAILED').length,'FAILED']];
+ const cards=document.getElementById('overviewCards');
+ replaceHTML(cards,counts.map(c=>'<button class="card '+(c[2]==='FAILED'?'failed':'')+'" data-focus-key="overview-'+c[2]+'" data-state="'+c[2]+'"><div class="num">'+c[1]+'</div><div class="label">'+c[0]+'</div></button>').join(''));
+ cards.querySelectorAll('button').forEach(button=>button.onclick=()=>openJobs(button.dataset.state));
+ const recent=document.getElementById('recentJobs');
+ replaceHTML(recent,jobsCache.length?jobsCache.slice().sort((a,b)=>b.submitTime-a.submitTime).slice(0,8).map(j=>'<button class="recent-job" data-focus-key="recent-'+esc(j.jobId)+'" data-job-id="'+esc(j.jobId)+'"><span class="name">'+esc(j.name)+'</span><span class="when">'+fmtDur(j.submitTime,j.endTime)+'</span><span class="badge b-'+esc(j.state)+'">'+esc(prettyState(j.state))+'</span></button>').join(''):'<div class="empty"><strong>No jobs observed yet</strong>Jobs will appear here after your application submits work.</div>');
+ recent.querySelectorAll('button').forEach(button=>button.onclick=()=>selectJob(button.dataset.jobId));
+}
+
+function value(x){ return x==null||x===undefined?"—":x; }
+function fmtBytes(bytes){
+  if(bytes==null||bytes===undefined) return "—";
+  if(bytes===0) return "0 B";
+  const units=["B","KB","MB","GB","TB"];
+  const exponent=Math.min(units.length-1,Math.floor(Math.log(bytes)/Math.log(1024)));
+  const amount=bytes/Math.pow(1024,exponent);
+  return (exponent===0?amount:amount.toFixed(1))+" "+units[exponent];
+}
+function table(headers,rows){
+  return '<div class="table-scroll" tabindex="0" role="region" aria-label="Scrollable runtime table"><table><thead><tr>'+headers.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+
+    (rows.length?rows.map(r=>'<tr>'+r.map(c=>'<td class="num">'+value(c)+'</td>').join('')+'</tr>').join(''):'<tr><td colspan="'+headers.length+'">No data</td></tr>')+'</tbody></table></div>';
+}
+
+function renderWorkerTable(ws){
+  window.workerCache=ws;
+  document.getElementById("workerTable").innerHTML=table(
+    ["Worker","Address","Slots","Free","Memory used","Memory max","Status"],
+    ws.map(w=>[esc(w.workerId),esc(w.host)+":"+w.port,w.slots,w.freeSlots,
+      esc(fmtBytes(w.managedMemoryUsedBytes)),esc(fmtBytes(w.managedMemoryMaxBytes)),
+      '<span class="pill '+(w.alive?"alive":"dead")+'">'+(w.alive?"ALIVE":"OFFLINE")+'</span>']));
+}
+
+async function renderRetention(){
+  if(pageRequests.retention)return;pageRequests.retention=true;const epoch=observationEpoch,controller=new AbortController();
+  try{
+    const [run,artifact,retry]=await Promise.all([getJSON("/api/retention",controller.signal),getJSON("/api/artifact-retention",controller.signal),getJSON("/api/retry-recovery",controller.signal)]);
+    if(epoch!==observationEpoch)return;
+    document.getElementById("retentionPage").innerHTML='<h2>Retention and recovery</h2>'+
+      table(["Run backlog","Claimed","Purged","Errors","Cycle complete"],[[run.backlog,run.claimedRuns,run.purgedRuns,run.errorRuns,run.cycleComplete]])+
+      '<h3>Artifacts</h3>'+table(["Backlog","Entries","Bytes","Deleted","Retained"],[[artifact.backlog,artifact.inventoryEntries,artifact.inventoryBytes,artifact.deletedArtifacts,artifact.retainedReferenced]])+
+      '<h3>Retry recovery</h3>'+table(["State","Active","Waiting","Scheduled","Exhausted"],[[retry.state,retry.activeRuns,retry.waitingRetries,retry.scheduledRetries,retry.exhaustedRetries]]);
+    pageSnapshots.retention=document.getElementById("retentionPage").innerHTML;
+  }catch(e){if(epoch===observationEpoch){document.getElementById("retentionPage").innerHTML=(pageSnapshots.retention||'<h2>Retention and recovery</h2>')+'<div class="empty">Snapshot unavailable. Check the connection and use Refresh to retry.</div>';updateConnection('disconnected');}}
+  finally{controller.abort();pageRequests.retention=false;}
+}
+
+async function renderConfig(){
+  if(pageRequests.config)return;pageRequests.config=true;const epoch=observationEpoch;
+  try{
+    const config=await getJSON("/api/config");if(epoch!==observationEpoch)return;
+    document.getElementById("configPage").innerHTML='<h2>Configuration</h2>'+table(
+      ["Setting","Value"],[["Bind address",esc(config.bindAddress)],["Port",config.port],["History",config.history],
+        ["CORS credentials",config.cors.allowCredentials],["Allowed origins",esc(config.cors.allowedOrigins.join(", "))]]);
+    pageSnapshots.config=document.getElementById("configPage").innerHTML;
+  }catch(e){if(epoch===observationEpoch){document.getElementById("configPage").innerHTML=(pageSnapshots.config||'<h2>Configuration</h2>')+'<div class="empty">Snapshot unavailable. Check the connection and use Refresh to retry.</div>';updateConnection('disconnected');}}
+  finally{pageRequests.config=false;}
+}
+
+let dagSig=null;
+function sigOf(job){return JSON.stringify([job.state,job.error,job.batchSink,job.stages]);}
+async function loadDag(jobId,force=false){
+ if(detailController){if(!force)return;detailController.abort();}
+ const controller=new AbortController(),sequence=++detailSequence,epoch=observationEpoch;detailController=controller;
+ try{
+  const job=await getJSON('/api/jobs/'+encodeURIComponent(jobId),controller.signal);
+  if(sequence!==detailSequence||selectedJobId!==jobId||epoch!==observationEpoch)return;
+  curJob=job;jobExpired=false;renderJobSummary(job);syncDetailTabs();
+  const sig=sigOf(job),first=!document.getElementById('dagsvg')||force;
+  if((force||sig!==dagSig)&&!pointerBusy){dagSig=sig;renderDag(job);if(first)resetView(.8);}
+  else{(job.stages||[]).forEach(stage=>{const duration=document.querySelector('.node[data-idx="'+stage.index+'"] .duration');if(duration)duration.textContent=fmtDur(stage.startTime,stage.endTime);});renderDetail(job);}
+  lastSuccess=Date.now();updateConnection('live');
+ }catch(error){
+  if(sequence!==detailSequence||selectedJobId!==jobId||epoch!==observationEpoch)return;
+  if(error.status===404){
+   curJob=null;jobExpired=true;dagSig=null;document.getElementById('jobSummary').innerHTML='<div class="hint">Job unavailable in this monitor history.</div>';
+   document.getElementById('dagview').innerHTML='<div class="empty"><strong>Job no longer available</strong>It may have expired from retained history. Choose another job or refresh.</div>';renderDetail(null);
+   lastSuccess=Date.now();updateConnection('live');
+  }else{updateConnection('disconnected');if(!curJob)document.getElementById('dagview').innerHTML='<div class="empty"><strong>Unable to load this job</strong>Check the connection and use Retry now.</div>';}
+ }finally{if(detailController===controller)detailController=null;}
+}
+async function tick(force=false){
+ if((paused&&!force)||polling)return;polling=true;
+ const epoch=observationEpoch,controller=new AbortController();tickController=controller;
+ document.getElementById('refreshNow').disabled=true;
+ try{
+  const [jobs,workers]=await Promise.all([getJSON('/api/jobs',controller.signal),getJSON('/api/workers',controller.signal)]);
+  if(epoch!==observationEpoch)return;
+  hasSnapshot=true;renderJobs(jobs);renderWorkers(workers);lastSuccess=Date.now();updateConnection('live');
+  if(activeView==='overview')renderOverview();if(activeView==='workers')renderWorkerTable(workers);
+  if(activeView==='retention')await renderRetention();if(activeView==='config')await renderConfig();
+  if(selectedJobId&&(!jobExpired||force||jobs.some(j=>j.jobId===selectedJobId)))await loadDag(selectedJobId,force&&!curJob);
+ }catch(error){if(epoch===observationEpoch)updateConnection('disconnected');}
+ finally{controller.abort();if(tickController===controller)tickController=null;polling=false;document.getElementById('refreshNow').disabled=false;}
+}
+function routeHash(){
+ const parts=(location.hash||'#overview').slice(1).replace(/^\//,'').split('/');
+ showView(parts[0]||'overview',false);
+ if(parts[0]==='jobs'&&parts[1]){try{selectJob(decodeURIComponent(parts[1]));}catch(e){showView('jobs');}}
+}
+window.addEventListener('hashchange',routeHash);
+syncDetailTabs();toggleDetails(!detailsCollapsed);routeHash();tick();
+setInterval(()=>tick(),1500);
+</script>
+</body>
+</html>

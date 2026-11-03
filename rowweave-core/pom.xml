@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.rowweave</groupId>
+        <artifactId>rowweave-parent</artifactId>
+        <version>0.2.0</version>
+    </parent>
+
+    <!-- Engine core: pure-push operators, local/cluster execution, ServiceRegistry SPI,
+         and the default in-process registry. No ZooKeeper/Curator dependency; the ZK
+         implementation lives in the separate rowweave-registry-zk module. -->
+    <artifactId>rowweave-core</artifactId>
+    <packaging>jar</packaging>
+    <name>RowWeave Core</name>
+    <description>Embedded compute engine: DataSet API, pure-push execution, batch and Stream runtimes, cluster orchestration and connector SPI.</description>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <properties>
+        <!-- The default suite excludes heavy @multiprocess cluster tests and @profile
+             performance tests. The cluster-isolated profile enables the former explicitly;
+             command-line properties can still override this exclusion. -->
+        <rowweave.test.excludedGroups>multiprocess | profile</rowweave.test.excludedGroups>
+        <!-- Use one report directory per Maven invocation to isolate default/profile/multiprocess XML. -->
+        <rowweave.test.reportSet>default</rowweave.test.reportSet>
+        <maven.build.timestamp.format>yyyyMMdd-HHmmss-SSS</maven.build.timestamp.format>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.ow2.asm</groupId>
+            <artifactId>asm</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-transport</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-codec</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-handler</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjdk.jol</groupId>
+            <artifactId>jol-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.224</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Default suite: unit plus local integration tests with a reused fork. Heavy
+                         @multiprocess cluster tests and @profile performance tests are excluded by default.
+                         Run performance tests with `-Pprofile-tests`; run cluster tests with
+                         `-Pcluster-isolated -DexcludedGroups=` so each class gets a fresh fork. Maven,
+                         Surefire, and launched Master/Worker JVMs keep explicit JVM resource limits. -->
+                    <excludedGroups>${rowweave.test.excludedGroups}</excludedGroups>
+                    <reportsDirectory>${project.build.directory}/surefire-reports/${rowweave.test.reportSet}-${maven.build.timestamp}</reportsDirectory>
+                    <systemPropertyVariables>
+                        <!-- Legacy fixture compatibility: current worker registration and mux data-plane
+                             endpoints come from rowweave.control.host and cannot bypass security/bind guards. -->
+                        <rowweave.worker.host>127.0.0.1</rowweave.worker.host>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+            </plugin>
+            <!-- Test JAR for monitor live runners that reuse the equivalence operator DAG. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>artifact-checksums</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <checksum algorithm="SHA-256" format="MD5SUM">
+                                    <fileset dir="${project.build.directory}">
+                                        <include name="*.jar"/>
+                                        <include name="bom.json"/>
+                                        <include name="bom.xml"/>
+                                    </fileset>
+                                </checksum>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+
+    <profiles>
+        <!-- Cluster-isolated profile: each multiprocess test class gets a fresh JVM and deterministic
+             resource cleanup. Run with `mvn test -Dgroups=multiprocess -DexcludedGroups= -Pcluster-isolated`.
+             Pass/fail is determined by this suite only. On OOM, audit RowWeave memory budgets and
+             JVM heap/direct/metaspace/stack/CPU settings; clean up only processes started by this run. -->
+        <profile>
+            <id>cluster-isolated</id>
+            <properties>
+                <!-- Cluster suite: clear exclusions to run multiprocess tests. -->
+                <rowweave.test.excludedGroups></rowweave.test.excludedGroups>
+                <rowweave.test.reportSet>multiprocess</rowweave.test.reportSet>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <reuseForks>false</reuseForks>
+                            <forkCount>1</forkCount>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <!-- Explicit profile-only performance tests with an isolated report directory:
+             mvn test -Pprofile-tests -Dtest=ProjectedKeySerializationPerformanceTest -->
+        <profile>
+            <id>profile-tests</id>
+            <properties>
+                <rowweave.test.excludedGroups></rowweave.test.excludedGroups>
+                <rowweave.test.reportSet>profile</rowweave.test.reportSet>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-surefire-plugin</artifactId>
+                        <configuration>
+                            <groups>profile</groups>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

@@ -1,0 +1,173 @@
+name: CI
+
+# The full suite runs on both Linux and macOS so that socket lifecycle
+# differences at the data-plane boundary stay covered: close() behaviour
+# (RST versus FIN), InputStream.available(), and half-close through
+# shutdownOutput(). Netty hides most of this, so the two-platform matrix is
+# the regression guard rather than the implementation.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # Public-surface guards. These checks are textual and finish in seconds, so they
+  # run before Maven: an identity leak, a Chinese comment in any tracked file,
+  # or a dead documentation link is a review failure, not a test-suite concern.
+  surface:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Zero predecessor identity
+        run: bash tools/oss_identity_residue_gate.sh
+      - name: Private process narrative boundary
+        run: bash tools/oss_content_boundary_gate.sh
+      - name: Retired identifiers absent from Java names
+        run: python3 tools/oss_java_identifier_gate.py
+      - name: Repository language is English
+        run: python3 tools/oss_source_language_gate.py
+      - name: Gate regression tests
+        run: python3 -m unittest discover -s tools -p 'test_oss_*gate.py'
+      - name: Documentation links resolve
+        run: |
+          python3 - <<'PYCHECK'
+          import os, re, sys
+          bad = []
+          for root, dirs, files in os.walk('.'):
+              dirs[:] = [d for d in dirs if d not in ('target', '.git')]
+              for name in files:
+                  if not name.endswith('.md'):
+                      continue
+                  path = os.path.join(root, name)
+                  text = open(path, encoding='utf-8', errors='replace').read()
+                  for m in re.finditer(r'\[([^\]]*)\]\(([^)\s]+)\)', text):
+                      target = m.group(2).split('#')[0]
+                      if not target or target.startswith(('http', 'mailto:')):
+                          continue
+                      if not os.path.exists(os.path.normpath(os.path.join(root, target))):
+                          bad.append((path, target))
+          for b in bad:
+              print('BROKEN LINK', b[0], '->', b[1])
+          sys.exit(1 if bad else 0)
+          PYCHECK
+  # Documentation is a product surface: contract wording, examples, defaults,
+  # support claims and translations are checked on every change, not only when
+  # the diff visibly touches Markdown.
+  documentation:
+    name: Documentation maintenance
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Complete documentation quality suite
+        run: bash tools/oss_docs_quality_gate.sh
+  security:
+    name: Dependency security
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - name: Resolve the complete reactor dependency tree
+        run: |
+          mkdir -p target
+          mvn -B -ntp dependency:tree > target/dependency-security-tree.log
+      - name: Check all resolved scopes against OSV
+        run: python3 tools/oss_dependency_security_gate.py target/dependency-security-tree.log
+
+  # Default suite: operators, unit and architecture tests. The bench, profile
+  # and multiprocess groups are excluded because they are heavy, diagnostic or
+  # need more than one JVM.
+  unit:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04-arm, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17.0.20+8'
+          cache: maven
+      - name: Unit + operator suite (exclude bench/profile/multiprocess)
+        run: mvn -B -ntp test -DexcludedGroups=bench,profile,multiprocess
+
+  # Multi-process cluster suite: real socket data plane plus cluster
+  # orchestration. This is where cross-OS socket lifecycle regressions surface.
+  cluster:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04-arm, macos-15]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17.0.20+8'
+          cache: maven
+      - name: "Cluster suite (@multiprocess: socket data plane, failover and timeout injection)"
+        # -Pcluster-isolated forks one JVM per test class, which releases the
+        # sockets, threads and ports that the cluster suites accumulate.
+        run: mvn -B -ntp test -Dgroups=multiprocess -DexcludedGroups= -Pcluster-isolated
+
+  # Release-integration gate: packaging and consumer gates on one runner.
+  # This turns "the artifact set is defined" into "it was built, checksummed
+  # and consumed": a clean checkout, a real JDK 8 consumer home, release-profile
+  # SBOM, and the published-jar ITs. A missing environment fails the job.
+  release:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Set up JDK 8 (consumer gate)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+      - name: Export ROWWEAVE_JAVA8_HOME
+        run: echo "ROWWEAVE_JAVA8_HOME=$JAVA_HOME" >> "$GITHUB_ENV"
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17.0.20+8'
+          cache: maven
+      - name: Release packaging gate (clean checkout, jars, SBOM, checksums)
+        run: bash tools/oss_release_gate.sh
+      # rowweave.java8.required=true turns a skipped Java 8 consumer IT into a
+      # job failure. Without it, an unforwarded property or an incomplete JDK 8
+      # would leave the ITs skipped and the job would still report success.
+      - name: Release verify (unit suite + published-jar ITs on JDK 8 consumer)
+        run: >-
+          mvn -Prelease -B -ntp verify
+          -Drowweave.java8.home="$ROWWEAVE_JAVA8_HOME"
+          -Drowweave.java8.required=true
+      - name: Example and connector qualification
+        run: bash tools/oss_example_qualification.sh

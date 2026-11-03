@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.rowweave</groupId>
+        <artifactId>rowweave-parent</artifactId>
+        <version>0.2.0</version>
+    </parent>
+
+    <!-- Runnable examples use only the public API. Keeping this module in the reactor makes CI
+         compile them and fail on public-signature drift. -->
+    <artifactId>rowweave-examples</artifactId>
+    <packaging>jar</packaging>
+    <name>RowWeave Examples</name>
+    <description>Runnable examples that use only the public API and are compiled by CI to keep them in step with the engine.</description>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.rowweave</groupId>
+            <artifactId>rowweave-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.github.rowweave</groupId>
+            <artifactId>rowweave-pipeline</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <rowweave.java8.home>${rowweave.java8.home}</rowweave.java8.home>
+                        <rowweave.published.core.jar>${project.basedir}/../rowweave-core/target/rowweave-core-${project.version}.jar</rowweave.published.core.jar>
+                        <rowweave.published.pipeline.jar>${project.basedir}/../rowweave-pipeline/target/rowweave-pipeline-${project.version}.jar</rowweave.published.pipeline.jar>
+                        <rowweave.stream.example.sources>${project.basedir}/src/main/java</rowweave.stream.example.sources>
+                    </systemPropertyVariables>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>artifact-checksums</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <checksum algorithm="SHA-256" format="MD5SUM">
+                                    <fileset dir="${project.build.directory}">
+                                        <include name="*.jar"/>
+                                        <include name="bom.json"/>
+                                        <include name="bom.xml"/>
+                                    </fileset>
+                                </checksum>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+
+    </build>
+</project>

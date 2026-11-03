@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>io.github.rowweave</groupId>
+    <artifactId>rowweave-parent</artifactId>
+    <version>0.2.0</version>
+    <packaging>pom</packaging>
+    <name>RowWeave Parent</name>
+    <description>Parent reactor for the RowWeave embedded compute engine.</description>
+
+    <!-- Single source for repository URLs; url/scm/developers/CI/templates derive from it. -->
+    <url>${rowweave.repo.url}</url>
+
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>rowweave</id>
+            <name>RowWeave Authors</name>
+            <url>${rowweave.repo.url}</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:${rowweave.repo.url}.git</connection>
+        <developerConnection>scm:git:${rowweave.repo.url}.git</developerConnection>
+        <url>${rowweave.repo.url}</url>
+    </scm>
+
+    <!-- Release channel: snapshots use Central Portal snapshots; release publishing uses
+         the external Central Portal workflow and is never pushed automatically by this repo. -->
+    <distributionManagement>
+        <snapshotRepository>
+            <id>central</id>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
+
+    <!-- Modules: core (engine core, no ZooKeeper dependency) and registry-zk
+         (the ZooKeeper implementation as a separate module using Curator). -->
+    <modules>
+        <module>rowweave-core</module>
+        <module>rowweave-connector-s3</module>
+        <module>rowweave-connector-postgres-cdc</module>
+        <module>rowweave-soak</module>
+        <module>rowweave-pipeline</module>
+        <module>rowweave-registry-zk</module>
+        <module>rowweave-monitor</module>
+        <!-- Runnable examples depend on core at compile time so CI detects public API drift. -->
+        <module>rowweave-examples</module>
+    </modules>
+
+    <properties>
+        <!-- Java 8 consumer home forwarded into the forked integration-test JVM.
+             Left empty so an unset property resolves to "" instead of a literal
+             ${...}; the ITs then fall back to JAVA8_HOME or the macOS probe. -->
+        <rowweave.java8.home></rowweave.java8.home>
+        <!-- Set to true by a gate that has already claimed Java 8 evidence: the
+             consumer IT then fails instead of skipping when no JDK 8 resolves. -->
+        <rowweave.java8.required>false</rowweave.java8.required>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <!-- Surefire late replacement is always defined; JaCoCo overrides it in core. -->
+        <argLine></argLine>
+        <!-- Centralized dependency versions. -->
+        <asm.version>9.7</asm.version>
+        <netty.version>4.1.139.Final</netty.version>
+        <slf4j.version>2.0.20</slf4j.version>
+        <!-- The logging backend is test-only and runs on the JDK 17 build JVM. -->
+        <logback.version>1.5.38</logback.version>
+        <junit.version>5.10.2</junit.version>
+        <jol.version>0.17</jol.version>
+        <aws.sdk.version>2.42.37</aws.sdk.version>
+        <jackson.version>2.22.3</jackson.version>
+        <postgresql.jdbc.version>42.7.13</postgresql.jdbc.version>
+        <!-- Curator is isolated to the optional registry and release qualification tooling. -->
+        <curator.version>5.9.0</curator.version>
+        <zookeeper.version>3.9.7</zookeeper.version>
+        <guava.version>33.7.2-jre</guava.version>
+        <snappy.version>1.1.10.12</snappy.version>
+        <!-- Release engineering: single repository coordinate source and reproducible artifact timestamp. -->
+        <rowweave.repo.url>https://github.com/pessoafernando/rowweave</rowweave.repo.url>
+        <project.build.outputTimestamp>2026-10-24T00:00:00Z</project.build.outputTimestamp>
+    </properties>
+
+    <!-- Central dependency versions; modules declare only groupId/artifactId. -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper-jute</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.xerial.snappy</groupId>
+                <artifactId>snappy-java</artifactId>
+                <version>${snappy.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.ow2.asm</groupId>
+                <artifactId>asm</artifactId>
+                <version>${asm.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-transport</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-handler</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <!-- HTTP codec is used only by rowweave-monitor; core has no HTTP dependency. -->
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-codec-http</artifactId>
+                <version>${netty.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-simple</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-framework</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-recipes</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.curator</groupId>
+                <artifactId>curator-test</artifactId>
+                <version>${curator.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.rowweave</groupId>
+                <artifactId>rowweave-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>s3</artifactId>
+                <version>${aws.sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>software.amazon.awssdk</groupId>
+                <artifactId>url-connection-client</artifactId>
+                <version>${aws.sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${postgresql.jdbc.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.rowweave</groupId>
+                <artifactId>rowweave-pipeline</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.github.rowweave</groupId>
+                <artifactId>rowweave-core</artifactId>
+                <version>${project.version}</version>
+                <type>test-jar</type>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jol</groupId>
+                <artifactId>jol-core</artifactId>
+                <version>${jol.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- Plugin configuration is centralized in pluginManagement for child modules. -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-surefire-plugin</artifactId>
+                    <version>3.2.5</version>
+                    <configuration>
+                        <!-- Scope caps to this test JVM, not JAVA_TOOL_OPTIONS inherited by
+                             already-budgeted Master/Worker children. Preserve JaCoCo's late argLine. -->
+                        <argLine>@{argLine} -Xms64m -Xmx1536m -XX:MaxDirectMemorySize=256m -XX:MaxMetaspaceSize=256m -XX:ReservedCodeCacheSize=128m -Xss1m -XX:ActiveProcessorCount=4 -Drowweave.process.memoryLimitBytes=8589934592 "-Djava.io.tmpdir=${java.io.tmpdir}"</argLine>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>default-compile</id>
+                            <configuration>
+                                <release>8</release>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>3.4.2</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-source-plugin</artifactId>
+                    <version>3.3.1</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>3.11.2</version>
+                    <configuration>
+                        <release>8</release>
+                        <doclint>none</doclint>
+                        <quiet>true</quiet>
+                        <detectJavaApiLink>false</detectJavaApiLink>
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                        <failOnError>true</failOnError>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.cyclonedx</groupId>
+                    <artifactId>cyclonedx-maven-plugin</artifactId>
+                    <version>2.9.1</version>
+                    <configuration>
+                        <projectType>library</projectType>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>3.1.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-shade-plugin</artifactId>
+                    <version>3.6.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>exec-maven-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                    <version>3.2.5</version>
+                    <configuration>
+                        <argLine>@{argLine} -Xms64m -Xmx1536m -XX:MaxDirectMemorySize=256m -XX:MaxMetaspaceSize=256m -XX:ReservedCodeCacheSize=128m -Xss1m -XX:ActiveProcessorCount=4 -Drowweave.process.memoryLimitBytes=8589934592 "-Djava.io.tmpdir=${java.io.tmpdir}"</argLine>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>0.8.12</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>report</id>
+                            <phase>test</phase>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <!-- SBOM is produced only by the explicit release profile because CycloneDX makeBom
+         requires online mode. Release builds must run `mvn -Prelease clean verify` online. -->
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.cyclonedx</groupId>
+                        <artifactId>cyclonedx-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>sbom</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>makeBom</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

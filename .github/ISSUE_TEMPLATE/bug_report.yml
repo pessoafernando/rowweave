@@ -1,0 +1,69 @@
+name: Bug report
+description: A result, recovery or resource behaviour that is wrong
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: >
+        Numeric correctness, data loss and recovery bugs are treated as
+        release blockers. Please fill in the runtime details: the same job can
+        behave differently in local, in-process and cross-host cluster mode.
+  - type: input
+    id: version
+    attributes:
+      label: RowWeave version
+      placeholder: "0.2.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: runtime
+    attributes:
+      label: Runtime
+      options: [Batch, Stream, Both]
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Deployment mode
+      options: [Embedded / local, InProcess cluster, Cross-host cluster]
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: >
+        Host JDK, operating system, and topology. Include source commit or
+        artifact identity, node roles, registry, connector versions, and
+        relevant resource limits. Omit credentials and private endpoints.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened
+      description: Expected result versus actual result, with the concrete values.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction
+      description: >
+        Provide a self-contained reproduction: a job or test, plus the operator
+        mix and DAG shape. Note whether it reproduces on one host and in a
+        multi-JVM cluster.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs and thread dumps
+      render: text
+      description: >
+        Omit key material, certificates and credentials. If the failure is a
+        spill, budget or shutdown problem, include the managed-memory report.
+        Report vulnerabilities privately through SECURITY.md rather than this
+        template.

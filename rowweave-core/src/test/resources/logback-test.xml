@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Logging while tests run: WARN by default, so a warning or a failure stays visible without drowning the surefire output. Set -Dlogback.cluster.level=DEBUG to raise one class when debugging. -->
+<configuration>
+    <appender name="STDERR" class="ch.qos.logback.core.ConsoleAppender">
+        <target>System.err</target>
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} %-5level %logger{24} [job=%X{jobId:-–} stage=%X{stageId:-–}] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="io.rowweave.cluster" level="${logback.cluster.level:-WARN}"/>
+
+    <root level="WARN">
+        <appender-ref ref="STDERR"/>
+    </root>
+</configuration>

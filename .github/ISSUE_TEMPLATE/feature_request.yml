@@ -1,0 +1,47 @@
+name: Feature request
+description: Request a capability boundary change or new supported surface
+labels: ["enhancement"]
+body:
+  - type: checkboxes
+    id: capability-boundary
+    attributes:
+      label: Capability boundary
+      options:
+        - label: >
+            I checked the capability matrix and this is an unsupported outcome,
+            stable refusal, or lifecycle need rather than a defect.
+          required: true
+        - label: >
+            I understand the roadmap is open work and is not a promise of
+            support.
+          required: true
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: >
+        Describe the outcome you need, the current stable refusal or unsupported
+        outcome, and why existing Batch, Stream, Pipeline, or SPI contracts do
+        not cover it.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Proposed outcome
+      description: >
+        Sketch the user-visible contract and limits. Include explicit failure
+        and resource behavior when relevant. Do not submit credentials or
+        private endpoints.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives
+      description: >
+        Describe composition, connectors, or supported APIs you already
+        considered.
+      render: text
