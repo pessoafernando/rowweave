@@ -4,15 +4,34 @@ doc-channel: default-branch
 ---
 # RowWeave
 
-RowWeave is an embedded compute engine for exact, deterministic row
-processing. An application can embed it in one JVM, or submit the same
-explicitly modeled graph to a cluster of Master and Worker JVMs.
+**RowWeave** is a lightweight, embeddable data-processing engine for the JVM.
+Write typed Batch or Stream pipelines in plain Java, run them inside an
+existing application JVM, or submit the same explicit DAG to a small
+Master/Worker cluster. The engine focuses on exact decimal arithmetic,
+deterministic semantics, bounded-memory execution, and explicit admission
+limits.
 
-RowWeave is a fit when your program needs explicit schemas and typed rows,
-reproducible decimal results, bounded sort/join/aggregate execution, and the
-same operator semantics from an embedded run to a distributed run. It exposes
-separate Batch and Stream APIs rather than disguising a timed batch loop as
-streaming.
+## Why RowWeave
+
+| Concern | RowWeave approach |
+|---|---|
+| **Embedding** | A Java library, not a platform to install. Local mode runs in one JVM; an optional small cluster uses Master plus Worker JVMs. |
+| **Dependency footprint** | Pure-Java core with a small direct runtime dependency set: ASM, Netty, and SLF4J. Embedded execution does not require Hadoop, YARN, Kubernetes, Scala, or an external coordinator. |
+| **Exact decimal processing** | `BigDecimal` values accumulate at full precision and receive one defined output rounding. |
+| **Deterministic pipelines** | Typed rows, explicit schemas, and stated null rules for grouping, ordering, and joining. |
+| **Batch and Stream** | Separate Batch and Stream APIs with one portable graph model. Stream is a distinct lifecycle, not a timed batch loop. |
+| **Predictable limits** | Unsupported or resource-exceeding plans are rejected with typed failures instead of silently degrading results. |
+| **Operations** | No cluster setup is required for local mode. Optional HTTP dashboard, read-only API, and Prometheus endpoint are available through `rowweave-monitor`. |
+
+RowWeave is a practical choice when Flink or Spark would bring more operational
+weight than a problem needs: embedded Java ETL, exact decimal transformations,
+repeatable backfills, deterministic integration tests, bounded sort/join/aggregate
+workloads, or a fixed Master/Worker deployment without a Hadoop or Kubernetes stack.
+
+It is not a general SQL warehouse, a Python-first analytics stack, or a
+thousand-node processing platform. Prefer Apache Flink, Apache Spark, or a
+database engine when you need their broader connector ecosystems, SQL optimizers,
+large elastic clusters, or unlimited unbounded-stream topologies.
 
 ## Core contracts
 
