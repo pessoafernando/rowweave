@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -47,7 +47,7 @@ class InProcessClusterTest {
     private Map<Integer, Long> runInProcess(List<DataRow> rows, int parallelism, Path tmp) throws Exception {
         Path outPath = tmp.resolve("inproc-p" + parallelism + ".tsv");
         try (InProcessCluster cluster = new InProcessCluster(parallelism, tmp.toFile())) {
-            ExecutionEnvironment s = new ExecutionEnvironment("inproc", "inproc", cluster);
+            BatchSession s = new BatchSession("inproc", "inproc", cluster);
             s.setParallelism(parallelism);
             s.fromSource(new CollectionSource(ORDER, rows))
                     .filter("amt >= 0")

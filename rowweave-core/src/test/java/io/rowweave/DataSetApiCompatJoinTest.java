@@ -10,7 +10,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * JoinDataSet.select and .withFunc with their getters, plus ExecutionEnvironment.fromSource(Source...).
+ * JoinDataSet.select and .withFunc with their getters, plus BatchSession.fromSource(Source...).
  * Syntactic sugar at graph-build time over several Sources. A single-machine commit returns the right rows.
  */
 class DataSetApiCompatJoinTest {
@@ -36,7 +36,7 @@ class DataSetApiCompatJoinTest {
         return new ArrayList<>(Arrays.asList(d("a", 100), d("b", 200)));
     }
 
-    private static List<DataRow> run(ExecutionEnvironment s, DataSet ds) {
+    private static List<DataRow> run(BatchSession s, DataSet ds) {
         WorkerCollectingOutput out = new WorkerCollectingOutput(ds.getSchema());
         ds.sinkTo(out);
         s.execute();
@@ -45,7 +45,7 @@ class DataSetApiCompatJoinTest {
 
     // JoinDataSet.withFunc(JoinFunction): a custom join output row
     @Test void joinWithFunc() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("jf");
+        BatchSession s = RowWeave.createBatchSession("jf");
         DataSet ords = s.fromSource(new CollectionSource(ORDER, orders()));
         DataSet dim = s.fromSource(new CollectionSource(DIM, dims()));
         DataSchema outMeta = new DataSchema(new Field("k", DataType.StringType), new Field("amtxlabel", DataType.BigDecimalType));
@@ -69,7 +69,7 @@ class DataSetApiCompatJoinTest {
 
     // JoinDataSet.select(String...): choosing columns of the join result
     @Test void joinSelect() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("js");
+        BatchSession s = RowWeave.createBatchSession("js");
         DataSet ords = s.fromSource(new CollectionSource(ORDER, orders()));
         DataSet dim = s.fromSource(new CollectionSource(DIM, dims()));
         // the join output is [k, amt, k, label], the whole left then the whole right, and select keeps amt and label.
@@ -81,7 +81,7 @@ class DataSetApiCompatJoinTest {
 
     // fromSource(Source...) reads several Sources in parallel, concatenating rows of one shape
     @Test void fromMultipleInputs() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("mi");
+        BatchSession s = RowWeave.createBatchSession("mi");
         DataSet ds = s.fromSource(
                 new CollectionSource(ORDER, orders()),
                 new CollectionSource(ORDER, orders()));

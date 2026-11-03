@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Tiny-budget spilling buffers and a disk SpillStore are injected through the operators' spill seams
  * (withSortBufferFactory/withSpill), the operators are fed far more rows than the budget allows, and
  * the full output is asserted, which proves spilling actually engaged. The cluster path takes the same
- * wiring once the ExecutionEnvironment memory-budget accessor exists.
+ * wiring once the BatchSession memory-budget accessor exists.
  */
 class OomStressTest {
 

@@ -4,7 +4,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -72,7 +72,7 @@ class ClusterConcurrentJobsTest {
 
     private long[] runJob(String name, int masterPort, Path dir) {
         Path f = dir.resolve(name + ".tsv");
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new ClusterJobClient("127.0.0.1", masterPort));
+        BatchSession s = new BatchSession(name, name, new ClusterJobClient("127.0.0.1", masterPort));
         s.fromSource(input())
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
                 .sinkTo(new FileSink(GB, f.toString()));
@@ -92,7 +92,7 @@ class ClusterConcurrentJobsTest {
             long[] oracle = runJob("oracle", port, tmp);
             assertEquals(KEYS, oracle[0], "groupBySum group count = KEYS");
 
-            System.out.println("\n=== concurrent multi-job on a real cluster (N rows per job=" + N + ", 2 threaded workers, ExecutionEnvironment plus ClusterJobClient)===");
+            System.out.println("\n=== concurrent multi-job on a real cluster (N rows per job=" + N + ", 2 threaded workers, BatchSession plus ClusterJobClient)===");
             System.out.printf("%-6s %-8s %-12s %-14s %-12s %-10s%n",
                     "jobsJ", "ok", "serial ms", "wall ms", "gain", "outcome");
 

@@ -142,7 +142,7 @@ class RowValidationModelTest {
                 .build();
         DataRow row = new DataRow(4);
         row.setValues(new Object[]{"1001", 1, 1L, BigDecimal.ONE});
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-model", "quality model");
+        BatchSession session = new BatchSession("quality-model", "quality model");
         DataSet dataSet = session.fromSource(new CollectionSource(META, Arrays.asList(row)));
 
         assertSame(META, dataSet.validateRows(validation).getSchema());
@@ -152,7 +152,7 @@ class RowValidationModelTest {
                 new Field("period", DataType.IntegerType),
                 new Field("sequence", DataType.LongType),
                 new Field("amount", DataType.BigDecimalType));
-        ExecutionEnvironment other = new ExecutionEnvironment("quality-drift", "quality drift");
+        BatchSession other = new BatchSession("quality-drift", "quality drift");
         DataSet driftedData = other.fromSource(new CollectionSource(drifted, Arrays.asList(row)));
         IllegalArgumentException mismatch = assertThrows(IllegalArgumentException.class,
                 () -> driftedData.validateRows(validation));

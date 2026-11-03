@@ -2,7 +2,7 @@ package io.rowweave.cluster;
 
 import io.rowweave.DataType;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ObjectStorageReadHandle;
 import io.rowweave.ObjectStorageReadRequest;
@@ -158,7 +158,7 @@ class ObjectStorageQualityDurabilityTest {
     private static void run(
             JobClient client, String definitionId, Path domain,
             ObjectStorageSnapshotSource input) {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 definitionId, definitionId, client);
         session.setDefinitionId(definitionId);
         session.setParallelism(2);

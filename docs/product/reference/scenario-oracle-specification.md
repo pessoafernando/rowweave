@@ -24,7 +24,7 @@ purpose, in different code.
 
 A scenario is written against the public production API, not against internals.
 `rowweave-examples/src/test/java/io/rowweave/examples/scenariolab/ScenarioLab.java:19-20`
-records what a scenario body does: it builds an `ExecutionEnvironment`, creates
+records what a scenario body does: it builds a `BatchSession`, creates
 sources with `ScenarioLab.java:58`, chains operators, and registers an expectation
 with `ScenarioLab.java:63` for set comparison or `ScenarioLab.java:68` for
 positional comparison. When the body returns, the framework calls

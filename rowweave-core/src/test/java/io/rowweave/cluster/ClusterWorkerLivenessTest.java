@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import org.junit.jupiter.api.Tag;
@@ -41,7 +41,7 @@ class ClusterWorkerLivenessTest {
                 DataRow row = new DataRow(1); row.set(0, i); rows.add(row);
             }
             Path output = tmp.resolve("healthy.tsv");
-            ExecutionEnvironment session = new ExecutionEnvironment(
+            BatchSession session = new BatchSession(
                     "healthy-after-loss", "healthy-after-loss",
                     new ClusterJobClient("127.0.0.1", master.port()));
             session.setParallelism(1);

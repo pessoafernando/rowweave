@@ -3,7 +3,7 @@ package io.rowweave.cluster;
 import io.rowweave.RowWeave;
 import io.rowweave.DataSet;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.bench.CsvInput;
@@ -76,7 +76,7 @@ class TenComplexDagTest {
 
     @FunctionalInterface
     private interface Dag {
-        void build(ExecutionEnvironment s, IoCollector ioCols);
+        void build(BatchSession s, IoCollector ioCols);
     }
 
     private final class IoCollector {
@@ -108,7 +108,7 @@ class TenComplexDagTest {
 
     private List<long[]> runQuad(String name, int parallelism, io.rowweave.cluster.JobClient client, int nOut, Dag dag, long[] elapsedMs) {
         IoCollector ioCols = new IoCollector(name);
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         long t0 = System.nanoTime();
         dag.build(s, ioCols);

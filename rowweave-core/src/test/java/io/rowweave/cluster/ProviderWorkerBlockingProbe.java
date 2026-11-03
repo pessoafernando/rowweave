@@ -3,7 +3,7 @@ package io.rowweave.cluster;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.CollectionSource;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.Sink;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -234,7 +234,7 @@ public final class ProviderWorkerBlockingProbe {
         Path output = workspace.resolve("local-retry-output-" + cycle);
         Files.createDirectories(output);
         LocalJobClient localClient = new LocalJobClient();
-        ExecutionEnvironment job = new ExecutionEnvironment(
+        BatchSession job = new BatchSession(
                 "provider-poison-retry-" + cycle,
                 "provider-poison-retry-" + cycle, localClient);
         DataRow row = new DataRow(1);

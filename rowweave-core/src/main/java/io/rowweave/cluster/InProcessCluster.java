@@ -36,7 +36,7 @@ public final class InProcessCluster implements JobClient, AutoCloseable {
     /**
      * {@code parallelism} is only a hint for sizing this worker's slots, {@code max(64, P * 16)};
      * it does not decide the job's parallelism. That comes from the submitted PlanGraph, where
-     * {@code ExecutionEnvironment.setParallelism} compiled it in. The value passed here must
+     * {@code BatchSession.setParallelism} compiled it in. The value passed here must
      * therefore be at least the parallelism of any job this cluster will run: on a single worker the
      * whole job lands here, so demand above the slot count is refused at admission. Callers should
      * keep it consistent with {@code setParallelism}.
@@ -172,7 +172,7 @@ public final class InProcessCluster implements JobClient, AutoCloseable {
         return submitInternal(artifact, null);
     }
 
-    /** Same-JVM default-runtime submission with the existing ExecutionEnvironment output-order hint. */
+    /** Same-JVM default-runtime submission with the existing BatchSession output-order hint. */
     public io.rowweave.plan.ExecutionReport submit(
             PlanArtifact artifact, boolean canonicalizeOutput) {
         return submitInternal(artifact, canonicalizeOutput);

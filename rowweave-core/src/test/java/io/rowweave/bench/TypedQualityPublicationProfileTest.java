@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.DataRowClassification;
@@ -161,7 +161,7 @@ class TypedQualityPublicationProfileTest {
     private static Sample run(
             Shape shape, JobClient client, int parallelism, boolean quality,
             Path domain) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-profile", "quality profile");
+        BatchSession session = new BatchSession("quality-profile", "quality profile");
         session.setParallelism(parallelism);
         DataRowClassification classified = session.fromSource(shape.inputs)
                 .uid("quality.profile.source")
@@ -273,7 +273,7 @@ class TypedQualityPublicationProfileTest {
         for (int row = 0; row < rows.size(); row++) shards[row % shardCount].add(rows.get(row));
 
         Path domain = work.resolve(label + "-source");
-        ExecutionEnvironment prepare = new ExecutionEnvironment("quality-profile-source", "quality profile source");
+        BatchSession prepare = new BatchSession("quality-profile-source", "quality profile source");
         for (int shard = 0; shard < shardCount; shard++) {
             prepare.fromSource(new CollectionSource(meta, shards[shard]))
                     .sinkTo(new ManifestFileSink(

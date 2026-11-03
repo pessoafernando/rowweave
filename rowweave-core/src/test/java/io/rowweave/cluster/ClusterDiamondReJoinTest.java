@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.join.JoinType;
@@ -54,7 +54,7 @@ class ClusterDiamondReJoinTest {
 
     private long[] run(String name, int parallelism, io.rowweave.cluster.JobClient client, List<DataRow> data, Path dir) {
         Path f = dir.resolve(name + ".tsv");
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet mid = s.fromSource(new CollectionSource(META, data)).filter("amt >= 5");
         DataSet b1 = mid.filter("k >= 2");

@@ -51,7 +51,7 @@ class LocalModeMonitorTest {
         InProcessBatchRuntime.setProcessWideMonitor(null);
         InProcessBatchRuntime.resetProcessWideForTesting();
 
-        ExecutionEnvironment environment = RowWeave.createEnvironment("local-http");
+        BatchSession environment = RowWeave.createBatchSession("local-http");
         environment.setParallelism(2);
         DataSet grouped = environment.fromSource(source(rows()))
                 .groupBy(ParallelGroupByAgg.of(SCHEMA, "key").sum("amount"));

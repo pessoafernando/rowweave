@@ -57,10 +57,10 @@ class DataRowClassificationModelTest {
     void rejectsNullSchemaDriftNonSourceMissingUidAndLegacySource() {
         DataSet exact = exactSource(META, "ledger.source");
         assertInvalid(() -> exact.classifyRowsWithSourcePosition(null));
-        assertInvalid(() -> new ExecutionEnvironment("missing-uid", "missing uid")
+        assertInvalid(() -> new BatchSession("missing-uid", "missing uid")
                 .fromSource(new CollectionSource(META, "split-a", Collections.emptyList()))
                 .classifyRowsWithSourcePosition(validation(META)));
-        assertInvalid(() -> new ExecutionEnvironment("legacy", "legacy")
+        assertInvalid(() -> new BatchSession("legacy", "legacy")
                 .fromSource(new CollectionSource(META, Collections.emptyList()))
                 .uid("ledger.source")
                 .classifyRowsWithSourcePosition(validation(META)));
@@ -93,7 +93,7 @@ class DataRowClassificationModelTest {
     }
 
     private static DataSet exactSource(DataSchema meta, String uid) {
-        return new ExecutionEnvironment("classification-model", "classification model")
+        return new BatchSession("classification-model", "classification model")
                 .fromSource(new CollectionSource(meta, "split-a", Collections.emptyList()))
                 .uid(uid);
     }

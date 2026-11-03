@@ -110,7 +110,7 @@ class QualityGatePlanBindingTest {
     }
 
     private static PlanGraph graph(Path domain, QualityGatePolicy policy) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-gate-plan", "quality gate plan");
+        BatchSession session = new BatchSession("quality-gate-plan", "quality gate plan");
         RowValidation validation = RowValidation.builder(META)
                 .notNull("adaptor.required", 0)
                 .integerRange("period.range", 1, 1, 12)

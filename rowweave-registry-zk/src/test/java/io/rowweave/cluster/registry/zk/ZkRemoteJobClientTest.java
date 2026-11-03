@@ -5,7 +5,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.DiscardSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.QualityGateDecision;
 import io.rowweave.QualityGatePolicy;
 import io.rowweave.DataRowClassification;
@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * ZkRemoteJobClient end to end: an embedded ZooKeeper (TestingServer), a real Master injected with a
  * ZkServiceRegistry and elected through MasterElection, and a Worker that connects to the current
  * leader through RegistryMasterLocator. The job is committed with {@link ZkRemoteJobClient} holding
- * nothing but a connection string and runs through ExecutionEnvironment.commit, which proves the
+ * nothing but a connection string and runs through BatchSession.commit, which proves the
  * client resolves the leader from ZooKeeper, submits, the job completes, and the row counts are right.
  */
 class ZkRemoteJobClientTest {
@@ -251,7 +251,7 @@ class ZkRemoteJobClientTest {
             try {
                 // The point of the test: only a connection string is given, so the client builds its own registry and locator and delegates to ClusterJobClient.
                 try (ZkRemoteJobClient client = new ZkRemoteJobClient(connect)) {
-                    ExecutionEnvironment s = new ExecutionEnvironment("zkjob", "zkjob", client);
+                    BatchSession s = new BatchSession("zkjob", "zkjob", client);
                     s.setParallelism(2);
                     Path f = tmp.resolve("out.tsv");
                     s.fromSource(new CollectionSource(META, rows(4000)))
@@ -273,7 +273,7 @@ class ZkRemoteJobClientTest {
 
     private static PlanArtifact qualityArtifact(
             Path domain, QualityGatePolicy policy) {
-        ExecutionEnvironment session = new ExecutionEnvironment("zk-quality", "zk quality");
+        BatchSession session = new BatchSession("zk-quality", "zk quality");
         session.setDefinitionId("zk-durable-quality");
         session.setParallelism(2);
         DataRowClassification classified = session.fromSource(new CollectionSource(

@@ -37,7 +37,7 @@ branches.
 
 ## Whole-job compilation and stages
 
-`ExecutionEnvironment` submits one whole-job graph with all sources, operators,
+`BatchSession` submits one whole-job graph with all sources, operators,
 and sinks. The push executor converts that graph into physical stages and wires
 adjacent stages through bounded channels. Linear chains become stages. A binary
 operator becomes a node with left and right input trees. The executor flattens
@@ -147,7 +147,7 @@ and `BoundedStageCancellationTest#rejectsNegativeCancelDrainBeforeOpeningWorker`
 
 ## Public and internal boundaries
 
-`ExecutionEnvironment`, `DataSet`, `Source`, `Sink`, function interfaces, and
+`BatchSession`, `DataSet`, `Source`, `Sink`, function interfaces, and
 Stream composition APIs are public. `RowStream`, `RowSink`, `Channel`,
 `PipelineExecutor`, and `PushDagExecutor` are internal execution types. User
 code extends the engine through public operators, functions, source and sink

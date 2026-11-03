@@ -44,14 +44,14 @@ the process JVM matrix aligned with [data-plane limits](../reference/data-plane-
 
 ## Local embedding
 
-Local Batch execution uses `RowWeave.createEnvironment`:
+Local Batch execution uses `RowWeave.createBatchSession`:
 
 ```java
-ExecutionEnvironment environment = RowWeave.createEnvironment("local-deploy");
-DataSet source = environment.fromSource(provider);
+BatchSession session = RowWeave.createBatchSession("local-deploy");
+DataSet source = session.fromSource(provider);
 DataSet aggregate = source.groupBy("key").sum("value");
 aggregate.sinkTo(new FileSink(aggregate.getSchema(), outputPath));
-environment.execute();
+session.execute();
 ```
 
 This is the same API shape exercised end to end by
@@ -99,19 +99,19 @@ lifecycles in one JVM without network listeners:
 
 ```java
 try (InProcessCluster cluster = RowWeave.startInProcessCluster(4, new File(stateDirectory))) {
-    ExecutionEnvironment environment = new ExecutionEnvironment(
+    BatchSession session = new BatchSession(
             "in-process-deploy", "in-process-deploy", cluster);
-    environment.setParallelism(4);
+    session.setParallelism(4);
 
     InProcessCluster.Diagnostics diagnostics = cluster.diagnostics();
     if (diagnostics.handlerThreadCount() == 0) {
         throw new IllegalStateException("in-process roles have no handler threads");
     }
 
-    DataSet source = environment.fromSource(provider);
+    DataSet source = session.fromSource(provider);
     DataSet aggregate = source.groupBy("key").sum("value");
     aggregate.sinkTo(new FileSink(aggregate.getSchema(), outputPath));
-    environment.execute();
+    session.execute();
 }
 ```
 
@@ -121,7 +121,7 @@ Follow these rules:
 * The parallelism hint is a lower bound for placement capacity, not a CPU
   promise. The runtime expands it to a safe slot budget.
 * `close()` is the shutdown operation. After close, do not submit to the same
-  client or environment.
+  client or session.
 * `diagnostics()` reports role wiring, not a readiness gate. An in-process
   cluster has no network listener, so `controlListenerCount()` and
   `dataListenerCount()` are `0` while both roles are healthy; test the

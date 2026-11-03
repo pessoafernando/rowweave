@@ -226,7 +226,7 @@ class FileOutputAtomicPublicationTest {
         input.set(0, 31L);
         input.set(1, "source");
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("short-output-row");
+        BatchSession session = RowWeave.createBatchSession("short-output-row");
         DataSet malformed = session.fromSource(new CollectionSource(
                 TWO_COLUMNS, Collections.singletonList(input))).map(row -> {
             DataRow shortRow = new DataRow(1);
@@ -255,7 +255,7 @@ class FileOutputAtomicPublicationTest {
         Files.write(firstTarget, firstOld);
         Files.write(failingTarget, failingOld);
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("multi-output-failure-atomicity");
+        BatchSession session = RowWeave.createBatchSession("multi-output-failure-atomicity");
         session.fromSource(new CollectionSource(META, Collections.singletonList(row(51))))
                 .sinkTo(new FileSink(META, firstTarget.toString()));
 
@@ -292,7 +292,7 @@ class FileOutputAtomicPublicationTest {
         Files.write(firstTarget, firstOld);
         Files.write(secondTarget, secondOld);
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("multi-output-publish-failure");
+        BatchSession session = RowWeave.createBatchSession("multi-output-publish-failure");
         session.fromSource(new CollectionSource(META, Collections.singletonList(row(71))))
                 .sinkTo(new FileSink(META, firstTarget.toString()));
         FileSink second = new FileSink(META, secondTarget.toString());
@@ -320,7 +320,7 @@ class FileOutputAtomicPublicationTest {
         DataRow input = new DataRow(2);
         input.set(0, 81L);
         input.set(1, "source");
-        ExecutionEnvironment session = RowWeave.createEnvironment("fanout-output-failure-atomicity");
+        BatchSession session = RowWeave.createBatchSession("fanout-output-failure-atomicity");
         DataSet shared = session.fromSource(
                 new CollectionSource(TWO_COLUMNS, Collections.singletonList(input)));
         shared.sinkTo(new FileSink(TWO_COLUMNS, firstTarget.toString()));
@@ -361,7 +361,7 @@ class FileOutputAtomicPublicationTest {
                 return Collections.singletonList(row(91)).iterator();
             }
         };
-        ExecutionEnvironment session = RowWeave.createEnvironment("irreversible-multi-output");
+        BatchSession session = RowWeave.createBatchSession("irreversible-multi-output");
         DataSet shared = session.fromSource(source);
         shared.sinkTo(new FileSink(META, target.toString()));
         shared.sinkTo(new PrintSink(META));
@@ -393,7 +393,7 @@ class FileOutputAtomicPublicationTest {
             }
         };
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("duplicate-output-destination");
+        BatchSession session = RowWeave.createBatchSession("duplicate-output-destination");
         DataSet shared = session.fromSource(source);
         shared.sinkTo(new FileSink(META, target.toString()));
         String lexicalAlias = target.getParent() + "/./" + target.getFileName();

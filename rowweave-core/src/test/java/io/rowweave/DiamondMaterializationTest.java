@@ -50,7 +50,7 @@ class DiamondMaterializationTest {
     void diamondReJoinSharedSourceReadOnce() {
         List<DataRow> data = rows();
         AtomicInteger reads = new AtomicInteger();
-        ExecutionEnvironment s = RowWeave.createEnvironment("diamond-mat");
+        BatchSession s = RowWeave.createBatchSession("diamond-mat");
         DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5");
         DataSet b1 = mid.filter("k >= 2");
         DataSet b2 = mid.filter("k <= 6");
@@ -83,7 +83,7 @@ class DiamondMaterializationTest {
     void selfJoinSharedSourceReadOnce() {
         List<DataRow> data = rows();
         AtomicInteger reads = new AtomicInteger();
-        ExecutionEnvironment s = RowWeave.createEnvironment("selfjoin-mat");
+        BatchSession s = RowWeave.createBatchSession("selfjoin-mat");
         DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5");
         DataSet joined = mid.join(mid, SortMergeJoin.of(META, META, new String[]{"k"}, new String[]{"k"}, JoinType.INNER));
         WorkerCollectingOutput out = new WorkerCollectingOutput(joined.getSchema());

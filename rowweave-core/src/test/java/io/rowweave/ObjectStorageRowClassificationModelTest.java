@@ -48,7 +48,7 @@ class ObjectStorageRowClassificationModelTest {
     @Test
     void facadeExposesOnlyAtomicManifestPublicationAndCannotBeForged() {
         ObjectStorageRowClassification classification = classification(
-                new ExecutionEnvironment("object-quality-api", "object quality api"));
+                new BatchSession("object-quality-api", "object quality api"));
 
         List<String> publicMethods = new ArrayList<>();
         for (Method method : ObjectStorageRowClassification.class.getDeclaredMethods()) {
@@ -67,7 +67,7 @@ class ObjectStorageRowClassificationModelTest {
     void buildsOneTenNodeThreeMemberPlanWithoutOpeningProviderOrOutput(
             @TempDir Path temp) {
         Path domain = temp.resolve("not-created").resolve("quality");
-        ExecutionEnvironment session = new ExecutionEnvironment("object-quality-plan", "object quality plan");
+        BatchSession session = new BatchSession("object-quality-plan", "object quality plan");
         ObjectStorageSnapshotSource first = input(
                 META, new ModelProvider(), "part-a.tsv", "version-1", 10L, SHA_A);
         ObjectStorageSnapshotSource second = input(
@@ -118,7 +118,7 @@ class ObjectStorageRowClassificationModelTest {
 
     @Test
     void rejectsInvalidUidInputsSchemaProviderGroupAndCarrierWidth() {
-        ExecutionEnvironment session = new ExecutionEnvironment("object-quality-invalid", "object quality invalid");
+        BatchSession session = new BatchSession("object-quality-invalid", "object quality invalid");
         ObjectStorageSnapshotSource good = input(
                 META, new ModelProvider(), "part-a.tsv", "version-1", 10L, SHA_A);
         assertInvalid(() -> session.classifyObjectStorageRows(null, good));
@@ -150,7 +150,7 @@ class ObjectStorageRowClassificationModelTest {
 
     @Test
     void invalidTargetLeavesNoPartiallyRegisteredSink(@TempDir Path temp) {
-        ExecutionEnvironment session = new ExecutionEnvironment("object-quality-atomic", "object quality atomic");
+        BatchSession session = new BatchSession("object-quality-atomic", "object quality atomic");
         ObjectStorageRowClassification classification = classification(session);
 
         assertPublicationInvalid(() -> classification.writeToManifest(null));
@@ -165,19 +165,19 @@ class ObjectStorageRowClassificationModelTest {
         ObjectStorageSnapshotSource object = input(
                 META, new ModelProvider(), "part-a.tsv", "version-1", 10L, SHA_A);
 
-        ExecutionEnvironment existingSink = new ExecutionEnvironment("existing", "existing");
+        BatchSession existingSink = new BatchSession("existing", "existing");
         existingSink.fromSource(new CollectionSource(
                         META, "collection", java.util.Collections.emptyList()))
                 .sinkTo(new DiscardSink(META));
         assertInvalid(() -> existingSink.classifyObjectStorageRows("object.source", object));
 
-        ExecutionEnvironment ordinaryAfter = new ExecutionEnvironment("ordinary-after", "ordinary after");
+        BatchSession ordinaryAfter = new BatchSession("ordinary-after", "ordinary after");
         ordinaryAfter.classifyObjectStorageRows("object.source", object);
         assertInvalid(() -> ordinaryAfter.fromSource(new CollectionSource(
                         META, "collection", java.util.Collections.emptyList()))
                 .sinkTo(new DiscardSink(META)));
 
-        ExecutionEnvironment typedAfter = new ExecutionEnvironment("typed-after", "typed after");
+        BatchSession typedAfter = new BatchSession("typed-after", "typed after");
         typedAfter.classifyObjectStorageRows("object.source", object);
         DataRowClassification typed = typedAfter.fromSource(new CollectionSource(
                         META, "collection", java.util.Collections.emptyList()))
@@ -187,7 +187,7 @@ class ObjectStorageRowClassificationModelTest {
         assertPublicationInvalid(() -> typed.writeToManifest(TypedQualityManifest.of(
                 temp.resolve("typed").toString(), "valid", "rejected", "summary")));
 
-        ExecutionEnvironment repeated = new ExecutionEnvironment("repeated", "repeated");
+        BatchSession repeated = new BatchSession("repeated", "repeated");
         ObjectStorageRowClassification publication =
                 repeated.classifyObjectStorageRows("object.source", object);
         publication.writeToManifest(TypedQualityManifest.of(
@@ -204,7 +204,7 @@ class ObjectStorageRowClassificationModelTest {
         ObjectStorageSnapshotSource original = input(
                 META, new ModelProvider(), "domain/private-ledger.tsv",
                 "secret-version-7", 10L, SHA_A);
-        ExecutionEnvironment session = new ExecutionEnvironment("object-quality-copy", "object quality copy");
+        BatchSession session = new BatchSession("object-quality-copy", "object quality copy");
         session.classifyObjectStorageRows("ledger.object.source", original)
                 .writeToManifest(TypedQualityManifest.of(
                         Paths.get("target", "object-quality").toAbsolutePath().toString(),
@@ -226,7 +226,7 @@ class ObjectStorageRowClassificationModelTest {
     @Test
     void wholePlanRoundTripPreservesQualitySourceWithoutOpeningProvider(
             @TempDir Path temp) {
-        ExecutionEnvironment session = new ExecutionEnvironment("object-quality-plan-copy", "plan copy");
+        BatchSession session = new BatchSession("object-quality-plan-copy", "plan copy");
         session.classifyObjectStorageRows("ledger.object.source", input(
                         META, new ModelProvider(), "domain/private-ledger.tsv",
                         "secret-version-7", 10L, SHA_A))
@@ -263,7 +263,7 @@ class ObjectStorageRowClassificationModelTest {
         assertEquals(0, ModelProvider.opens);
     }
 
-    private static ObjectStorageRowClassification classification(ExecutionEnvironment session) {
+    private static ObjectStorageRowClassification classification(BatchSession session) {
         return session.classifyObjectStorageRows(
                 "ledger.object.source",
                 input(META, new ModelProvider(), "part-a.tsv", "version-1", 10L, SHA_A));

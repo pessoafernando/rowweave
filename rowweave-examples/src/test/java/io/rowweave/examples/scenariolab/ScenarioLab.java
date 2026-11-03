@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataSet;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Execution context for one scenario: an ExecutionEnvironment plus the expected sinks.
+ * Execution context for one scenario: an BatchSession plus the expected sinks.
  *
  * <p>The scenario body creates sources with {@link #source}, chains operators and registers
  * expectations with {@link #expect} or {@link #expectOrdered}. When the body returns, the
@@ -22,7 +22,7 @@ import java.util.List;
  */
 public final class ScenarioLab {
 
-    private final ExecutionEnvironment session;
+    private final BatchSession session;
     private final String filePathPrefix;
     private final List<Expectation> expectations = new ArrayList<>();
     private int sinkCounter;
@@ -32,10 +32,10 @@ public final class ScenarioLab {
 
     public ScenarioLab(String filePathPrefix) {
         this.filePathPrefix = filePathPrefix;
-        this.session = io.rowweave.RowWeave.createEnvironment("scenariolab", filePathPrefix);
+        this.session = io.rowweave.RowWeave.createBatchSession("scenariolab", filePathPrefix);
     }
 
-    public ExecutionEnvironment session() {
+    public BatchSession session() {
         return session;
     }
 

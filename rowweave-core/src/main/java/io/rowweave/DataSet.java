@@ -28,10 +28,10 @@ import java.util.List;
  * compiled into a sequence of {@link PipelineExecutor} stages that push data to a {@link Sink} (the Sink is written by the Worker at the end of execution).
  *
  * <p>Only SOURCE plus pass-through UNARY nodes (filter, select column pruning, map, flatMap). breaker
- * (groupBy, orderBy, ...); binary (join, coGroup, union); the expression forms of filter and select; ExecutionEnvironment.commit and the cluster path.
+ * (groupBy, orderBy, ...); binary (join, coGroup, union); the expression forms of filter and select; BatchSession.commit and the cluster path.
  *
  * <p>Immutable: every builder returns a new node holding parent (the upstream) plus this node's stage. {@code executeToOutput} builds a fresh
- * PipelineExecutor each time (its stages are mutable and cannot be reused); the compile logic is extracted into {@link #compileStages} so ExecutionEnvironment.commit can reuse it.
+ * PipelineExecutor each time (its stages are mutable and cannot be reused); the compile logic is extracted into {@link #compileStages} so BatchSession.commit can reuse it.
  */
 public final class DataSet {
 
@@ -49,7 +49,7 @@ public final class DataSet {
     private final DataSet left;                  // BINARY only (left upstream).
     private final DataSet right;                 // BINARY only (right upstream).
     private final PipelineExecutor.BinaryStage binaryStage; // BINARY only
-    private final ExecutionEnvironment session;             // SOURCE only (the one built by fromSource carries a session, for output and commit); may be null.
+    private final BatchSession session;             // SOURCE only (the one built by fromSource carries a session, for output and commit); may be null.
     // Describable operator form (UNARY/BINARY: typeId plus params/listParams); null for a lambda node,
     // which is filter(fn), map or flatMap. A graph containing any lambda node makes toPlanGraph take the in-process Stage path.
     private final Descriptor descriptor;
@@ -87,19 +87,19 @@ public final class DataSet {
 
     private DataSet(DataSchema dataSchema, Kind kind, DataSet parent, Iterable<DataRow> source,
                      PipelineExecutor.Stage stage, DataSet left, DataSet right,
-                     PipelineExecutor.BinaryStage binaryStage, ExecutionEnvironment session) {
+                     PipelineExecutor.BinaryStage binaryStage, BatchSession session) {
         this(dataSchema, kind, parent, source, stage, left, right, binaryStage, session, null);
     }
 
     private DataSet(DataSchema dataSchema, Kind kind, DataSet parent, Iterable<DataRow> source,
                      PipelineExecutor.Stage stage, DataSet left, DataSet right,
-                     PipelineExecutor.BinaryStage binaryStage, ExecutionEnvironment session, Descriptor descriptor) {
+                     PipelineExecutor.BinaryStage binaryStage, BatchSession session, Descriptor descriptor) {
         this(dataSchema, kind, parent, source, stage, left, right, binaryStage, session, descriptor, null);
     }
 
     private DataSet(DataSchema dataSchema, Kind kind, DataSet parent, Iterable<DataRow> source,
                      PipelineExecutor.Stage stage, DataSet left, DataSet right,
-                     PipelineExecutor.BinaryStage binaryStage, ExecutionEnvironment session, Descriptor descriptor,
+                     PipelineExecutor.BinaryStage binaryStage, BatchSession session, Descriptor descriptor,
                      java.util.List<Source> sourceInputs) {
         this(dataSchema, kind, parent, source, stage, left, right, binaryStage, session, descriptor,
                 sourceInputs, null);
@@ -107,7 +107,7 @@ public final class DataSet {
 
     private DataSet(DataSchema dataSchema, Kind kind, DataSet parent, Iterable<DataRow> source,
                      PipelineExecutor.Stage stage, DataSet left, DataSet right,
-                     PipelineExecutor.BinaryStage binaryStage, ExecutionEnvironment session, Descriptor descriptor,
+                     PipelineExecutor.BinaryStage binaryStage, BatchSession session, Descriptor descriptor,
                      java.util.List<Source> sourceInputs, String operatorUid) {
         this.dataSchema = dataSchema;
         this.kind = kind;
@@ -179,8 +179,8 @@ public final class DataSet {
         return new DataSet(dataSchema, Kind.SOURCE, null, rows, null);
     }
 
-    /** A SOURCE node with a session, used by ExecutionEnvironment.fromSource, which enables output and commit. */
-    static DataSet source(ExecutionEnvironment session, DataSchema dataSchema, Iterable<DataRow> rows) {
+    /** A SOURCE node with a session, used by BatchSession.fromSource, which enables output and commit. */
+    static DataSet source(BatchSession session, DataSchema dataSchema, Iterable<DataRow> rows) {
         return new DataSet(dataSchema, Kind.SOURCE, null, rows, null, null, null, null, session);
     }
 
@@ -188,7 +188,7 @@ public final class DataSet {
      * One source with several splits (the fromSource(Source[]) shape): a single logical source holds several homogeneous Source splits,
      * and the runtime spreads them over instances by parallelism instead of the API layer collapsing them into a union. The session enables output and commit.
      */
-    static DataSet source(ExecutionEnvironment session, DataSchema dataSchema, java.util.List<Source> inputs) {
+    static DataSet source(BatchSession session, DataSchema dataSchema, java.util.List<Source> inputs) {
         return new DataSet(dataSchema, Kind.SOURCE, null, null, null, null, null, null, session, null,
                 new java.util.ArrayList<>(inputs));
     }
@@ -204,30 +204,30 @@ public final class DataSet {
     }
 
     /**
-     * Registers as a sink of the session: commit executes this DAG and writes to out. Requires the DAG to originate from {@link ExecutionEnvironment#fromSource}
+     * Registers as a sink of the session: commit executes this DAG and writes to out. Requires the DAG to originate from {@link BatchSession#fromSource}
      * (which carries a session); a node built by the static {@link #source(DataSchema, Iterable)} has none and throws IllegalStateException.
      */
     public void sinkTo(Sink out) {
-        ExecutionEnvironment s = resolveSession();
+        BatchSession s = resolveSession();
         if (s == null) {
             throw new IllegalStateException(
-                    "output() requires a session-bound DataSet; use RowWeave.createEnvironment().fromSource(...)");
+                    "output() requires a session-bound DataSet; use RowWeave.createBatchSession().fromSource(...)");
         }
         s.registerSink(this, out);
     }
 
     /** Registers a SINK carrying a stable logical UID. */
     public void sinkTo(String sinkUid, Sink out) {
-        ExecutionEnvironment s = resolveSession();
+        BatchSession s = resolveSession();
         if (s == null) {
             throw new IllegalStateException(
-                    "output() requires a session-bound DataSet; use RowWeave.createEnvironment().fromSource(...)");
+                    "output() requires a session-bound DataSet; use RowWeave.createBatchSession().fromSource(...)");
         }
         s.registerSink(this, sinkUid, out);
     }
 
     /** Walks back along parent (UNARY) or left (BINARY) to the SOURCE and returns its session (may be null). */
-    private ExecutionEnvironment resolveSession() {
+    private BatchSession resolveSession() {
         DataSet n = this;
         while (n != null) {
             if (n.kind == Kind.SOURCE) {
@@ -239,7 +239,7 @@ public final class DataSet {
     }
 
     /** package-private ownership proof for atomic compound sink registration. */
-    ExecutionEnvironment owningSession() {
+    BatchSession owningSession() {
         return resolveSession();
     }
 

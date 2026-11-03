@@ -55,7 +55,7 @@ class FanoutSingleMachineTest {
         List<DataRow> data = rows();
 
         // a fan-out job in which mid is reused by two downstreams, a filter and a groupBy each leading to its own output.
-        ExecutionEnvironment s = RowWeave.createEnvironment("fanout");
+        BatchSession s = RowWeave.createBatchSession("fanout");
         DataSet mid = s.fromSource(input(data)).filter("amt >= 10");
         DataSet b1 = mid.filter("k >= 5");
         WorkerCollectingOutput o1 = new WorkerCollectingOutput(b1.getSchema());
@@ -66,12 +66,12 @@ class FanoutSingleMachineTest {
         s.execute();
 
         // oracle: each branch run on its own, with no fan-out.
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("o1");
+        BatchSession s1 = RowWeave.createBatchSession("o1");
         DataSet e1 = s1.fromSource(input(data)).filter("amt >= 10").filter("k >= 5");
         WorkerCollectingOutput eo1 = new WorkerCollectingOutput(e1.getSchema());
         e1.sinkTo(eo1); s1.execute();
 
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("o2");
+        BatchSession s2 = RowWeave.createBatchSession("o2");
         DataSet e2 = s2.fromSource(input(data)).filter("amt >= 10")
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
         WorkerCollectingOutput eo2 = new WorkerCollectingOutput(e2.getSchema());
@@ -97,7 +97,7 @@ class FanoutSingleMachineTest {
                 return new ArrayList<>(data).iterator();
             }
         };
-        ExecutionEnvironment s = RowWeave.createEnvironment("fanout-once");
+        BatchSession s = RowWeave.createBatchSession("fanout-once");
         DataSet mid = s.fromSource(counting).filter("amt >= 10");  // shared: source and filter
         DataSet b1 = mid.filter("k >= 5");
         b1.sinkTo(new WorkerCollectingOutput(b1.getSchema()));

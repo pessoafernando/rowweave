@@ -18,14 +18,14 @@ import java.security.NoSuchAlgorithmException;
 import java.io.UncheckedIOException;
 
 /**
- * The job session: {@link #fromSource} builds a source DataSet, transforms chain, {@link DataSet#output} registers a sink.
- * {@link #commit()} compiles the whole Job into <b>one complete PlanGraph DAG</b> ({@link #toPlanGraph}, at ExecutionEnvironment level, walked from every sink with
+ * The Batch job session: {@link #fromSource} builds a source DataSet, transforms chain, {@link DataSet#output} registers a sink.
+ * {@link #commit()} compiles the whole Job into <b>one complete PlanGraph DAG</b> ({@link #toPlanGraph}, at BatchSession level, walked from every sink with
  * identity de-duplication), submits it through {@link JobClient}, and then waits for completion only - it <b>takes no data back</b> (a Sink is written by the Worker at the tail of execution).
  *
  * <p>A single commit always submits multiple sources, multiple SINK nodes and shared subgraphs as one complete graph; the execution
  * entry never splits the graph per sink, and a shared upstream is computed only once.
  */
-public final class ExecutionEnvironment {
+public final class BatchSession {
 
     private static final class PendingSink {
         final DataSet dataSet;
@@ -56,12 +56,12 @@ public final class ExecutionEnvironment {
     private boolean objectQualityClassificationClaimed;
     private boolean objectQualityPublicationRegistered;
 
-    public ExecutionEnvironment(String jobName, String jobTitle) {
+    public BatchSession(String jobName, String jobTitle) {
         this(jobName, jobTitle, null);
     }
 
     /** An injectable JobClient; by default a submission goes to the process-wide shared InProcess Batch Runtime. */
-    public ExecutionEnvironment(String jobName, String jobTitle, JobClient jobClient) {
+    public BatchSession(String jobName, String jobTitle, JobClient jobClient) {
         this.jobName = jobName;
         this.jobTitle = jobTitle;
         this.injectedClient = jobClient;
@@ -250,7 +250,7 @@ public final class ExecutionEnvironment {
                 || objectQualityPublicationRegistered || !sinks.isEmpty()) {
             throw new IllegalArgumentException(
                     "QUALITY_PUBLICATION_INVALID: Object Storage quality publication "
-                            + "must be the only publication in its ExecutionEnvironment");
+                            + "must be the only publication in its BatchSession");
         }
         List<PendingSink> publication = new ArrayList<>(3);
         publication.add(new PendingSink(

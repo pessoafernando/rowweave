@@ -33,7 +33,7 @@ class DataSetBinaryTest {
         return new ArrayList<>(Arrays.asList(rs));
     }
 
-    private ExecutionEnvironment session;
+    private BatchSession session;
 
     private static Source input(DataSchema meta, List<DataRow> rs) {
         return new Source() {
@@ -44,7 +44,7 @@ class DataSetBinaryTest {
 
     /** The left source is bound to a session: resolveSession walks the left side, and a binary needs only its left input to carry the session. */
     private DataSet lsrc(DataSchema meta, List<DataRow> rs) {
-        session = RowWeave.createEnvironment("t");
+        session = RowWeave.createBatchSession("t");
         return session.fromSource(input(meta, rs));
     }
 

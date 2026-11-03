@@ -11,7 +11,7 @@ import io.rowweave.FlatMapFunction;
 import io.rowweave.GroupCombineFunction;
 import io.rowweave.GroupCombineReduceFunction;
 import io.rowweave.GroupReduceFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.JoinFunction;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
@@ -194,7 +194,7 @@ public final class FullOperatorBenchmarkRunner {
     // ==================== DAG definitions ====================
 
     @FunctionalInterface
-    private interface Dag { void build(ExecutionEnvironment s, Io ioCols); }
+    private interface Dag { void build(BatchSession s, Io ioCols); }
 
     /**
      * Each output writes one FileSink file, named by tag and index; after the run those files are fingerprinted and compared.
@@ -367,7 +367,7 @@ public final class FullOperatorBenchmarkRunner {
      */
     private static Result runOne(Path dir, String name, int par, JobClient client, Dag dag) {
         Io ioCols = new Io(dir, name);
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(par);
         long t0 = System.nanoTime();
         dag.build(s, ioCols);

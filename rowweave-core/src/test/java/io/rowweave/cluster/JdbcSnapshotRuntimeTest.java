@@ -9,7 +9,7 @@ import io.rowweave.JdbcSnapshotSource;
 import io.rowweave.JdbcSnapshotReadHandle;
 import io.rowweave.JdbcSnapshotReadRequest;
 import io.rowweave.JdbcSnapshotSourceProvider;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.commit.SchemaFingerprint;
@@ -130,9 +130,9 @@ class JdbcSnapshotRuntimeTest {
                 "a", "1.2500", "b", "2.0000"));
         RuntimeProvider.install("part-b", rows(
                 "a", "3.7500", "b", "-0.5000"));
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("jdbc-source", "jdbc-source")
-                : new ExecutionEnvironment("jdbc-source", "jdbc-source", client);
+        BatchSession session = client == null
+                ? new BatchSession("jdbc-source", "jdbc-source")
+                : new BatchSession("jdbc-source", "jdbc-source", client);
         session.setParallelism(parallelism);
         DataSet source = session.fromSource(
                 input("part-a", digest('c')),

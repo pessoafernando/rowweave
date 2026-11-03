@@ -44,7 +44,7 @@ class JobSessionTest {
 
     @Test
     void createSessionFromInputFilterSelectCommit() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("test");
+        BatchSession session = RowWeave.createBatchSession("test");
         DataSet ds = session.fromSource(input(META, row("a", new BigDecimal("100")),
                         row("b", new BigDecimal("50")), row("c", new BigDecimal("200"))))
                 .filter(r -> ((BigDecimal) r.get(1)).compareTo(new BigDecimal("100")) >= 0)
@@ -60,7 +60,7 @@ class JobSessionTest {
 
     @Test
     void commitMultipleSinks() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("multi");
+        BatchSession session = RowWeave.createBatchSession("multi");
         DataSet src = session.fromSource(input(META, row("a", new BigDecimal("1")), row("b", new BigDecimal("2"))));
         WorkerCollectingOutput allOut = new WorkerCollectingOutput(META);
         src.sinkTo(allOut);
@@ -75,7 +75,7 @@ class JobSessionTest {
 
     @Test
     void commitGroupByBreaker() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("agg");
+        BatchSession session = RowWeave.createBatchSession("agg");
         DataSet src = session.fromSource(input(META,
                 row("a", new BigDecimal("10")), row("b", new BigDecimal("20")), row("a", new BigDecimal("5"))));
         ParallelGroupByAgg agg = ParallelGroupByAgg.of(META, "k").sum("amt");
@@ -90,7 +90,7 @@ class JobSessionTest {
     void commitJoinBinary() {
         DataSchema lm = new DataSchema(new Field("lk", DataType.IntegerType), new Field("lv", DataType.StringType));
         DataSchema rm = new DataSchema(new Field("rk", DataType.IntegerType), new Field("rv", DataType.StringType));
-        ExecutionEnvironment session = RowWeave.createEnvironment("join");
+        BatchSession session = RowWeave.createBatchSession("join");
         DataRow l1 = new DataRow(2); l1.set(0, 1); l1.set(1, "a");
         DataRow l2 = new DataRow(2); l2.set(0, 2); l2.set(1, "b");
         DataRow r1 = new DataRow(2); r1.set(0, 2); r1.set(1, "x");
@@ -106,14 +106,14 @@ class JobSessionTest {
 
     @Test
     void outputWithoutSessionThrows() {
-        // DataSet built via static source() (no session) cannot output() — must use RowWeave.createEnvironment().fromSource
+        // DataSet built via static source() (no session) cannot output() — must use RowWeave.createBatchSession().fromSource
         DataSet ds = DataSet.source(META, new ArrayList<>());
         assertThrows(IllegalStateException.class, () -> ds.sinkTo(new WorkerCollectingOutput(META)));
     }
 
     @Test
     void emptySourceCommitClosesOutput() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("empty");
+        BatchSession session = RowWeave.createBatchSession("empty");
         final boolean[] closed = {false};
         Sink out = new CloseTrackingOutput(closed);
         DataSet ds = session.fromSource(input(META));
@@ -139,14 +139,14 @@ class JobSessionTest {
 
     @Test
     void createSessionName() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("myjob");
+        BatchSession s = RowWeave.createBatchSession("myjob");
         assertEquals("myjob", s.getJobName());
     }
 
     /** commit goes through a whole PlanGraph: toPlanGraph emits a multi-node graph that ends in a SINK, so the IR is no longer dead code. */
     @Test
     void toPlanGraphProducesSinkRootedDag() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("plan");
+        BatchSession session = RowWeave.createBatchSession("plan");
         DataSet ds = session.fromSource(input(META, row("a", new BigDecimal("1"))))
                 .filter(r -> true).select(0);
         ds.sinkTo(new WorkerCollectingOutput(ds.getSchema()));
@@ -160,7 +160,7 @@ class JobSessionTest {
     /** A multi-sink dag whose toPlanGraph carries several SINK nodes, one per output, while commit still submits the whole graph once. */
     @Test
     void toPlanGraphMultiSink() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("multi-plan");
+        BatchSession session = RowWeave.createBatchSession("multi-plan");
         DataSet a = session.fromSource(input(META, row("a", new BigDecimal("1"))));
         a.sinkTo(new WorkerCollectingOutput(META));
         DataSet b = session.fromSource(input(META, row("b", new BigDecimal("2"))));
@@ -176,7 +176,7 @@ class JobSessionTest {
     /** A fan-out in which one DataSet feeds 2 outputs: commit copies the shared subgraph per sink. */
     @Test
     void fanOutToTwoOutputs() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("fanout");
+        BatchSession session = RowWeave.createBatchSession("fanout");
         DataSet shared = session.fromSource(input(META, row("a", new BigDecimal("1")))).filter(r -> true);
         WorkerCollectingOutput o1 = new WorkerCollectingOutput(META);
         WorkerCollectingOutput o2 = new WorkerCollectingOutput(META);
@@ -190,7 +190,7 @@ class JobSessionTest {
     /** The commit PlanGraph of a describable dag is serializable, round-tripping through toBytes and fromBytes. */
     @Test
     void describableDagPlanGraphSerializable() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("ser");
+        BatchSession session = RowWeave.createBatchSession("ser");
         // filter(expr), groupBy and orderBy are all describable, with no lambda
         DataSet ds = session.fromSource(input(META,
                         row("a", new BigDecimal("10")), row("b", new BigDecimal("20")), row("a", new BigDecimal("5"))))
@@ -224,7 +224,7 @@ class JobSessionTest {
     void joinDescribableSerializeRebuildExecute() {
         DataSchema lm = new DataSchema(new Field("lk", DataType.IntegerType), new Field("lv", DataType.StringType));
         DataSchema rm = new DataSchema(new Field("rk", DataType.IntegerType), new Field("rv", DataType.StringType));
-        ExecutionEnvironment session = RowWeave.createEnvironment("joinser");
+        BatchSession session = RowWeave.createBatchSession("joinser");
         DataRow l1 = new DataRow(2); l1.set(0, 1); l1.set(1, "a");
         DataRow l2 = new DataRow(2); l2.set(0, 2); l2.set(1, "b");
         DataRow r1 = new DataRow(2); r1.set(0, 2); r1.set(1, "x");
@@ -250,7 +250,7 @@ class JobSessionTest {
     /** A describable union serialized and executed after a round-trip, concatenating in order. */
     @Test
     void unionDescribableSerializeRebuildExecute() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("unionser");
+        BatchSession session = RowWeave.createBatchSession("unionser");
         DataSet a = session.fromSource(input(META, row("a", new BigDecimal("1"))));
         DataSet b = session.fromSource(input(META, row("b", new BigDecimal("2"))));
         DataSet u = a.union(b, io.rowweave.ops.Union.of(META));
@@ -269,7 +269,7 @@ class JobSessionTest {
     /** A guard that a count(*) through a describable groupBy still executes correctly after a serialization round-trip, where a null measure means count(*) rather than a crash. */
     @Test
     void countStarGroupBySerializeRebuildExecute() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("countstar");
+        BatchSession session = RowWeave.createBatchSession("countstar");
         DataSet grouped = session.fromSource(input(META,
                         row("a", new BigDecimal("1")), row("a", null), row("b", new BigDecimal("2"))))
                 .groupBy(ParallelGroupByAgg.of(META, "k").count()); // count(*) — measure null
@@ -308,13 +308,13 @@ class JobSessionTest {
     private void assertSerializeRebuildMatches(java.util.function.Function<DataSet, DataSet> op) {
         DataRow[] rows = {row("a", new BigDecimal("10")), row("b", new BigDecimal("20")), row("a", new BigDecimal("5"))};
         // run directly through commit, the same IR path production takes
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("direct");
+        BatchSession s1 = RowWeave.createBatchSession("direct");
         DataSet d1 = op.apply(s1.fromSource(input(META, rows)));
         WorkerCollectingOutput direct = new WorkerCollectingOutput(d1.getSchema());
         d1.sinkTo(direct);
         s1.execute();
         // executed after a serialization round-trip, with rows written into the deserialized copy of the SINK Sink, so they are read back from that SINK.
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("ser");
+        BatchSession s2 = RowWeave.createBatchSession("ser");
         DataSet d2 = op.apply(s2.fromSource(input(META, rows)));
         d2.sinkTo(new WorkerCollectingOutput(d2.getSchema()));
         io.rowweave.plan.PlanGraph back = io.rowweave.plan.PlanGraph.fromBytes(s2.toPlanGraph().toBytes());
@@ -331,7 +331,7 @@ class JobSessionTest {
     /** filter(fn), map and flatMap are describable now that a userFunction is serializable, so the commit PlanGraph toBytes does not throw and the round-trip executes. */
     @Test
     void codeLambdaDescribableSerializeRebuildExecute() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("codelambda");
+        BatchSession session = RowWeave.createBatchSession("codelambda");
         // filter(FilterFunction), map(MapFunction) and flatMap(FlatMapFunction) are all code lambdas, and all describable now
         DataSet ds = session.fromSource(input(META,
                         row("a", new BigDecimal("10")), row("b", new BigDecimal("1")), row("c", new BigDecimal("20"))))
@@ -356,7 +356,7 @@ class JobSessionTest {
     /** A filter(fn) that captures something unserializable makes toBytes fail loudly at commit time, naming the typeId and leaving no partial result. */
     @Test
     void nonSerializableCapturedLambdaFailsLoudAtToBytes() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("notser");
+        BatchSession session = RowWeave.createBatchSession("notser");
         final Object notSerializable = new Object();  // a captured variable that is not serializable
         DataSet ds = session.fromSource(input(META, row("a", new BigDecimal("1"))))
                 .filter(r -> notSerializable.hashCode() >= 0);  // the lambda captures notSerializable
@@ -386,7 +386,7 @@ class JobSessionTest {
     void coGroupDescribableSerializeRebuildExecute() {
         DataSchema lm = new DataSchema(new Field("k", DataType.IntegerType), new Field("lv", DataType.StringType));
         DataSchema rm = new DataSchema(new Field("k", DataType.IntegerType), new Field("rv", DataType.StringType));
-        ExecutionEnvironment session = RowWeave.createEnvironment("cogroup");
+        BatchSession session = RowWeave.createBatchSession("cogroup");
         DataRow l1 = new DataRow(2); l1.set(0, 1); l1.set(1, "a");
         DataRow r1 = new DataRow(2); r1.set(0, 1); r1.set(1, "x");
         DataSet left = session.fromSource(input(lm, l1));
@@ -415,7 +415,7 @@ class JobSessionTest {
     /** reduceGroup is describable now that GroupReduceFunction is Serializable, so a serialization round-trip rebuilds and executes it. */
     @Test
     void reduceGroupDescribableSerializeRebuildExecute() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("reduce");
+        BatchSession session = RowWeave.createBatchSession("reduce");
         DataSet reduced = session.fromSource(input(META,
                         row("a", new BigDecimal("1")), row("a", new BigDecimal("2")), row("b", new BigDecimal("3"))))
                 .reduceGroup(io.rowweave.ops.ReduceGroup.of(META, "k", new StaticReduceFn()), REDUCE_OUT);
@@ -484,14 +484,14 @@ class JobSessionTest {
                 s -> s.groupBy(ParallelGroupByAgg.of(META3, "k").sum("amt").count().max("qty"));
 
         // run directly
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("direct-multi");
+        BatchSession s1 = RowWeave.createBatchSession("direct-multi");
         DataSet d1 = op.apply(s1.fromSource(input(META3, rows)));
         WorkerCollectingOutput direct = new WorkerCollectingOutput(d1.getSchema());
         d1.sinkTo(direct);
         s1.execute();
 
         // serialized and round-tripped
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("ser-multi");
+        BatchSession s2 = RowWeave.createBatchSession("ser-multi");
         DataSet d2 = op.apply(s2.fromSource(input(META3, rows)));
         d2.sinkTo(new WorkerCollectingOutput(d2.getSchema()));
         io.rowweave.plan.PlanGraph back = io.rowweave.plan.PlanGraph.fromBytes(s2.toPlanGraph().toBytes());
@@ -535,13 +535,13 @@ class JobSessionTest {
         java.util.function.Function<DataSet, DataSet> op =
                 s -> s.groupBy(ParallelGroupByAgg.of(metaColon, "k").sum("a:b").count());
 
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("colon-direct");
+        BatchSession s1 = RowWeave.createBatchSession("colon-direct");
         DataSet d1 = op.apply(s1.fromSource(input(metaColon, r1, r2)));
         WorkerCollectingOutput direct = new WorkerCollectingOutput(d1.getSchema());
         d1.sinkTo(direct);
         s1.execute();
 
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("colon-ser");
+        BatchSession s2 = RowWeave.createBatchSession("colon-ser");
         DataSet d2 = op.apply(s2.fromSource(input(metaColon, r1, r2)));
         d2.sinkTo(new WorkerCollectingOutput(d2.getSchema()));
         io.rowweave.plan.PlanGraph back = io.rowweave.plan.PlanGraph.fromBytes(s2.toPlanGraph().toBytes());
@@ -566,13 +566,13 @@ class JobSessionTest {
         java.util.function.Function<DataSet, DataSet> op =
                 s -> s.groupBy(ParallelGroupByAgg.of(META3, "k").sum("amt").max("qty").count().min("amt"));
 
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("mix-direct");
+        BatchSession s1 = RowWeave.createBatchSession("mix-direct");
         DataSet d1 = op.apply(s1.fromSource(input(META3, rows)));
         WorkerCollectingOutput direct = new WorkerCollectingOutput(d1.getSchema());
         d1.sinkTo(direct);
         s1.execute();
 
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("mix-ser");
+        BatchSession s2 = RowWeave.createBatchSession("mix-ser");
         DataSet d2 = op.apply(s2.fromSource(input(META3, rows)));
         d2.sinkTo(new WorkerCollectingOutput(d2.getSchema()));
         io.rowweave.plan.PlanGraph back = io.rowweave.plan.PlanGraph.fromBytes(s2.toPlanGraph().toBytes());
@@ -601,7 +601,7 @@ class JobSessionTest {
         for (int i = 0; i < 2000; i++) {
             many.add(row3("k" + (i % 50), Integer.toString(i), Integer.toString(i % 7)));
         }
-        ExecutionEnvironment session = RowWeave.createEnvironment("bounded-multi");
+        BatchSession session = RowWeave.createBatchSession("bounded-multi");
         DataSet grouped = session.fromSource(input(META3, many.toArray(new DataRow[0])))
                 .groupBy(ParallelGroupByAgg.of(META3, "k").sum("amt").count().max("qty"));
         grouped.sinkTo(new WorkerCollectingOutput(grouped.getSchema()));

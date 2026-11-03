@@ -40,7 +40,7 @@ class ManifestFileConnectorTest {
     void singleMemberAlsoPublishesThroughManifestCoordinator(@TempDir Path tmp) throws Exception {
         Path domain = tmp.resolve("single-domain");
         DataRow expected = row(1);
-        ExecutionEnvironment session = RowWeave.createEnvironment("manifest-single");
+        BatchSession session = RowWeave.createBatchSession("manifest-single");
         session.fromSource(new CollectionSource(META, Collections.singletonList(expected)))
                 .sinkTo(new ManifestFileSink(META, domain.toString(), "ledger"));
 
@@ -57,7 +57,7 @@ class ManifestFileConnectorTest {
     void twoToFiveMembersShareOneGenerationAndMatchFileOutputBytes(@TempDir Path tmp) throws Exception {
         for (int memberCount = 2; memberCount <= 5; memberCount++) {
             Path domain = tmp.resolve("domain-" + memberCount);
-            ExecutionEnvironment session = RowWeave.createEnvironment("manifest-" + memberCount);
+            BatchSession session = RowWeave.createBatchSession("manifest-" + memberCount);
             List<DataRow> expected = new ArrayList<>();
             for (int i = 0; i < memberCount; i++) {
                 DataRow row = row(100L * memberCount + i);
@@ -126,7 +126,7 @@ class ManifestFileConnectorTest {
     void mixedManifestDomainsAndLegacyOutputFailBeforeInputOpens(@TempDir Path tmp) {
         AtomicInteger opens = new AtomicInteger();
         Source source = countingInput(opens);
-        ExecutionEnvironment domains = RowWeave.createEnvironment("mixed-manifest-domains");
+        BatchSession domains = RowWeave.createBatchSession("mixed-manifest-domains");
         DataSet shared = domains.fromSource(source);
         shared.sinkTo(new ManifestFileSink(META, tmp.resolve("a").toString(), "left"));
         shared.sinkTo(new ManifestFileSink(META, tmp.resolve("b").toString(), "right"));
@@ -139,7 +139,7 @@ class ManifestFileConnectorTest {
         assertFalse(Files.exists(tmp.resolve("a")));
         assertFalse(Files.exists(tmp.resolve("b")));
 
-        ExecutionEnvironment legacy = RowWeave.createEnvironment("mixed-manifest-legacy");
+        BatchSession legacy = RowWeave.createBatchSession("mixed-manifest-legacy");
         DataSet again = legacy.fromSource(source);
         again.sinkTo(new ManifestFileSink(META, tmp.resolve("c").toString(), "manifest"));
         again.sinkTo(new FileSink(META, tmp.resolve("legacy.tsv").toString()));
@@ -160,7 +160,7 @@ class ManifestFileConnectorTest {
 
         Path foreignConflict = domain.resolve("data/2/b.data");
         Files.createDirectories(foreignConflict);
-        ExecutionEnvironment failing = RowWeave.createEnvironment("manifest-install-failure");
+        BatchSession failing = RowWeave.createBatchSession("manifest-install-failure");
         failing.fromSource(new CollectionSource(META, Collections.singletonList(row(51))))
                 .sinkTo(new ManifestFileSink(META, domain.toString(), "a"));
         failing.fromSource(new CollectionSource(META, Collections.singletonList(row(52))))
@@ -201,7 +201,7 @@ class ManifestFileConnectorTest {
         Path domain = tmp.resolve("source-domain");
         commitOne(domain, row(71));
         Path copied = tmp.resolve("copied.tsv");
-        ExecutionEnvironment session = RowWeave.createEnvironment("manifest-input-source");
+        BatchSession session = RowWeave.createBatchSession("manifest-input-source");
         session.fromSource(new ManifestFileSource(META, domain.toString(), "ledger"))
                 .sinkTo(new FileSink(META, copied.toString()));
 
@@ -222,7 +222,7 @@ class ManifestFileConnectorTest {
         ManifestFileSink output = new ManifestFileSink(META, alias.toString(), "ledger");
         Files.delete(alias);
         Files.createSymbolicLink(alias, second);
-        ExecutionEnvironment session = RowWeave.createEnvironment("manifest-retarget");
+        BatchSession session = RowWeave.createBatchSession("manifest-retarget");
         session.fromSource(new CollectionSource(META, Collections.singletonList(row(81))))
                 .sinkTo(output);
 
@@ -232,14 +232,14 @@ class ManifestFileConnectorTest {
     }
 
     private static void commitOne(Path domain, DataRow row) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("manifest-generation");
+        BatchSession session = RowWeave.createBatchSession("manifest-generation");
         session.fromSource(new CollectionSource(META, Collections.singletonList(row)))
                 .sinkTo(new ManifestFileSink(META, domain.toString(), "ledger"));
         session.execute();
     }
 
     private static void commitPair(Path domain, DataRow a, DataRow b) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("manifest-pair");
+        BatchSession session = RowWeave.createBatchSession("manifest-pair");
         session.fromSource(new CollectionSource(META, Collections.singletonList(a)))
                 .sinkTo(new ManifestFileSink(META, domain.toString(), "a"));
         session.fromSource(new CollectionSource(META, Collections.singletonList(b)))

@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.registry.InProcessRegistry;
@@ -51,7 +51,7 @@ class ParallelismDowngradeClusterTest {
     }
 
     private long runGroupBy(int par, MasterServer m, String name, Path out) {
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new ClusterJobClient("127.0.0.1", m.port()));
+        BatchSession s = new BatchSession(name, name, new ClusterJobClient("127.0.0.1", m.port()));
         s.setParallelism(par);
         s.fromSource(new CollectionSource(META, rows(4000)))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
@@ -134,7 +134,7 @@ class ParallelismDowngradeClusterTest {
         File w0 = new File(tmp.toFile(), "w0"); w0.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 1, "127.0.0.1", m.port(), w0)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("fail", "fail", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("fail", "fail", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(4);
             s.fromSource(new CollectionSource(META, rows(4000)))
                     .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))

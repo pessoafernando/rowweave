@@ -8,7 +8,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FlatMapFunction;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.PrintSink;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -21,10 +21,10 @@ import java.util.List;
  *
   * <p>This example shows the four core engine steps:
  * <ol>
-  * <li>{@link RowWeave#createEnvironment(String)} creates the execution environment.</li>
-  * <li>{@link ExecutionEnvironment#fromSource(Source)} creates a source.</li>
+  * <li>{@link RowWeave#createBatchSession(String)} creates a Batch session.</li>
+  * <li>{@link BatchSession#fromSource(Source)} creates a source.</li>
   * <li>Transformations chain flatMap splitting and groupBy counting.</li>
-  * <li>{@link DataSet#sinkTo} registers a sink and {@link ExecutionEnvironment#execute()} submits execution.</li>
+  * <li>{@link DataSet#sinkTo} registers a sink and {@link BatchSession#execute()} submits execution.</li>
  * </ol>
  *
   * <p>Data pushes from Source to Sink without materializing {@code List<DataRow>}; flatMap emits each word
@@ -48,7 +48,7 @@ public final class WordCountExample {
           * @param lines input lines, one record per line
      */
     public static void run(List<String> lines) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("wordcount");
+        BatchSession session = RowWeave.createBatchSession("wordcount");
 
                 // Wrap each line as a single-column DataRow in a replayable Source.
         DataSet source = session.fromSource(lineInput(lines));

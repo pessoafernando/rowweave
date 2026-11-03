@@ -44,7 +44,7 @@ class EndToEndEquivalenceTest {
                 row("b", new BigDecimal("7")));
         DataSchema gbMeta = ParallelGroupByAgg.of(META, "grp").sum("amt").getOutputSchema();
         // DataSet: source, filter(amt>2), groupBySum(grp) then orderBy(sum desc), run through commit on the IR path
-        ExecutionEnvironment session = RowWeave.createEnvironment("e2e");
+        BatchSession session = RowWeave.createBatchSession("e2e");
         final List<DataRow> srcRows = rows;
         DataSet ds = session.fromSource(new Source() {
                     @Override public DataSchema getSchema() { return META; }

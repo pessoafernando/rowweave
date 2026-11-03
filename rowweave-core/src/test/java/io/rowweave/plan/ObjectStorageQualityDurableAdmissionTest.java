@@ -4,7 +4,7 @@ import io.rowweave.BatchSource;
 import io.rowweave.BatchSourceSplitDescriptor;
 import io.rowweave.DataType;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ObjectStorageReadHandle;
 import io.rowweave.ObjectStorageReadRequest;
 import io.rowweave.ObjectStorageSnapshotSource;
@@ -65,7 +65,7 @@ class ObjectStorageQualityDurableAdmissionTest {
                 META, new AdmissionProvider(), "endpoint", "credential", "domain",
                 "ledger.tsv", "version-1", 0L, sha256(empty),
                 ObjectStorageSnapshotSource.MIN_ROW_BYTES);
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-durable-admission", "quality durable");
+        BatchSession session = new BatchSession("quality-durable-admission", "quality durable");
         session.classifyObjectStorageRows("ledger.source", input)
                 .writeToManifest(TypedQualityManifest.of(
                         domain.toString(), "valid", "rejected", "summary"));

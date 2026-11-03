@@ -198,7 +198,7 @@ public final class RpcMessage {
     private transient Object stageCommand;
     // same-JVM local-attached Artifact binding. Never encoded by RpcCodec.
     private transient PlanArtifact inProcessPlanArtifact;
-    // Default local preserves ExecutionEnvironment's existing output-order performance hint.
+    // Default local preserves BatchSession's existing output-order performance hint.
     // Null means cluster policy; never encoded by RpcCodec.
     private transient Boolean inProcessCanonicalizeOutput;
     /**

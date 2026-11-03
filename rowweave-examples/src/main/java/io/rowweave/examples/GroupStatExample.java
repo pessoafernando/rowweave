@@ -10,7 +10,7 @@ import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.GroupReduceFunction;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 
@@ -48,7 +48,7 @@ public final class GroupStatExample {
 
         /** Computes [region, cnt, total] per region and writes {@code outputPath}. */
     public static void run(List<DataRow> details, String outputPath) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("group-stat");
+        BatchSession session = RowWeave.createBatchSession("group-stat");
 
         DataSet stat = session.fromSource(detailInput(details))
                 .groupBy("region")

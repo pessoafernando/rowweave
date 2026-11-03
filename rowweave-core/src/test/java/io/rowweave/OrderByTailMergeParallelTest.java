@@ -52,7 +52,7 @@ class OrderByTailMergeParallelTest {
 
     /** groupBy(k, sum amt) then orderBy(sum DESC) at a given parallelism, collected in output order with no further sorting. */
     private static List<DataRow> runGroupByOrderBySumDesc(List<DataRow> rows, int parallelism) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("par2-ob");
+        BatchSession session = RowWeave.createBatchSession("par2-ob");
         session.setParallelism(parallelism);
         DataSet grouped = session.fromSource(input(rows))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
@@ -67,7 +67,7 @@ class OrderByTailMergeParallelTest {
     }
 
     private static List<DataRow> runGroupByTopSumDesc(List<DataRow> rows, int parallelism, int n) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("par3-top");
+        BatchSession session = RowWeave.createBatchSession("par3-top");
         session.setParallelism(parallelism);
         DataSet grouped = session.fromSource(input(rows))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
@@ -171,7 +171,7 @@ class OrderByTailMergeParallelTest {
         };
 
         java.util.function.BiFunction<Integer, Boolean, List<DataRow>> run = (p, parallel) -> {
-            ExecutionEnvironment s = RowWeave.createEnvironment("par4-idx");
+            BatchSession s = RowWeave.createBatchSession("par4-idx");
             s.setParallelism(p);
             DataSet g = s.fromSource(in).groupBy(ParallelGroupByAgg.of(srcMeta, "k").sum("amt"));
             DataSet o = g.orderBy(

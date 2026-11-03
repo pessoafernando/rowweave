@@ -8,7 +8,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.GroupReduceFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -53,15 +53,15 @@ class InProcessClusterUnionLocalTest {
         return rows;
     }
 
-    private static ExecutionEnvironment session(io.rowweave.cluster.JobClient client, String name, int par) {
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+    private static BatchSession session(io.rowweave.cluster.JobClient client, String name, int par) {
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(par);
         return s;
     }
 
     private List<String> runSymUnion(List<DataRow> a, List<DataRow> b, int par,
                                      io.rowweave.cluster.JobClient client, Path out) {
-        ExecutionEnvironment s = session(client, "usym", par);
+        BatchSession s = session(client, "usym", par);
         DataSet ga = s.fromSource(new CollectionSource(META, a))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amount"));
         DataSet gb = s.fromSource(new CollectionSource(META, b))
@@ -94,7 +94,7 @@ class InProcessClusterUnionLocalTest {
 
     private List<String> runAsymUnion(List<DataRow> a, List<DataRow> b, int par,
                                       io.rowweave.cluster.JobClient client, Path out) {
-        ExecutionEnvironment s = session(client, "uasym", par);
+        BatchSession s = session(client, "uasym", par);
         DataSet gp = s.fromSource(new CollectionSource(META, a))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amount"));
         DataSet rg = s.fromSource(new CollectionSource(META, b))
@@ -116,7 +116,7 @@ class InProcessClusterUnionLocalTest {
 
     private List<String> runSourceUnion(List<DataRow> a, List<DataRow> b, int par,
                                         io.rowweave.cluster.JobClient client, Path out) {
-        ExecutionEnvironment s = session(client, "usrc", par);
+        BatchSession s = session(client, "usrc", par);
         DataSet ua = s.fromSource(new CollectionSource(META, a));
         DataSet ub = s.fromSource(new CollectionSource(META, b));
         ua.union(ub, Union.of(META)).filter("amount >= 3").sinkTo(new FileSink(META, out.toString()));

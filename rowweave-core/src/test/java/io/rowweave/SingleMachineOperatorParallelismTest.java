@@ -36,7 +36,7 @@ class SingleMachineOperatorParallelismTest {
     }
 
     private static List<DataRow> runOrderBy(List<DataRow> rows, int parallelism) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("sm-par-c-ob");
+        BatchSession session = RowWeave.createBatchSession("sm-par-c-ob");
         session.setParallelism(parallelism);
         // sorted on amt alone, with g left out of the sort key, so many rows tie and the __seq total order has to settle the result deterministically
         DataSet ds = session.fromSource(input(rows))
@@ -49,7 +49,7 @@ class SingleMachineOperatorParallelismTest {
     }
 
     private static List<DataRow> runTop(List<DataRow> rows, int n, int parallelism) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("sm-par-c-top");
+        BatchSession session = RowWeave.createBatchSession("sm-par-c-top");
         session.setParallelism(parallelism);
         DataSet ds = session.fromSource(input(rows))
                 .top(Top.of(META, n, new SortField(1, SortField.Direction.ASC, SortField.NullOrder.NULLS_LAST)),

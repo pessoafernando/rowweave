@@ -17,7 +17,7 @@ contracts, decimal precision, or stable refusals.
 
 | Mode | Public entry point | Process model | Choose when |
 |---|---|---|---|
-| Local | `RowWeave.createEnvironment` with the default client | One JVM | Embedding a bounded job in an application, evaluating the API, or running a small deterministic job. |
+| Local | `RowWeave.createBatchSession` with the default client | One JVM | Embedding a bounded job in an application, evaluating the API, or running a small deterministic job. |
 | InProcess cluster | `RowWeave.startInProcessCluster(parallelism, stateDirectory)` | Master and Worker product roles in one JVM | Testing cluster admission, placement, and whole-graph behavior without deploying separate processes. |
 | Cluster | `RowWeave.createClusterJobClient(...)` with `io.rowweave.cluster.ClusterMain` | Separate Client, Master, and Worker JVMs | Running jobs across processes and hosts, scaling workers, or using production deployment and monitoring. |
 

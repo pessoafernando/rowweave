@@ -12,7 +12,7 @@ import io.rowweave.Field;
 import io.rowweave.Source;
 import io.rowweave.SourceExecutor;
 import io.rowweave.SourceExecutorFactory;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataRowClassification;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -79,7 +79,7 @@ class TypedRowClassificationPlanAdmissionTest {
 
     @Test
     void apiRoundTripKeepsCanonicalNodesAndLocalIrExecutesSharedClassifierOnce() {
-        ExecutionEnvironment session = new ExecutionEnvironment("classification-plan", "classification plan");
+        BatchSession session = new BatchSession("classification-plan", "classification plan");
         DataSet source = session.fromSource(exact("split-a", Arrays.asList(
                 row("A", 1, BigDecimal.ZERO),
                 row(null, 2, BigDecimal.ZERO)))).uid(SOURCE_UID);

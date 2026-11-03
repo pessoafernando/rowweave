@@ -9,7 +9,7 @@ import io.rowweave.FlatMapFunction;
 import io.rowweave.GroupCombineFunction;
 import io.rowweave.GroupCombineReduceFunction;
 import io.rowweave.GroupReduceFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -81,11 +81,11 @@ public final class SubmitDagsClient {
 
     private static CsvInput csv(String p, DataSchema m) { return new CsvInput(p, m); }
 
-    interface Dag { void build(ExecutionEnvironment s); }
+    interface Dag { void build(BatchSession s); }
     private static String only;
     private static void submit(String name, Dag dag) {
         if (only != null && !name.contains(only)) return;
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new ClusterJobClient("127.0.0.1", masterPort));
+        BatchSession s = new BatchSession(name, name, new ClusterJobClient("127.0.0.1", masterPort));
         s.setParallelism(2);
         long t0 = System.currentTimeMillis();
         dag.build(s);

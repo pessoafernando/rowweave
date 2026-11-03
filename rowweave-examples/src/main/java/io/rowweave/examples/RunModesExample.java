@@ -8,7 +8,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.InProcessCluster;
@@ -22,7 +22,7 @@ import java.util.List;
 /**
   * SDK usage for three run modes. The same job DAG runs with a different injected {@link JobClient}:
  * <ol>
-  * <li>Local (default): {@code RowWeave.createEnvironment(...)} reuses the in-process, port-free Master+Worker runtime.</li>
+  * <li>Local (default): {@code RowWeave.createBatchSession(...)} reuses the in-process, port-free Master+Worker runtime.</li>
   * <li>In-process cluster: inject {@link InProcessCluster} for isolated Master+Worker lifecycles in one JVM.</li>
   * <li>Cluster: inject {@code ClusterJobClient(masterIp, port)} or {@code ZkRemoteJobClient(zk)} after starting separate processes;
   * {@link #clusterModeSketch()} shows the code but does not execute it.</li>
@@ -48,9 +48,9 @@ public final class RunModesExample {
 
     /**
           * Builds the mode-independent job DAG: group by region, sum amount, and write outputPath.
-          * Every mode calls it with an ExecutionEnvironment backed by a different client.
+          * Every mode calls it with an BatchSession backed by a different client.
      */
-        private static void buildAndExecute(ExecutionEnvironment session, List<DataRow> details, String outputPath) {
+        private static void buildAndExecute(BatchSession session, List<DataRow> details, String outputPath) {
         DataSet result = session.fromSource(detailInput(details))
                 .groupBy("region").sum("amount");
         result.sinkTo(new FileSink(result.getSchema(), outputPath));
@@ -59,7 +59,7 @@ public final class RunModesExample {
 
         /** Local mode: use the default in-process Batch Runtime without injecting a client. */
     public static void runSingleMachine(List<DataRow> details, String outputPath) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("run-modes-single");
+        BatchSession session = RowWeave.createBatchSession("run-modes-single");
                 session.setParallelism(2);                     // Optional parallelism for local keyed shuffle.
                 buildAndExecute(session, details, outputPath);
     }
@@ -68,7 +68,7 @@ public final class RunModesExample {
     public static void runInProcessCluster(List<DataRow> details, String outputPath, File tmpDir) {
                 // The worker-slot hint must be at least the requested parallelism; P=2, so 4 is sufficient.
         try (InProcessCluster cluster = RowWeave.startInProcessCluster(4, tmpDir)) {
-            ExecutionEnvironment session = new ExecutionEnvironment("run-modes-inproc", "run-modes-inproc", cluster);
+            BatchSession session = new BatchSession("run-modes-inproc", "run-modes-inproc", cluster);
             session.setParallelism(2);
                         buildAndExecute(session, details, outputPath);
         }
@@ -81,7 +81,7 @@ public final class RunModesExample {
      * JobClient client = new ClusterJobClient("192.168.1.10", 19000);
           * // Or multi-Master HA with a ZooKeeper connection string; requires rowweave-registry-zk on the classpath:
      * // JobClient client = new ZkRemoteJobClient("zk1:2181,zk2:2181,zk3:2181");
-          * ExecutionEnvironment session = new ExecutionEnvironment("job", "job", client);
+          * BatchSession session = new BatchSession("job", "job", client);
      * session.setParallelism(4);
      * DataSet result = session.fromSource(input).groupBy("region").sum("amount");
           * // In cluster mode a Sink must be worker-writable: FileSink can, CollectingSink cannot.

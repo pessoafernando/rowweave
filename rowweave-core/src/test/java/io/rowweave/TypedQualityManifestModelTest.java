@@ -61,7 +61,7 @@ class TypedQualityManifestModelTest {
     void oneCallBuildsExactlyThreeSameDomainManifestSinksAndCanonicalSummaryDag(
             @TempDir Path tmp) {
         Path domain = tmp.resolve("quality-domain");
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-publication", "quality publication");
+        BatchSession session = new BatchSession("quality-publication", "quality publication");
         DataRowClassification classification = classification(session);
 
         classification.writeToManifest(TypedQualityManifest.of(
@@ -97,7 +97,7 @@ class TypedQualityManifestModelTest {
     @Test
     void invalidCompoundTargetLeavesSessionWithoutPartiallyRegisteredSinks(
             @TempDir Path tmp) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-atomic-build", "quality atomic build");
+        BatchSession session = new BatchSession("quality-atomic-build", "quality atomic build");
         DataRowClassification classification = classification(session);
 
         assertInvalid(() -> classification.writeToManifest(null));
@@ -110,7 +110,7 @@ class TypedQualityManifestModelTest {
     void planConstructionRemainsSideEffectFreeAfterSummaryRuntimeAdmission(
             @TempDir Path tmp) {
         Path domain = tmp.resolve("runtime-admitted");
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-plan-only", "quality plan only");
+        BatchSession session = new BatchSession("quality-plan-only", "quality plan only");
         classification(session).writeToManifest(TypedQualityManifest.of(
                 domain.toString(), "valid", "rejected", "summary"));
 
@@ -118,7 +118,7 @@ class TypedQualityManifestModelTest {
         assertFalse(Files.exists(domain), "Plan compilation must not open the commit domain");
     }
 
-    private static DataRowClassification classification(ExecutionEnvironment session) {
+    private static DataRowClassification classification(BatchSession session) {
         RowValidation validation = RowValidation.builder(META)
                 .notNull("adaptor.required", 0)
                 .integerRange("period.range", 1, 1, 12)

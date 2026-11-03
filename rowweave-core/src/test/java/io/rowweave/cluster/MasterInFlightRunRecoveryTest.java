@@ -4,7 +4,7 @@ import io.rowweave.DataType;
 import io.rowweave.CollectionSource;
 import io.rowweave.DiscardSink;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.QualityGateDecision;
@@ -1288,7 +1288,7 @@ class MasterInFlightRunRecoveryTest {
         first.set(0, 7);
         DataRow second = new DataRow(1);
         second.set(0, 8);
-        ExecutionEnvironment session = io.rowweave.RowWeave.createEnvironment(
+        BatchSession session = io.rowweave.RowWeave.createBatchSession(
                 "in-flight-source-snapshot");
         session.fromSource(new CollectionSource(META, Arrays.asList(first, second)))
                 .sinkTo(new ManifestFileSink(META, domain.toString(), "ledger"));
@@ -1843,7 +1843,7 @@ class MasterInFlightRunRecoveryTest {
 
     private static PlanArtifact qualityArtifact(
             String definitionId, Path domain, QualityGatePolicy policy) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-recovery", "quality recovery");
+        BatchSession session = new BatchSession("quality-recovery", "quality recovery");
         session.setDefinitionId(definitionId);
         session.setParallelism(2);
         DataRowClassification classified = session.fromSource(new CollectionSource(

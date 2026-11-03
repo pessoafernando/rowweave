@@ -17,10 +17,10 @@ import io.rowweave.plan.PushDagExecutor;
 /**
  * Legacy embedded JobClient: runs a SINK-rooted graph directly through {@link PushDagExecutor#runSinkGraph}.
  *
- * <p>This is no longer the default path of {@code ExecutionEnvironment.execute()} and takes no new execution capability. It is
+ * <p>This is no longer the default path of {@code BatchSession.execute()} and takes no new execution capability. It is
  * kept only for explicit embedded use, diagnostics and emergency fallback; default local execution uses the shared Master/Worker runtime that opens no listening port.
  *
- * @deprecated Use the default unified local runtime from {@code RowWeave.createEnvironment(...)}; construct this class explicitly only when the embedded executor is specifically required.
+ * @deprecated Use the default unified local runtime from {@code RowWeave.createBatchSession(...)}; construct this class explicitly only when the embedded executor is specifically required.
  */
 @Deprecated
 public final class LocalJobClient implements JobClient {
@@ -34,8 +34,8 @@ public final class LocalJobClient implements JobClient {
 
     /**
      * Parallelism is a job property read from the submitted graph, its single source, and is no longer held by the client. The
-     * parallelism argument here is ignored, and the signature is kept only so that existing calls still compile (the value is already compiled into the graph by {@code ExecutionEnvironment.toPlanGraph()}).
-     * @deprecated Use the no-argument constructor; parallelism enters the graph through {@link ExecutionEnvironment#setParallelism}.
+     * parallelism argument here is ignored, and the signature is kept only so that existing calls still compile (the value is already compiled into the graph by {@code BatchSession.toPlanGraph()}).
+     * @deprecated Use the no-argument constructor; parallelism enters the graph through {@link BatchSession#setParallelism}.
      */
     @Deprecated
     public LocalJobClient(int parallelism) {

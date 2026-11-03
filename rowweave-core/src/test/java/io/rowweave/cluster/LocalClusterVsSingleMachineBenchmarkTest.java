@@ -5,7 +5,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.artifact.LegacyPlanArtifactAdapter;
@@ -81,11 +81,11 @@ class LocalClusterVsSingleMachineBenchmarkTest {
     private CsvInput csv(String path, DataSchema meta) { return new CsvInput(path, meta); }
 
     @FunctionalInterface
-    private interface Scene { void build(ExecutionEnvironment s, FileSink out); }
+    private interface Scene { void build(BatchSession s, FileSink out); }
 
     private long run(int par, JobClient client, Scene scene, DataSchema outMeta, Path outPath) {
         long t = System.nanoTime();
-        ExecutionEnvironment s = new ExecutionEnvironment("b", "b", client);
+        BatchSession s = new BatchSession("b", "b", client);
         s.setParallelism(par);
         scene.build(s, new FileSink(outMeta, outPath.toString()));
         s.execute();

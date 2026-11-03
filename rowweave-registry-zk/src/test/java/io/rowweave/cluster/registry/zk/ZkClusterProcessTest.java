@@ -8,7 +8,7 @@ import io.rowweave.DiscardSink;
 import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.artifact.LegacyPlanArtifactAdapter;
@@ -221,7 +221,7 @@ class ZkClusterProcessTest {
             // 3) This JVM submits through ZkRemoteJobClient with only a connection string; it resolves the leader from ZooKeeper.
             Path out = tmp.resolve("zk-cluster-out.tsv");
             try (ZkRemoteJobClient client = new ZkRemoteJobClient(connect)) {
-                ExecutionEnvironment s = new ExecutionEnvironment("zkproc", "zkproc", client);
+                BatchSession s = new BatchSession("zkproc", "zkproc", client);
                 s.setParallelism(2);
                 s.fromSource(new CollectionSource(META, rows()))
                         .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))

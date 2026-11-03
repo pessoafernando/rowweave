@@ -31,10 +31,10 @@ class DataSetApiCompatTest {
         return r;
     }
 
-    private ExecutionEnvironment session;
+    private BatchSession session;
 
     private DataSet src(List<DataRow> rs) {
-        session = RowWeave.createEnvironment("apicompat");
+        session = RowWeave.createBatchSession("apicompat");
         return session.fromSource(new CollectionSource(META, rs));
     }
 
@@ -66,7 +66,7 @@ class DataSetApiCompatTest {
 
     // the union(DataSet) overload
     @Test void unionConvenience() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("u");
+        BatchSession s = RowWeave.createBatchSession("u");
         DataSet left = s.fromSource(new CollectionSource(META, data()));
         DataSet right = s.fromSource(new CollectionSource(META, data()));
         DataSet u = left.union(right);

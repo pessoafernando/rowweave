@@ -8,7 +8,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -91,7 +91,7 @@ class ComplexMultiIoDagQuadrantTest {
     }
 
     @FunctionalInterface
-    private interface MultiIoDag { void build(ExecutionEnvironment s, DataSet srcA, DataSet srcB, List<FileSink> outs); }
+    private interface MultiIoDag { void build(BatchSession s, DataSet srcA, DataSet srcB, List<FileSink> outs); }
 
     private static long[] fingerprint(Path p) {
         long count = 0, sum = 0;
@@ -114,7 +114,7 @@ class ComplexMultiIoDagQuadrantTest {
             Path f = tmpDir.resolve(name + "-o" + i + ".tsv");
             paths.add(f);
         }
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet srcA = s.fromSource(new CollectionSource(A, dataA));
         DataSet srcB = s.fromSource(new CollectionSource(B, dataB));

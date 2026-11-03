@@ -7,7 +7,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.join.JoinType;
@@ -241,7 +241,7 @@ class ClusterJoinFanoutTwoSinkTest {
 
     private static void run(String name, JobClient client, List<DataRow> leftRows, List<DataRow> rightRows, Path dir,
                             int parallelism, JobGraph graph) {
-        ExecutionEnvironment session = client == null ? new ExecutionEnvironment(name, name) : new ExecutionEnvironment(name, name, client);
+        BatchSession session = client == null ? new BatchSession(name, name) : new BatchSession(name, name, client);
         session.setParallelism(parallelism);
         graph.build(session, leftRows, rightRows, dir, name);
         session.execute();
@@ -249,7 +249,7 @@ class ClusterJoinFanoutTwoSinkTest {
 
     private static void runJoinRejoin(String name, JobClient client, List<DataRow> leftRows, List<DataRow> rightRows,
                                       Path dir) {
-        ExecutionEnvironment session = client == null ? new ExecutionEnvironment(name, name) : new ExecutionEnvironment(name, name, client);
+        BatchSession session = client == null ? new BatchSession(name, name) : new BatchSession(name, name, client);
         session.setParallelism(1);
         DataSet joined = session.fromSource(new CollectionSource(LEFT, leftRows))
                 .join(session.fromSource(new CollectionSource(RIGHT, rightRows)),
@@ -261,7 +261,7 @@ class ClusterJoinFanoutTwoSinkTest {
 
     private static void runSideBranch(String name, JobClient client, List<DataRow> leftRows, List<DataRow> rightRows,
                                       Path dir) {
-        ExecutionEnvironment session = client == null ? new ExecutionEnvironment(name, name) : new ExecutionEnvironment(name, name, client);
+        BatchSession session = client == null ? new BatchSession(name, name) : new BatchSession(name, name, client);
         session.setParallelism(1);
         DataSet left = session.fromSource(new CollectionSource(LEFT, leftRows));
         DataSet joined = left.join(session.fromSource(new CollectionSource(RIGHT, rightRows)),
@@ -274,7 +274,7 @@ class ClusterJoinFanoutTwoSinkTest {
 
     @FunctionalInterface
     private interface JobGraph {
-        void build(ExecutionEnvironment session, List<DataRow> left, List<DataRow> right, Path dir, String name);
+        void build(BatchSession session, List<DataRow> left, List<DataRow> right, Path dir, String name);
     }
 
     private static List<DataRow> rows(DataSchema meta, int count, int offset) {

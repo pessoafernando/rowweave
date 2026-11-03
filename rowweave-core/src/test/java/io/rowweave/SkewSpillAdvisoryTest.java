@@ -69,7 +69,7 @@ class SkewSpillAdvisoryTest {
         List<DataRow> rows = new ArrayList<>();
         for (int i = 0; i < 300; i++) rows.add(row(i % 9, 1));
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("adv");
+        BatchSession session = RowWeave.createBatchSession("adv");
         session.setParallelism(3);
         AtomicInteger callbacks = new AtomicInteger();
         AtomicReference<ExecutionReport> captured = new AtomicReference<>();
@@ -96,7 +96,7 @@ class SkewSpillAdvisoryTest {
         List<DataRow> rows = new ArrayList<>();
         for (int i = 0; i < 100; i++) rows.add(row(i % 5, 1));
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("adv-boom");
+        BatchSession session = RowWeave.createBatchSession("adv-boom");
         session.setParallelism(2);
         session.setMetricsListener(rep -> { throw new RuntimeException("listener boom"); });
         DataSet g = session.fromSource(in(rows)).groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
@@ -113,14 +113,14 @@ class SkewSpillAdvisoryTest {
         List<DataRow> rows = new ArrayList<>();
         for (int i = 0; i < 100; i++) rows.add(row(i % 5, 7));
 
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("no-listener");
+        BatchSession s1 = RowWeave.createBatchSession("no-listener");
         s1.setParallelism(2);
         DataSet g1 = s1.fromSource(in(rows)).groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
         WorkerCollectingOutput o1 = new WorkerCollectingOutput(g1.getSchema());
         g1.sinkTo(o1);
         s1.execute();
 
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("with-listener");
+        BatchSession s2 = RowWeave.createBatchSession("with-listener");
         s2.setParallelism(2);
         s2.setMetricsListener(rep -> { });
         DataSet g2 = s2.fromSource(in(rows)).groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));

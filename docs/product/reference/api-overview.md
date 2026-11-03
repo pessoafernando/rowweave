@@ -8,10 +8,10 @@ For the exhaustive source-visible declaration set and the frozen 0.2.0 API
 vocabulary, see the [public API inventory](api-inventory.md). This overview is
 the task-oriented summary; the inventory is the traceability authority.
 
-## Batch `DataSet`
+## BatchSession / DataSet
 
-`ExecutionEnvironment` is the batch entry point. Create it with
-`RowWeave.createEnvironment`, open a `Source`, and compose operators through
+`BatchSession` is the batch entry point. Create it with
+`RowWeave.createBatchSession`, open a `Source`, and compose operators through
 `DataSet`. `execute()` submits the whole graph.
 
 Common operations include `filter`, `select`, `map`, `flatMap`, `groupBy`,

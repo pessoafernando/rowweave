@@ -40,7 +40,7 @@ class DiamondReJoinTest {
     @Test
     void diamondSrcTeeThenJoin() {
         List<DataRow> data = rows();
-        ExecutionEnvironment s = RowWeave.createEnvironment("diamond");
+        BatchSession s = RowWeave.createBatchSession("diamond");
         DataSet mid = s.fromSource(input(data)).filter("amt >= 5");
         DataSet b1 = mid.filter("k >= 2");  // branch 1
         DataSet b2 = mid.filter("k <= 6");  // branch 2

@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -62,7 +62,7 @@ class DataSetC2ClusterTest {
                 new Field("rate", DataType.BigDecimalType),
                 new Field("src", DataType.StringType)};
         Object[] vals = {7, new BigDecimal("1.2500000000"), "batch\tX"};
-        ExecutionEnvironment s = RowWeave.createEnvironment("af1");
+        BatchSession s = RowWeave.createBatchSession("af1");
         s.setParallelism(1);
         DataSet ds = s.fromSource(new CollectionSource(ORDER, orders())).addFields(add, vals);
         assertEquals(5, ds.getSchema().getFieldCount());
@@ -84,7 +84,7 @@ class DataSetC2ClusterTest {
 
         long[] single;
         {
-            ExecutionEnvironment s = RowWeave.createEnvironment("afs"); s.setParallelism(1);
+            BatchSession s = RowWeave.createBatchSession("afs"); s.setParallelism(1);
             Path f = tmp.resolve("af-s.tsv");
             s.fromSource(new CollectionSource(ORDER, data)).addFields(add, vals)
                     .sinkTo(new FileSink(outMeta, f.toString()));
@@ -97,7 +97,7 @@ class DataSetC2ClusterTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("afc", "afc", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("afc", "afc", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("af-c.tsv");
             s.fromSource(new CollectionSource(ORDER, data)).addFields(add, vals)
@@ -111,7 +111,7 @@ class DataSetC2ClusterTest {
 
     @Test void partitionByHash_singleMachine(@TempDir Path dir) {
         DataSchema gb = ParallelGroupByAgg.of(ORDER, "k").sum("amt").getOutputSchema();
-        ExecutionEnvironment s = RowWeave.createEnvironment("ph1");
+        BatchSession s = RowWeave.createBatchSession("ph1");
         s.setParallelism(1);
         DataSet ds = s.fromSource(new CollectionSource(ORDER, orders()))
                 .partitionByHash("k")
@@ -128,7 +128,7 @@ class DataSetC2ClusterTest {
 
         long[] single;
         {
-            ExecutionEnvironment s = RowWeave.createEnvironment("phs"); s.setParallelism(1);
+            BatchSession s = RowWeave.createBatchSession("phs"); s.setParallelism(1);
             Path f = tmp.resolve("ph-s.tsv");
             s.fromSource(new CollectionSource(ORDER, data))
                     .partitionByHash("k")
@@ -143,7 +143,7 @@ class DataSetC2ClusterTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("phc", "phc", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("phc", "phc", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("ph-c.tsv");
             s.fromSource(new CollectionSource(ORDER, data))

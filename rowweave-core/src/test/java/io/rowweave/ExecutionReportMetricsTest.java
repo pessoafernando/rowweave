@@ -141,7 +141,7 @@ class ExecutionReportMetricsTest {
 
     @Test
     void disjointPerSinkRouteMergesCompleteFactsWithoutResettingThem() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("telemetry-disjoint");
+        BatchSession session = RowWeave.createBatchSession("telemetry-disjoint");
         DataSet left = session.fromSource(in(Arrays.asList(row("a", 1), row("b", 2))))
                 .filter("amt >= 0");
         DataSet right = session.fromSource(in(Collections.singletonList(row("c", 3))))
@@ -161,7 +161,7 @@ class ExecutionReportMetricsTest {
 
     @Test
     void materializedMultiOutputRouteKeepsItsDiskFacts() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("telemetry-materialized");
+        BatchSession session = RowWeave.createBatchSession("telemetry-materialized");
         DataSet mid = session.fromSource(in(Arrays.asList(
                 row("a", 1), row("a", 2), row("b", 3)))).filter("amt >= 0");
         DataSet left = mid.filter("amt >= 1");
@@ -234,7 +234,7 @@ class ExecutionReportMetricsTest {
         assertEquals(TelemetryCoverage.COMPLETE, sharded.resourceTelemetryCoverage());
         assertEquals(0L, sharded.acquiredBytes());
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("reported-parallel-binary");
+        BatchSession session = RowWeave.createBatchSession("reported-parallel-binary");
         DataSet left = session.fromSource(in(Arrays.asList(row("a", 1), row("b", 2))));
         DataSet right = session.fromSource(in(Arrays.asList(row("a", 3), row("c", 4))));
         DataSet joined = left.join(right, SortMergeJoin.of(

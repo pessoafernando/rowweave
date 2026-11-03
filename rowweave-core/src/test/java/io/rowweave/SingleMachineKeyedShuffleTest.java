@@ -36,7 +36,7 @@ class SingleMachineKeyedShuffleTest {
 
     /** Collects the groupBySum result, sorted by k so it is easy to compare. */
     private static List<DataRow> runGroupBySum(List<DataRow> rows, int parallelism) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("sm-par-a");
+        BatchSession session = RowWeave.createBatchSession("sm-par-a");
         session.setParallelism(parallelism);
         DataSet grouped = session.fromSource(input(rows))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
@@ -101,7 +101,7 @@ class SingleMachineKeyedShuffleTest {
                 };
             }
         };
-        ExecutionEnvironment session = RowWeave.createEnvironment("sm-par-ff");
+        BatchSession session = RowWeave.createBatchSession("sm-par-ff");
         session.setParallelism(3);
         DataSet grouped = session.fromSource(boom).groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
         grouped.sinkTo(new WorkerCollectingOutput(grouped.getSchema()));
@@ -111,7 +111,7 @@ class SingleMachineKeyedShuffleTest {
     /** setParallelism defaults to 1 and rejects an illegal value. */
     @Test
     void setParallelismValidation() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("v");
+        BatchSession session = RowWeave.createBatchSession("v");
         assertThrows(IllegalArgumentException.class, () -> session.setParallelism(0));
         assertThrows(IllegalArgumentException.class, () -> session.setParallelism(-1));
     }

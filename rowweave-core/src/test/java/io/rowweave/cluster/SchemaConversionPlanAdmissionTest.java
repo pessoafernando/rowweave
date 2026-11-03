@@ -7,7 +7,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.local.LocalJobClient;
@@ -54,7 +54,7 @@ class SchemaConversionPlanAdmissionTest {
     @Test
     void planRoundTripKeepsBuiltInDescriptionAndExecutesLocally(@TempDir Path temp) {
         Path output = temp.resolve("local.tsv");
-        ExecutionEnvironment session = new ExecutionEnvironment("schema-plan", "schema plan");
+        BatchSession session = new BatchSession("schema-plan", "schema plan");
         session.fromSource(new CollectionSource(INPUT, inputRows()))
                 .convertSchema(CONVERSION)
                 .sinkTo(new FileSink(OUTPUT, output.toString()));
@@ -153,7 +153,7 @@ class SchemaConversionPlanAdmissionTest {
 
     @Test
     void conversionRemainsAVisibleFusibleLogicalNode() {
-        ExecutionEnvironment session = new ExecutionEnvironment("schema-visible", "schema visible");
+        BatchSession session = new BatchSession("schema-visible", "schema visible");
         DataSet converted = session.fromSource(new CollectionSource(INPUT, inputRows()))
                 .convertSchema(CONVERSION)
                 .filter("adaptor_id > 0");
@@ -197,9 +197,9 @@ class SchemaConversionPlanAdmissionTest {
     }
 
     private static List<String> run(JobClient client, int parallelism, Path output) {
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("schema-runtime", "schema runtime")
-                : new ExecutionEnvironment("schema-runtime", "schema runtime", client);
+        BatchSession session = client == null
+                ? new BatchSession("schema-runtime", "schema runtime")
+                : new BatchSession("schema-runtime", "schema runtime", client);
         session.setParallelism(parallelism);
         session.fromSource(new CollectionSource(INPUT, inputRows()))
                 .convertSchema(CONVERSION)

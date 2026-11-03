@@ -5,7 +5,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -113,7 +113,7 @@ class MasterFailoverEndToEndTest {
         workerDir.mkdirs();
         WorkerServer worker = WorkerServer.newUnguarded("term-worker", 16, locator, workerDir);
         try {
-            ExecutionEnvironment session = new ExecutionEnvironment("old-term", "old-term", new ClusterJobClient(locator));
+            BatchSession session = new BatchSession("old-term", "old-term", new ClusterJobClient(locator));
             session.setParallelism(1);
             Path output = tmp.resolve("old-term.tsv");
             session.fromSource(ClusterTestFileInput.write(
@@ -171,7 +171,7 @@ class MasterFailoverEndToEndTest {
     }
 
     private void runJobAndAssert(Path tmp, String tag, MasterLocator locator) {
-        ExecutionEnvironment s = new ExecutionEnvironment(tag, tag, new ClusterJobClient(locator));
+        BatchSession s = new BatchSession(tag, tag, new ClusterJobClient(locator));
         s.setParallelism(2);
         Path f = tmp.resolve(tag + ".tsv");
         s.fromSource(new CollectionSource(META, rows(4000)))

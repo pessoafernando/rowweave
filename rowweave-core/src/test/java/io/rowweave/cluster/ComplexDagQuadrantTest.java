@@ -6,7 +6,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.FileSource;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.Distinct;
@@ -93,9 +93,9 @@ class ComplexDagQuadrantTest {
     private long[] runQuad(String name, int parallelism, io.rowweave.cluster.JobClient client, Dag dag, DataSchema outMeta) {
         Path f;
         try { f = Files.createTempFile("cdag-" + name + "-", ".tsv"); } catch (Exception e) { throw new RuntimeException(e); }
-        ExecutionEnvironment s = client != null
-                ? new ExecutionEnvironment(name, name, client)
-                : RowWeave.createEnvironment(name);
+        BatchSession s = client != null
+                ? new BatchSession(name, name, client)
+                : RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet src = s.fromSource(sourceInput);
         DataSet out = dag.build(src);

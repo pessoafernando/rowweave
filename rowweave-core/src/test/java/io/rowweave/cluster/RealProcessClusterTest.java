@@ -8,7 +8,7 @@ import io.rowweave.CoGroupFunction;
 import io.rowweave.Collector;
 import io.rowweave.GroupReduceFunction;
 import io.rowweave.GroupCombineFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ObjectStorageReadHandle;
 import io.rowweave.ObjectStorageReadRequest;
@@ -595,7 +595,7 @@ class RealProcessClusterTest {
 
             Path validPath = tmp.resolve("classification-valid.tsv");
             Path rejectedPath = tmp.resolve("classification-rejected.tsv");
-            ExecutionEnvironment session = new ExecutionEnvironment(
+            BatchSession session = new BatchSession(
                     "classification-multiprocess", "classification multiprocess",
                     new ClusterJobClient("127.0.0.1", masterPort));
             session.setParallelism(4);
@@ -697,7 +697,7 @@ class RealProcessClusterTest {
     private static QualitySnapshot runObjectQuality(
             JobClient client, int parallelism, DataSchema meta,
             Path partA, Path partB, Path domain) throws Exception {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "object-quality-multiprocess", "object quality multiprocess", client);
         session.setParallelism(parallelism);
         session.classifyObjectStorageRows(

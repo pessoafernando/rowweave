@@ -5,7 +5,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.Sink;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -192,7 +192,7 @@ class PushDagExecutorTelemetryRouteTest {
     }
 
     private static PlanGraph materializedGraph() {
-        ExecutionEnvironment session = io.rowweave.RowWeave.createEnvironment("telemetry-route-materialized");
+        BatchSession session = io.rowweave.RowWeave.createBatchSession("telemetry-route-materialized");
         DataSet middle = session.fromSource(input(Arrays.asList(
                 row("a", 1), row("a", 2), row("b", 3)))).filter("v >= 0");
         DataSet left = middle.filter("v >= 1");

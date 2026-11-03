@@ -5,7 +5,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -71,7 +71,7 @@ class ClusterDiamondPerfCompareTest {
 
     private long runDiamond(String name, JobClient client, Source in, Path dir) {
         Path f = dir.resolve(name + ".tsv");
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, client);
+        BatchSession s = new BatchSession(name, name, client);
         s.setParallelism(1);
         DataSet mid = s.fromSource(in).filter("amt >= 100")
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
@@ -95,7 +95,7 @@ class ClusterDiamondPerfCompareTest {
     }
 
     private long[] runMultiOutput(String name, JobClient client, Source in, Path dir, int fanoutN) {
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, client);
+        BatchSession s = new BatchSession(name, name, client);
         s.setParallelism(1);
         DataSet mid = s.fromSource(in).filter("amt >= 100")
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));

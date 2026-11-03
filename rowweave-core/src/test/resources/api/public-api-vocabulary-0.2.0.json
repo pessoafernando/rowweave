@@ -3,7 +3,7 @@
   "requiredClasses": [
     "io.rowweave.DataRow",
     "io.rowweave.DataSchema",
-    "io.rowweave.ExecutionEnvironment",
+    "io.rowweave.BatchSession",
     "io.rowweave.Source",
     "io.rowweave.Sink",
     "io.rowweave.Collector",
@@ -36,7 +36,7 @@
   ],
   "forbiddenClasses": [
     "io.rowweave.Row",
-    "io.rowweave.Row\u004deta",
+    "io.rowweave.RowMeta",
     "io.rowweave.RowClassification",
     "io.rowweave.JobSession",
     "io.rowweave.Input",
@@ -65,7 +65,8 @@
     "io.rowweave.ObjectStorageQualityInput",
     "io.rowweave.ObjectStorageSnapshotInput",
     "io.rowweave.PrintOutput",
-    "io.rowweave.ProviderBatchSinkOutput"
+    "io.rowweave.ProviderBatchSinkOutput",
+    "io.rowweave.ExecutionEnvironment"
   ],
   "retainedClasses": [
     "io.rowweave.DataSet",
@@ -99,57 +100,426 @@
     "io.rowweave.stream.api.StreamOutputTag"
   ],
   "methods": [
-    {"owner": "io.rowweave.DataRow", "name": "size", "parameters": [], "returns": "int"},
-    {"owner": "io.rowweave.DataRow", "name": "set", "parameters": ["int", "java.lang.Object"], "returns": "void"},
-    {"owner": "io.rowweave.DataRow", "name": "get", "parameters": ["int"], "returns": "java.lang.Object"},
-    {"owner": "io.rowweave.DataRow", "name": "copy", "parameters": [], "returns": "io.rowweave.DataRow"},
-    {"owner": "io.rowweave.DataSchema", "name": "getFieldCount", "parameters": [], "returns": "int"},
-    {"owner": "io.rowweave.DataSchema", "name": "getField", "parameters": ["int"], "returns": "io.rowweave.Field"},
-    {"owner": "io.rowweave.DataSchema", "name": "getFields", "parameters": [], "returns": "io.rowweave.Field[]"},
-    {"owner": "io.rowweave.DataSchema", "name": "getFieldIndex", "parameters": ["java.lang.String"], "returns": "int"},
-    {"owner": "io.rowweave.ExecutionEnvironment", "name": "fromSource", "parameters": ["io.rowweave.Source"], "returns": "io.rowweave.DataSet"},
-    {"owner": "io.rowweave.ExecutionEnvironment", "name": "fromSource", "parameters": ["io.rowweave.Source[]"], "returns": "io.rowweave.DataSet"},
-    {"owner": "io.rowweave.ExecutionEnvironment", "name": "setParallelism", "parameters": ["int"], "returns": "void"},
-    {"owner": "io.rowweave.ExecutionEnvironment", "name": "getParallelism", "parameters": [], "returns": "int"},
-    {"owner": "io.rowweave.ExecutionEnvironment", "name": "execute", "parameters": [], "returns": "void"},
-    {"owner": "io.rowweave.RowWeave", "name": "createEnvironment", "parameters": ["java.lang.String"], "returns": "io.rowweave.ExecutionEnvironment"},
-    {"owner": "io.rowweave.RowWeave", "name": "createEnvironment", "parameters": ["java.lang.String", "java.lang.String"], "returns": "io.rowweave.ExecutionEnvironment"},
-    {"owner": "io.rowweave.DataSet", "name": "getSchema", "parameters": [], "returns": "io.rowweave.DataSchema"},
-    {"owner": "io.rowweave.DataSet", "name": "sinkTo", "parameters": ["io.rowweave.Sink"], "returns": "void"},
-    {"owner": "io.rowweave.DataSet", "name": "sinkTo", "parameters": ["java.lang.String", "io.rowweave.Sink"], "returns": "void"},
-    {"owner": "io.rowweave.DataStream", "name": "getSchema", "parameters": [], "returns": "io.rowweave.DataSchema"},
-    {"owner": "io.rowweave.DataStream", "name": "sinkTo", "parameters": ["java.lang.String", "io.rowweave.stream.api.StreamSinkSpec"], "returns": "void"},
-    {"owner": "io.rowweave.Source", "name": "getSchema", "parameters": [], "returns": "io.rowweave.DataSchema"},
-    {"owner": "io.rowweave.Sink", "name": "getSchema", "parameters": [], "returns": "io.rowweave.DataSchema"},
-    {"owner": "io.rowweave.Sink", "name": "collect", "parameters": ["io.rowweave.DataRow"], "returns": "void"},
-    {"owner": "io.rowweave.Collector", "name": "collect", "parameters": ["io.rowweave.DataRow"], "returns": "void"},
-    {"owner": "io.rowweave.ResultSchemaAware", "name": "getResultSchema", "parameters": [], "returns": "io.rowweave.DataSchema"},
-    {"owner": "io.rowweave.MapFunction", "name": "map", "parameters": ["io.rowweave.DataRow"], "returns": "io.rowweave.DataRow"},
-    {"owner": "io.rowweave.FilterFunction", "name": "filter", "parameters": ["io.rowweave.DataRow"], "returns": "boolean"},
-    {"owner": "io.rowweave.FlatMapFunction", "name": "flatMap", "parameters": ["io.rowweave.DataRow", "io.rowweave.Collector"], "returns": "void"},
-    {"owner": "io.rowweave.MapPartitionFunction", "name": "mapPartition", "parameters": ["io.rowweave.PartitionDataRowCursor", "io.rowweave.Collector"], "returns": "void"},
-    {"owner": "io.rowweave.GroupReduceFunction", "name": "reduce", "parameters": ["java.lang.Iterable", "io.rowweave.Collector"], "returns": "void"},
-    {"owner": "io.rowweave.GroupCombineFunction", "name": "combine", "parameters": ["java.lang.Iterable", "io.rowweave.Collector"], "returns": "void"},
-    {"owner": "io.rowweave.GroupCombineFunction", "name": "getResultSchema", "parameters": [], "returns": "io.rowweave.DataSchema"},
-    {"owner": "io.rowweave.GroupCombineReduceFunction", "name": "combine", "parameters": ["java.lang.Iterable", "io.rowweave.Collector"], "returns": "void"},
-    {"owner": "io.rowweave.GroupCombineReduceFunction", "name": "reduce", "parameters": ["java.lang.Iterable", "io.rowweave.Collector"], "returns": "void"},
-    {"owner": "io.rowweave.JoinFunction", "name": "join", "parameters": ["io.rowweave.DataRow", "io.rowweave.DataRow"], "returns": "io.rowweave.DataRow"},
-    {"owner": "io.rowweave.CoGroupFunction", "name": "coGroup", "parameters": ["java.lang.Iterable", "java.lang.Iterable", "io.rowweave.Collector"], "returns": "void"},
-    {"owner": "io.rowweave.StreamAggregateFunction", "name": "add", "parameters": ["io.rowweave.DataRow", "byte[]"], "returns": "byte[]"},
-    {"owner": "io.rowweave.StreamAggregateFunction", "name": "getResult", "parameters": ["byte[]"], "returns": "io.rowweave.DataRow"},
-    {"owner": "io.rowweave.RetractableStreamAggregateFunction", "name": "retract", "parameters": ["io.rowweave.DataRow", "byte[]"], "returns": "byte[]"},
-    {"owner": "io.rowweave.StreamWindowAggregateFunction", "name": "add", "parameters": ["io.rowweave.DataRow", "byte[]"], "returns": "byte[]"},
-    {"owner": "io.rowweave.StreamWindowAggregateFunction", "name": "getResult", "parameters": ["byte[]", "io.rowweave.StreamWindowContext"], "returns": "io.rowweave.DataRow"},
-    {"owner": "io.rowweave.StreamAsyncFunction", "name": "createRequest", "parameters": ["io.rowweave.DataRow"], "returns": "byte[]"},
-    {"owner": "io.rowweave.StreamAsyncFunction", "name": "complete", "parameters": ["io.rowweave.DataRow", "byte[]", "io.rowweave.StreamCollector"], "returns": "void"},
-    {"owner": "io.rowweave.StreamKeyedProcessFunction", "name": "processElement", "parameters": ["io.rowweave.DataRow", "io.rowweave.StreamProcessContext", "io.rowweave.StreamCollector"], "returns": "void"},
-    {"owner": "io.rowweave.StreamKeyedCoProcessFunction", "name": "processLeft", "parameters": ["io.rowweave.DataRow", "io.rowweave.StreamProcessContext", "io.rowweave.StreamCollector"], "returns": "void"},
-    {"owner": "io.rowweave.StreamKeyedCoProcessFunction", "name": "processRight", "parameters": ["io.rowweave.DataRow", "io.rowweave.StreamProcessContext", "io.rowweave.StreamCollector"], "returns": "void"},
-    {"owner": "io.rowweave.StreamKeyedBroadcastProcessFunction", "name": "processKeyed", "parameters": ["io.rowweave.DataRow", "io.rowweave.StreamKeyedBroadcastProcessContext", "io.rowweave.StreamCollector"], "returns": "void"},
-    {"owner": "io.rowweave.StreamKeyedBroadcastProcessFunction", "name": "processBroadcast", "parameters": ["io.rowweave.DataRow", "io.rowweave.StreamBroadcastProcessContext", "io.rowweave.StreamCollector"], "returns": "void"},
-    {"owner": "io.rowweave.StreamWindowProcessFunction", "name": "process", "parameters": ["io.rowweave.StreamWindowContext", "io.rowweave.StreamWindowDataRowCursor", "io.rowweave.StreamWindowCollector"], "returns": "void"},
-    {"owner": "io.rowweave.stream.api.StreamDataRowCodec", "name": "encode", "parameters": ["io.rowweave.DataRow"], "returns": "byte[]"},
-    {"owner": "io.rowweave.stream.api.StreamDataRowCodec", "name": "decode", "parameters": ["byte[]"], "returns": "io.rowweave.DataRow"},
-    {"owner": "io.rowweave.StreamWindowDataRowCursor", "name": "row", "parameters": [], "returns": "io.rowweave.DataRow"}
+    {
+      "owner": "io.rowweave.DataRow",
+      "name": "size",
+      "parameters": [],
+      "returns": "int"
+    },
+    {
+      "owner": "io.rowweave.DataRow",
+      "name": "set",
+      "parameters": [
+        "int",
+        "java.lang.Object"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.DataRow",
+      "name": "get",
+      "parameters": [
+        "int"
+      ],
+      "returns": "java.lang.Object"
+    },
+    {
+      "owner": "io.rowweave.DataRow",
+      "name": "copy",
+      "parameters": [],
+      "returns": "io.rowweave.DataRow"
+    },
+    {
+      "owner": "io.rowweave.DataSchema",
+      "name": "getFieldCount",
+      "parameters": [],
+      "returns": "int"
+    },
+    {
+      "owner": "io.rowweave.DataSchema",
+      "name": "getField",
+      "parameters": [
+        "int"
+      ],
+      "returns": "io.rowweave.Field"
+    },
+    {
+      "owner": "io.rowweave.DataSchema",
+      "name": "getFields",
+      "parameters": [],
+      "returns": "io.rowweave.Field[]"
+    },
+    {
+      "owner": "io.rowweave.DataSchema",
+      "name": "getFieldIndex",
+      "parameters": [
+        "java.lang.String"
+      ],
+      "returns": "int"
+    },
+    {
+      "owner": "io.rowweave.BatchSession",
+      "name": "fromSource",
+      "parameters": [
+        "io.rowweave.Source"
+      ],
+      "returns": "io.rowweave.DataSet"
+    },
+    {
+      "owner": "io.rowweave.BatchSession",
+      "name": "fromSource",
+      "parameters": [
+        "io.rowweave.Source[]"
+      ],
+      "returns": "io.rowweave.DataSet"
+    },
+    {
+      "owner": "io.rowweave.BatchSession",
+      "name": "setParallelism",
+      "parameters": [
+        "int"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.BatchSession",
+      "name": "getParallelism",
+      "parameters": [],
+      "returns": "int"
+    },
+    {
+      "owner": "io.rowweave.BatchSession",
+      "name": "execute",
+      "parameters": [],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.RowWeave",
+      "name": "createBatchSession",
+      "parameters": [
+        "java.lang.String"
+      ],
+      "returns": "io.rowweave.BatchSession"
+    },
+    {
+      "owner": "io.rowweave.RowWeave",
+      "name": "createBatchSession",
+      "parameters": [
+        "java.lang.String",
+        "java.lang.String"
+      ],
+      "returns": "io.rowweave.BatchSession"
+    },
+    {
+      "owner": "io.rowweave.DataSet",
+      "name": "getSchema",
+      "parameters": [],
+      "returns": "io.rowweave.DataSchema"
+    },
+    {
+      "owner": "io.rowweave.DataSet",
+      "name": "sinkTo",
+      "parameters": [
+        "io.rowweave.Sink"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.DataSet",
+      "name": "sinkTo",
+      "parameters": [
+        "java.lang.String",
+        "io.rowweave.Sink"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.DataStream",
+      "name": "getSchema",
+      "parameters": [],
+      "returns": "io.rowweave.DataSchema"
+    },
+    {
+      "owner": "io.rowweave.DataStream",
+      "name": "sinkTo",
+      "parameters": [
+        "java.lang.String",
+        "io.rowweave.stream.api.StreamSinkSpec"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.Source",
+      "name": "getSchema",
+      "parameters": [],
+      "returns": "io.rowweave.DataSchema"
+    },
+    {
+      "owner": "io.rowweave.Sink",
+      "name": "getSchema",
+      "parameters": [],
+      "returns": "io.rowweave.DataSchema"
+    },
+    {
+      "owner": "io.rowweave.Sink",
+      "name": "collect",
+      "parameters": [
+        "io.rowweave.DataRow"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.Collector",
+      "name": "collect",
+      "parameters": [
+        "io.rowweave.DataRow"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.ResultSchemaAware",
+      "name": "getResultSchema",
+      "parameters": [],
+      "returns": "io.rowweave.DataSchema"
+    },
+    {
+      "owner": "io.rowweave.MapFunction",
+      "name": "map",
+      "parameters": [
+        "io.rowweave.DataRow"
+      ],
+      "returns": "io.rowweave.DataRow"
+    },
+    {
+      "owner": "io.rowweave.FilterFunction",
+      "name": "filter",
+      "parameters": [
+        "io.rowweave.DataRow"
+      ],
+      "returns": "boolean"
+    },
+    {
+      "owner": "io.rowweave.FlatMapFunction",
+      "name": "flatMap",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "io.rowweave.Collector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.MapPartitionFunction",
+      "name": "mapPartition",
+      "parameters": [
+        "io.rowweave.PartitionDataRowCursor",
+        "io.rowweave.Collector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.GroupReduceFunction",
+      "name": "reduce",
+      "parameters": [
+        "java.lang.Iterable",
+        "io.rowweave.Collector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.GroupCombineFunction",
+      "name": "combine",
+      "parameters": [
+        "java.lang.Iterable",
+        "io.rowweave.Collector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.GroupCombineFunction",
+      "name": "getResultSchema",
+      "parameters": [],
+      "returns": "io.rowweave.DataSchema"
+    },
+    {
+      "owner": "io.rowweave.GroupCombineReduceFunction",
+      "name": "combine",
+      "parameters": [
+        "java.lang.Iterable",
+        "io.rowweave.Collector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.GroupCombineReduceFunction",
+      "name": "reduce",
+      "parameters": [
+        "java.lang.Iterable",
+        "io.rowweave.Collector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.JoinFunction",
+      "name": "join",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "io.rowweave.DataRow"
+      ],
+      "returns": "io.rowweave.DataRow"
+    },
+    {
+      "owner": "io.rowweave.CoGroupFunction",
+      "name": "coGroup",
+      "parameters": [
+        "java.lang.Iterable",
+        "java.lang.Iterable",
+        "io.rowweave.Collector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.StreamAggregateFunction",
+      "name": "add",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "byte[]"
+      ],
+      "returns": "byte[]"
+    },
+    {
+      "owner": "io.rowweave.StreamAggregateFunction",
+      "name": "getResult",
+      "parameters": [
+        "byte[]"
+      ],
+      "returns": "io.rowweave.DataRow"
+    },
+    {
+      "owner": "io.rowweave.RetractableStreamAggregateFunction",
+      "name": "retract",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "byte[]"
+      ],
+      "returns": "byte[]"
+    },
+    {
+      "owner": "io.rowweave.StreamWindowAggregateFunction",
+      "name": "add",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "byte[]"
+      ],
+      "returns": "byte[]"
+    },
+    {
+      "owner": "io.rowweave.StreamWindowAggregateFunction",
+      "name": "getResult",
+      "parameters": [
+        "byte[]",
+        "io.rowweave.StreamWindowContext"
+      ],
+      "returns": "io.rowweave.DataRow"
+    },
+    {
+      "owner": "io.rowweave.StreamAsyncFunction",
+      "name": "createRequest",
+      "parameters": [
+        "io.rowweave.DataRow"
+      ],
+      "returns": "byte[]"
+    },
+    {
+      "owner": "io.rowweave.StreamAsyncFunction",
+      "name": "complete",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "byte[]",
+        "io.rowweave.StreamCollector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.StreamKeyedProcessFunction",
+      "name": "processElement",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "io.rowweave.StreamProcessContext",
+        "io.rowweave.StreamCollector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.StreamKeyedCoProcessFunction",
+      "name": "processLeft",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "io.rowweave.StreamProcessContext",
+        "io.rowweave.StreamCollector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.StreamKeyedCoProcessFunction",
+      "name": "processRight",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "io.rowweave.StreamProcessContext",
+        "io.rowweave.StreamCollector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.StreamKeyedBroadcastProcessFunction",
+      "name": "processKeyed",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "io.rowweave.StreamKeyedBroadcastProcessContext",
+        "io.rowweave.StreamCollector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.StreamKeyedBroadcastProcessFunction",
+      "name": "processBroadcast",
+      "parameters": [
+        "io.rowweave.DataRow",
+        "io.rowweave.StreamBroadcastProcessContext",
+        "io.rowweave.StreamCollector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.StreamWindowProcessFunction",
+      "name": "process",
+      "parameters": [
+        "io.rowweave.StreamWindowContext",
+        "io.rowweave.StreamWindowDataRowCursor",
+        "io.rowweave.StreamWindowCollector"
+      ],
+      "returns": "void"
+    },
+    {
+      "owner": "io.rowweave.stream.api.StreamDataRowCodec",
+      "name": "encode",
+      "parameters": [
+        "io.rowweave.DataRow"
+      ],
+      "returns": "byte[]"
+    },
+    {
+      "owner": "io.rowweave.stream.api.StreamDataRowCodec",
+      "name": "decode",
+      "parameters": [
+        "byte[]"
+      ],
+      "returns": "io.rowweave.DataRow"
+    },
+    {
+      "owner": "io.rowweave.StreamWindowDataRowCursor",
+      "name": "row",
+      "parameters": [],
+      "returns": "io.rowweave.DataRow"
+    }
   ]
 }

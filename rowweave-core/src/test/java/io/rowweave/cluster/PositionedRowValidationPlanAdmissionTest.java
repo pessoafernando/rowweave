@@ -11,7 +11,7 @@ import io.rowweave.FileSink;
 import io.rowweave.Source;
 import io.rowweave.SourceExecutor;
 import io.rowweave.SourceExecutorFactory;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.registry.InProcessRegistry;
@@ -70,7 +70,7 @@ class PositionedRowValidationPlanAdmissionTest {
 
     @Test
     void apiRequiresExactUidSourceAndRoundTripKeepsSingleModeParam() {
-        ExecutionEnvironment session = new ExecutionEnvironment("position-plan", "position plan");
+        BatchSession session = new BatchSession("position-plan", "position plan");
         DataSet source = session.fromSource(exact("split-a", validRows())).uid(SOURCE_UID);
         source.validateRowsWithSourcePosition(VALIDATION)
                 .sinkTo(new DiscardSink(META));
@@ -81,12 +81,12 @@ class PositionedRowValidationPlanAdmissionTest {
         assertEquals(EXACT_MODE, graph.node(1).param(MODE_PARAM));
         assertEquals(1, graph.node(1).params().size());
 
-        assertApiInvalid(() -> new ExecutionEnvironment("missing-uid", "missing uid")
+        assertApiInvalid(() -> new BatchSession("missing-uid", "missing uid")
                 .fromSource(exact("split", validRows()))
                 .validateRowsWithSourcePosition(VALIDATION));
         assertApiInvalid(() -> source.validateRows(VALIDATION)
                 .validateRowsWithSourcePosition(VALIDATION));
-        assertApiInvalid(() -> new ExecutionEnvironment("legacy", "legacy")
+        assertApiInvalid(() -> new BatchSession("legacy", "legacy")
                 .fromSource(new CollectionSource(META, validRows())).uid(SOURCE_UID)
                 .validateRowsWithSourcePosition(VALIDATION));
     }
@@ -225,9 +225,9 @@ class PositionedRowValidationPlanAdmissionTest {
     }
 
     private static List<String> run(JobClient client, int parallelism, Path output) {
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("position-runtime", "position runtime")
-                : new ExecutionEnvironment("position-runtime", "position runtime", client);
+        BatchSession session = client == null
+                ? new BatchSession("position-runtime", "position runtime")
+                : new BatchSession("position-runtime", "position runtime", client);
         session.setParallelism(parallelism);
         DataSet source = session.fromSource(
                 exact("split-a", Arrays.asList(
@@ -249,7 +249,7 @@ class PositionedRowValidationPlanAdmissionTest {
     }
 
     private static String locatedFailure() {
-        ExecutionEnvironment session = new ExecutionEnvironment("position-failure", "position failure");
+        BatchSession session = new BatchSession("position-failure", "position failure");
         DataSet source = session.fromSource(exact("domain/private-split", Arrays.asList(
                 row("A", 1, BigDecimal.ZERO),
                 row("B", 99, BigDecimal.ZERO)))).uid(SOURCE_UID);

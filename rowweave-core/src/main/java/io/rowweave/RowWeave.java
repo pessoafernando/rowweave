@@ -12,20 +12,20 @@ public final class RowWeave {
     private RowWeave() {
     }
 
-    /** Creates a Batch environment using the process-wide embedded cluster runtime. */
-    public static ExecutionEnvironment createEnvironment(String name) {
-        return new ExecutionEnvironment(name, name);
+    /** Creates a Batch session using the process-wide embedded cluster runtime. */
+    public static BatchSession createBatchSession(String name) {
+        return new BatchSession(name, name);
     }
 
-    /** Creates a named Batch environment using the process-wide embedded cluster runtime. */
-    public static ExecutionEnvironment createEnvironment(String jobName, String jobTitle) {
-        return new ExecutionEnvironment(jobName, jobTitle);
+    /** Creates a named Batch session using the process-wide embedded cluster runtime. */
+    public static BatchSession createBatchSession(String jobName, String jobTitle) {
+        return new BatchSession(jobName, jobTitle);
     }
 
-    /** Creates a Batch environment bound to an explicit client. */
-    public static ExecutionEnvironment createEnvironment(
+    /** Creates a Batch session bound to an explicit client. */
+    public static BatchSession createBatchSession(
             String jobName, String jobTitle, io.rowweave.cluster.JobClient jobClient) {
-        return new ExecutionEnvironment(jobName, jobTitle, jobClient);
+        return new BatchSession(jobName, jobTitle, jobClient);
     }
 
     /** Starts an owned Batch Master/Worker lifecycle entirely in one JVM. */

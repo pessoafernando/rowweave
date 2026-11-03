@@ -69,7 +69,7 @@ class DiamondFullFormMaterializationTest {
         withWatchdog(() -> {
             List<DataRow> data = data();
             AtomicInteger reads = new AtomicInteger();
-            ExecutionEnvironment s = RowWeave.createEnvironment("d-union");
+            BatchSession s = RowWeave.createBatchSession("d-union");
             DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5");
             DataSet b1 = mid.filter("k >= 3");
             DataSet b2 = mid.filter("k <= 2");
@@ -105,7 +105,7 @@ class DiamondFullFormMaterializationTest {
                             DataRow o = new DataRow(3); o.set(0, k); o.set(1, lc); o.set(2, rc); c.collect(o);
                         }
                     });
-            ExecutionEnvironment s = RowWeave.createEnvironment("d-cogroup");
+            BatchSession s = RowWeave.createBatchSession("d-cogroup");
             DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5");
             DataSet b1 = mid.filter("k >= 3");
             DataSet b2 = mid.filter("k <= 2");
@@ -124,7 +124,7 @@ class DiamondFullFormMaterializationTest {
         withWatchdog(() -> {
             List<DataRow> data = data();
             AtomicInteger reads = new AtomicInteger();
-            ExecutionEnvironment s = RowWeave.createEnvironment("mixed");
+            BatchSession s = RowWeave.createBatchSession("mixed");
             DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5");
             // Branches 1 and 2 re-join, so they only produce rows where their keys overlap, while branch 3 goes straight to a SINK.
             DataSet b1 = mid.filter("k >= 2");
@@ -148,7 +148,7 @@ class DiamondFullFormMaterializationTest {
         withWatchdog(() -> {
             List<DataRow> data = data();
             AtomicInteger reads = new AtomicInteger();
-            ExecutionEnvironment s = RowWeave.createEnvironment("two-bin");
+            BatchSession s = RowWeave.createBatchSession("two-bin");
             DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5"); // A
             DataSet a1 = mid.filter("k >= 1");     // A1
             DataSet b1 = a1.filter("k <= 5");      // B1
@@ -173,7 +173,7 @@ class DiamondFullFormMaterializationTest {
         withWatchdog(() -> {
             List<DataRow> data = data();
             AtomicInteger reads = new AtomicInteger();
-            ExecutionEnvironment s = RowWeave.createEnvironment("d-hashjoin");
+            BatchSession s = RowWeave.createBatchSession("d-hashjoin");
             DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5");
             DataSet b1 = mid.filter("k >= 2");
             DataSet b2 = mid.filter("k <= 4");
@@ -195,7 +195,7 @@ class DiamondFullFormMaterializationTest {
             // Two levels of same-key joins amplify quadratically, so 30 rows are enough to cover nested fork reachability without turning the topology test into an unbounded materialization.
             List<DataRow> data = data(30);
             AtomicInteger reads = new AtomicInteger();
-            ExecutionEnvironment s = RowWeave.createEnvironment("nested");
+            BatchSession s = RowWeave.createBatchSession("nested");
             DataSet mid = s.fromSource(countingInput(data, reads)).filter("amt >= 5"); // fork1
             DataSet j1 = mid.filter("k >= 2").join(mid.filter("k <= 4"),
                     SortMergeJoin.of(META, META, new String[]{"k"}, new String[]{"k"}, JoinType.INNER));  // the inner diamond
@@ -218,7 +218,7 @@ class DiamondFullFormMaterializationTest {
         withWatchdog(() -> {
             List<DataRow> data = data();
             AtomicInteger reads = new AtomicInteger();
-            ExecutionEnvironment s = RowWeave.createEnvironment("asym");
+            BatchSession s = RowWeave.createBatchSession("asym");
             DataSet a = s.fromSource(countingInput(data, reads)).filter("amt >= 5"); // fork A
             DataSet left = a.filter("k >= 2");  // the left branch spans one hop
             DataSet right = a.filter("k <= 4").filter("amt <= 30").filter("k >= 1");  // the right branch spans three hops

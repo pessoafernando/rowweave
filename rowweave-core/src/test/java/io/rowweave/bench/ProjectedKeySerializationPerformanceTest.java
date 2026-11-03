@@ -6,7 +6,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -92,7 +92,7 @@ class ProjectedKeySerializationPerformanceTest {
         for (int i = 0; i < parts.size(); i++) {
             inputs[i] = new FileSource(ORDER, parts.get(i).toString());
         }
-        ExecutionEnvironment session = RowWeave.createEnvironment("projected-key-" + label);
+        BatchSession session = RowWeave.createBatchSession("projected-key-" + label);
         session.setParallelism(4);
         session.fromSource(inputs)
                 .groupBy(ParallelGroupByAgg.of(ORDER, "region").sum("amount"))

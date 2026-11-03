@@ -7,7 +7,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.bench.CsvInput;
@@ -40,7 +40,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * prove the socket shuffle really crosses JVMs, since instances land on two workers, and that the
  * result equals the single-machine oracle as a multiset. A single {@link RealProcessCluster} is
  * shared, started once in @BeforeAll and reused by every @Test, which keeps the fork cost down.
- * Work runs through ExecutionEnvironment.commit with CsvInput instead of an embedded list source.
+ * Work runs through BatchSession.commit with CsvInput instead of an embedded list source.
  */
 @Tag("multiprocess")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -92,18 +92,18 @@ class RealProcessCrossShuffleTest {
     private CsvInput csv(String path, DataSchema meta) { return new CsvInput(path, meta); }
 
     /** Run one DAG on the single machine at parallelism one as the oracle, then on the real cluster at parallelism two; assert the multisets agree and cluster instances span two workers. */
-    private void assertClusterMatchesSingle(String name, DataSchema outMeta, Function<ExecutionEnvironment, DataSet> build) throws Exception {
+    private void assertClusterMatchesSingle(String name, DataSchema outMeta, Function<BatchSession, DataSet> build) throws Exception {
         Path single = dir.resolve(name + "-single.tsv");
         Path clusterOut = dir.resolve(name + "-cluster.tsv");
 
-        ExecutionEnvironment s1 = RowWeave.createEnvironment(name + "-s1");
+        BatchSession s1 = RowWeave.createBatchSession(name + "-s1");
         s1.setParallelism(1);
         build.apply(s1).sinkTo(new FileSink(outMeta, single.toString()));
         s1.execute();
         List<String> oracle = fingerprint(outMeta, single);
         assertFalse(oracle.isEmpty(), name + " single-process oracle produces output");
 
-        ExecutionEnvironment sc = new ExecutionEnvironment(name + "-c2", name, cluster.newClient());
+        BatchSession sc = new BatchSession(name + "-c2", name, cluster.newClient());
         sc.setParallelism(2);
         build.apply(sc).sinkTo(new FileSink(outMeta, clusterOut.toString()));
         sc.execute();

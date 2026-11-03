@@ -10,7 +10,7 @@ import io.rowweave.FlatMapFunction;
 import io.rowweave.GroupCombineFunction;
 import io.rowweave.GroupCombineReduceFunction;
 import io.rowweave.GroupReduceFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -129,10 +129,10 @@ public final class LocalClusterMonitorRunner {
     }
 
     @FunctionalInterface
-    private interface Dag { void build(ExecutionEnvironment s, File dir, String tag); }
+    private interface Dag { void build(BatchSession s, File dir, String tag); }
 
     // ================ F01: the full-operator linear trunk ================
-    private static void dagFull01(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull01(BatchSession s, File dir, String tag) {
         DataSet preAgg = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .filter("amount >= 10")
                 .select("id", "dept", "region", "grade", "amount", "qty")
@@ -171,7 +171,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F02: join first, then a deep chain ================
-    private static void dagFull02(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull02(BatchSession s, File dir, String tag) {
         output(s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .coGroup(s.fromSource(csv(supp, TenDagData.ORDER)), CG_FN).on("dept")
                 .filter("rc >= 0")
@@ -208,7 +208,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F03: fan out to three outputs through a shared mid section ================
-    private static void dagFull03(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull03(BatchSession s, File dir, String tag) {
         DataSet mid1 = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .filter("qty >= 1")
                 .select("id", "dept", "region", "grade", "amount", "qty")
@@ -246,7 +246,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F04: union first over three sources, then a deep tail chain ================
-    private static void dagFull04(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull04(BatchSession s, File dir, String tag) {
         DataSet u3 = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .union(s.fromSource(csv(ordersB, TenDagData.ORDER)))
                 .union(s.fromSource(csv(supp, TenDagData.ORDER)))
@@ -286,7 +286,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F05: combine first, closed out by reduce, then a tail projection ================
-    private static void dagFull05(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull05(BatchSession s, File dir, String tag) {
         DataSet cr1 = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .combineReduceGroup(COMBINE_REDUCE_SUM, 4);
         DataSchema crm = cr1.getSchema();
@@ -324,7 +324,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F06: regionDim join with orderBy and top at the front ================
-    private static void dagFull06(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull06(BatchSession s, File dir, String tag) {
         DataSchema om = TenDagData.ORDER;
         output(s.fromSource(csv(ordersA, om))
                 .orderBy(OrderBy.of(om, asc(0)), 1, false)
@@ -366,7 +366,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F07: distinct first, then three nested binary operators ================
-    private static void dagFull07(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull07(BatchSession s, File dir, String tag) {
         DataSet d1 = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .distinct("id", "dept", "region", "grade", "amount", "qty")
                 .filter("amount >= 0")
@@ -407,7 +407,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F08: partitionByHash reshuffles up front, closed out by a join at the tail ================
-    private static void dagFull08(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull08(BatchSession s, File dir, String tag) {
         DataSet p1 = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .partitionByHash("dept")
                 .map(MAP_ID)
@@ -449,7 +449,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F09: five sources and five outputs, using dim and regionDim together ================
-    private static void dagFull09(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull09(BatchSession s, File dir, String tag) {
         DataSet j1 = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .join(s.fromSource(csv(dim, TenDagData.DIM))).on("dept")
                 .select("id", "dept", "region", "grade", "amount", "qty")
@@ -494,7 +494,7 @@ public final class LocalClusterMonitorRunner {
     }
 
     // ================ F10: a deep mixture of everything ================
-    private static void dagFull10(ExecutionEnvironment s, File dir, String tag) {
+    private static void dagFull10(BatchSession s, File dir, String tag) {
         DataSet chain = s.fromSource(csv(ordersA, TenDagData.ORDER))
                 .filter("amount >= 0")
                 .select("id", "dept", "region", "grade", "amount", "qty")
@@ -579,7 +579,7 @@ public final class LocalClusterMonitorRunner {
                 if (Thread.currentThread().isInterrupted()) return;
                 String name = e.getKey();
                 try {
-                    ExecutionEnvironment s = new ExecutionEnvironment("lc-" + name, name, lc);
+                    BatchSession s = new BatchSession("lc-" + name, name, lc);
                     s.setParallelism(par);
                     e.getValue().build(s, dir, name);
                     s.execute();

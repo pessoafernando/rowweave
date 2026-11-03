@@ -45,10 +45,10 @@ class DataSetFluentBuilderTest {
         return new ArrayList<>(Arrays.asList(d("a", 100), d("b", 200)));
     }
 
-    private ExecutionEnvironment session;
+    private BatchSession session;
 
     private DataSet srcOrders() {
-        session = RowWeave.createEnvironment("fb");
+        session = RowWeave.createBatchSession("fb");
         return session.fromSource(new CollectionSource(ORDER, orders()));
     }
 
@@ -103,7 +103,7 @@ class DataSetFluentBuilderTest {
     @Test void joinBuilder_inner_matchesOp() {
         List<DataRow> viaShell = run(srcOrders().join(session.fromSource(new CollectionSource(DIM, dims()))).on("k"));
         // The operator form needs a rebuild to reuse the same session, which fan-out refuses, so each side gets its own session.
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("fb2");
+        BatchSession s2 = RowWeave.createBatchSession("fb2");
         DataSet ords = s2.fromSource(new CollectionSource(ORDER, orders()));
         DataSet dim = s2.fromSource(new CollectionSource(DIM, dims()));
         DataSet opJoin = ords.join(dim, SortMergeJoin.of(ORDER, DIM, new String[]{"k"}, new String[]{"k"}, JoinType.INNER));

@@ -24,8 +24,8 @@ the same split again. For how the runtime opens a source, see
   is handed and treats each `Source` as exactly one split, so a single source
   runs at parallelism one.
 
-`ExecutionEnvironment.fromSource(Source...)`
-(`rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java:138`) builds
+`BatchSession.fromSource(Source...)`
+(`rowweave-core/src/main/java/io/rowweave/BatchSession.java:138`) builds
 one logical source from several homogeneous splits rather than unioning them
 into several sources, and every split must carry an identical schema.
 

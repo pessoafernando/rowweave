@@ -7,7 +7,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.FlatMapFunction;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -146,14 +146,14 @@ class ComplexDagMultiInputMultiOutputEquivalenceTest {
     }
 
     /** A multi-split source: one Source cut from each CSV of the same shape, and fromSource(Source...) builds the single logical source over them. */
-    private DataSet multiSrc(ExecutionEnvironment s, DataSchema meta, String... paths) {
+    private DataSet multiSrc(BatchSession s, DataSchema meta, String... paths) {
         Source[] ins = new Source[paths.length];
         for (int i = 0; i < paths.length; i++) ins[i] = csv(paths[i], meta);
         return s.fromSource(ins);
     }
 
     @FunctionalInterface
-    private interface Dag { void build(ExecutionEnvironment s, Io ioCols); }
+    private interface Dag { void build(BatchSession s, Io ioCols); }
 
     private final class Io {
         final String tag; final List<DataSchema> metas = new ArrayList<>(); final List<Path> paths = new ArrayList<>(); int used = 0;
@@ -168,7 +168,7 @@ class ComplexDagMultiInputMultiOutputEquivalenceTest {
 
     private List<List<DataRow>> run(String name, int par, io.rowweave.cluster.JobClient client, Dag dag, List<DataSchema> outMetas) {
         Io ioCols = new Io(name);
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(par);
         dag.build(s, ioCols);
         s.execute();

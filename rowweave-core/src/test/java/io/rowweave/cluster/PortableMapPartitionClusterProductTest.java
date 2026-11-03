@@ -16,7 +16,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapPartitionFunction;
 import io.rowweave.MapPartitionEmissionLimit;
 import io.rowweave.PartitionDataRowCursor;
@@ -610,7 +610,7 @@ class PortableMapPartitionClusterProductTest {
     }
 
     private static PlanGraph legacyGraph(Path output) {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "legacy-map-partition-v9",
                 "legacy-map-partition-v9",
                 new io.rowweave.local.LocalJobClient(false));

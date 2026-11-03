@@ -175,7 +175,7 @@ public final class ScenarioLabRunner {
 
     private static String engineCodeSource() {
         try {
-            return io.rowweave.ExecutionEnvironment.class.getProtectionDomain()
+            return io.rowweave.BatchSession.class.getProtectionDomain()
                     .getCodeSource().getLocation().toExternalForm();
         } catch (RuntimeException unavailable) {
             return "unavailable:" + unavailable.getClass().getSimpleName();

@@ -20,9 +20,9 @@ public final class ObjectStorageRowClassification {
         if (target == null) {
             throw publicationInvalid("target is required");
         }
-        ExecutionEnvironment session = validRows.owningSession();
+        BatchSession session = validRows.owningSession();
         if (session == null || session != rejectedRows.owningSession()) {
-            throw publicationInvalid("classification must belong to one ExecutionEnvironment");
+            throw publicationInvalid("classification must belong to one BatchSession");
         }
         try {
             DataSet acceptedSummary = validRows.typedQualityAcceptedSummarySkeleton();

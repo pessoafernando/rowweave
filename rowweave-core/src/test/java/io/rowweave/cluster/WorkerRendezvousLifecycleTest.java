@@ -5,7 +5,7 @@ import io.rowweave.DataType;
 import io.rowweave.DiscardSink;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.rpc.RpcMessage;
@@ -42,7 +42,7 @@ class WorkerRendezvousLifecycleTest {
              WorkerServer w1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", master.port(), d1)) {
             ClusterJobClient client = new ClusterJobClient("127.0.0.1", master.port());
             for (int job = 0; job < 8; job++) {
-                ExecutionEnvironment session = new ExecutionEnvironment("rz-" + job, "rz-" + job, client);
+                BatchSession session = new BatchSession("rz-" + job, "rz-" + job, client);
                 session.setParallelism(2);
                 session.fromSource(new CollectionSource(META, rows(2_000)))
                         .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))

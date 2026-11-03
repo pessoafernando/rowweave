@@ -7,7 +7,7 @@ import io.rowweave.DataType;
 import io.rowweave.DiscardSink;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.commit.SchemaFingerprint;
@@ -184,7 +184,7 @@ class BatchSourcePlanBindingTest {
     }
 
     private static PlanGraph graph(Source... inputs) {
-        ExecutionEnvironment session = new ExecutionEnvironment("source-binding", "source-binding");
+        BatchSession session = new BatchSession("source-binding", "source-binding");
         io.rowweave.DataSet source = session.fromSource(inputs);
         source.sinkTo(new DiscardSink(META));
         return session.toPlanGraph();

@@ -3,7 +3,7 @@ package io.rowweave.cluster;
 import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.ObjectStorageSnapshotSource;
@@ -466,7 +466,7 @@ class DurableCommitBarrierFailureTest {
 
     private static PlanArtifact qualityArtifact(
             Path output, QualityGatePolicy policy) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-ack-loss", "quality ack loss");
+        BatchSession session = new BatchSession("quality-ack-loss", "quality ack loss");
         session.setDefinitionId("durable-quality-ack-loss");
         session.setParallelism(2);
         DataRowClassification classified = session.fromSource(new CollectionSource(
@@ -491,7 +491,7 @@ class DurableCommitBarrierFailureTest {
                 "endpoint-test", "credential-test", "domain", "ack-loss.tsv",
                 "version-1", content.length, sha256Hex(content),
                 ObjectStorageSnapshotSource.MIN_ROW_BYTES);
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "object-quality-ack-loss", "object quality ack loss");
         session.setDefinitionId("durable-object-quality-ack-loss");
         session.setParallelism(2);
@@ -523,7 +523,7 @@ class DurableCommitBarrierFailureTest {
     }
 
     private static DataSchema rejectedMeta() {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-meta", "quality meta");
+        BatchSession session = new BatchSession("quality-meta", "quality meta");
         return session.fromSource(new CollectionSource(
                         QUALITY_META, "quality-meta-split", java.util.Collections.emptyList()))
                 .uid("ledger.source")

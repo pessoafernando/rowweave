@@ -132,14 +132,14 @@ The following fragment shows the Batch API shape. See the first job for a
 complete, tested evaluation path.
 
 ```java
-ExecutionEnvironment environment = RowWeave.createEnvironment("evaluation");
-DataSet source = environment.fromSource(new CollectionSource(schema, rows));
+BatchSession session = RowWeave.createBatchSession("evaluation");
+DataSet source = session.fromSource(new CollectionSource(schema, rows));
 DataSet aggregate = source.groupBy("categoryKey").sum("quantity");
 aggregate.sinkTo(new PrintSink(aggregate.getSchema()));
-environment.execute();
+session.execute();
 ```
 
-The environment compiles every source and sink into one plan graph and submits
+The session compiles every source and sink into one plan graph and submits
 it through the configured job client. A sink receives rows during execution;
 `execute()` does not return a row collection to the client.
 

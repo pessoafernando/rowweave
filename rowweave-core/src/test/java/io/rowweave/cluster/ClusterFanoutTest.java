@@ -7,7 +7,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -80,7 +80,7 @@ class ClusterFanoutTest {
 
     private long[][] run(String name, int parallelism, io.rowweave.cluster.JobClient client, Source input, Path dir) {
         Path f1 = dir.resolve(name + "-1.tsv"), f2 = dir.resolve(name + "-2.tsv");
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet mid = s.fromSource(input).filter("amt >= 10");
         DataSet b1 = mid.filter("k >= 7");
@@ -131,7 +131,7 @@ class ClusterFanoutTest {
         try (MasterServer master = new MasterServer(5000);
              WorkerServer worker = WorkerServer.newUnguarded(
                      "snapshot-w0", 8, "127.0.0.1", master.port(), workerDir)) {
-            ExecutionEnvironment session = new ExecutionEnvironment("snapshot-fanout", "snapshot-fanout",
+            BatchSession session = new BatchSession("snapshot-fanout", "snapshot-fanout",
                     new ClusterJobClient("127.0.0.1", master.port()));
             session.setParallelism(1);
             DataSet shared = session.fromSource(new CollectionSource(TIME_META, Collections.singletonList(row)));

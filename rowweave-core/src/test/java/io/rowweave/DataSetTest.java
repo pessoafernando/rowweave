@@ -28,7 +28,7 @@ class DataSetTest {
         return new ArrayList<>(Arrays.asList(rs));
     }
 
-    /** A Source that can be traversed repeatedly, bound to a session through ExecutionEnvironment.fromSource. */
+    /** A Source that can be traversed repeatedly, bound to a session through BatchSession.fromSource. */
     private static Source input(List<DataRow> rs) {
         return new Source() {
             @Override public DataSchema getSchema() { return META; }
@@ -37,7 +37,7 @@ class DataSetTest {
     }
 
     /** Executes through commit, the same IR path production takes with per-operator spill, and reads the SINK Sink. */
-    private static List<DataRow> run(ExecutionEnvironment s, DataSet ds) {
+    private static List<DataRow> run(BatchSession s, DataSet ds) {
         WorkerCollectingOutput out = new WorkerCollectingOutput(ds.getSchema());
         ds.sinkTo(out);
         s.execute();
@@ -46,7 +46,7 @@ class DataSetTest {
 
     @Test
     void sourceFilterSelectOutputEndToEnd() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("t");
+        BatchSession s = RowWeave.createBatchSession("t");
         DataSet ds = s.fromSource(input(rows(row(1, "a", 100), row(2, "b", 200), row(3, "c", 50))))
                 .filter(r -> (Integer) r.get(2) >= 100)   // amt >= 100
                 .select(0, 1);                             // keep id, name
@@ -61,7 +61,7 @@ class DataSetTest {
 
     @Test
     void sourceMapFlatMap() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("t");
+        BatchSession s = RowWeave.createBatchSession("t");
         DataSet ds = s.fromSource(input(rows(row(1, "x", 2), row(2, "y", 3))))
                 .map(r -> {
                     DataRow o = new DataRow(3);
@@ -82,7 +82,7 @@ class DataSetTest {
 
     @Test
     void chainedOperatorsOrderPreserved() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("t");
+        BatchSession s = RowWeave.createBatchSession("t");
         DataSet ds = s.fromSource(input(rows(
                         row(1, "a", 10), row(2, "b", 20), row(3, "c", 30), row(4, "d", 40))))
                 .filter(r -> (Integer) r.get(0) >= 2)    // id>=2 -> b,c,d
@@ -115,7 +115,7 @@ class DataSetTest {
 
     @Test
     void emptySourceProducesNothing() {
-        ExecutionEnvironment s = RowWeave.createEnvironment("t");
+        BatchSession s = RowWeave.createBatchSession("t");
         DataSet ds = s.fromSource(input(rows())).filter(r -> true).select(0);
         assertTrue(run(s, ds).isEmpty());
     }
@@ -123,11 +123,11 @@ class DataSetTest {
     @Test
     void reExecuteSameDagIsRepeatable() {
         // The same dag run twice, each with its own session and commit, gives the same result, accumulating nothing and failing nowhere.
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("r1");
+        BatchSession s1 = RowWeave.createBatchSession("r1");
         DataSet d1 = s1.fromSource(input(rows(row(1, "a", 100), row(2, "b", 50))))
                 .filter(r -> (Integer) r.get(2) >= 100);
         assertEquals(1, run(s1, d1).size());
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("r2");
+        BatchSession s2 = RowWeave.createBatchSession("r2");
         DataSet d2 = s2.fromSource(input(rows(row(1, "a", 100), row(2, "b", 50))))
                 .filter(r -> (Integer) r.get(2) >= 100);
         assertEquals(1, run(s2, d2).size()); // second run must not accumulate / fail

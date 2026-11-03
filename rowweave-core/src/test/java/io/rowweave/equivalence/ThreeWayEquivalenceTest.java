@@ -6,7 +6,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.FlatMapFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -146,7 +146,7 @@ class ThreeWayEquivalenceTest {
     }
 
     @FunctionalInterface
-    private interface Dag { void build(ExecutionEnvironment s, Io ioCols); }
+    private interface Dag { void build(BatchSession s, Io ioCols); }
 
     /** Collects the (DataSchema, file path) of each output, then reads them back after the run to compare. */
     private final class Io {
@@ -163,7 +163,7 @@ class ThreeWayEquivalenceTest {
     /** Runs once, single machine with a null client or a cluster with Cluster, and returns the rows read back from each output plus its meta. */
     private List<List<DataRow>> run(String name, int par, io.rowweave.cluster.JobClient client, Dag dag, List<DataSchema> outMetas) {
         Io ioCols = new Io(name);
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(par);
         dag.build(s, ioCols);
         s.execute();

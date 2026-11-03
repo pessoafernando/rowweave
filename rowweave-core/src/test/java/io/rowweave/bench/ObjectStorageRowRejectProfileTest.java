@@ -2,7 +2,7 @@ package io.rowweave.bench;
 
 import io.rowweave.DataType;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.ObjectStorageReadHandle;
@@ -205,7 +205,7 @@ class ObjectStorageRowRejectProfileTest {
 
     private static Sample runOrdinary(
             Shape shape, JobClient client, int parallelism, Path domain) {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "object-quality-profile-ordinary", "object quality profile ordinary");
         session.setParallelism(parallelism);
         session.fromSource(shape.inputs)
@@ -225,7 +225,7 @@ class ObjectStorageRowRejectProfileTest {
 
     private static Sample runQuality(
             Shape shape, JobClient client, int parallelism, Path domain) {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "object-quality-profile", "object quality profile");
         session.setParallelism(parallelism);
         session.classifyObjectStorageRows("profile.object.source", shape.inputs)

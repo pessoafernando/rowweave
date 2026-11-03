@@ -104,14 +104,14 @@ class SingleMachineCanonicalizeTest {
         }
     }
 
-    /** ExecutionEnvironment passes it through: setCanonicalizeOutput defaults to true, and with false the end-to-end result is still set-equal. */
+    /** BatchSession passes it through: setCanonicalizeOutput defaults to true, and with false the end-to-end result is still set-equal. */
     @Test
     void jobSessionCanonicalizePropagation() {
         List<DataRow> rows = new ArrayList<>();
         for (int i = 0; i < 300; i++) rows.add(row("k" + (i % 9), 1));
 
         // With the default of false the output is set-equal, and the order is whatever the developer OrderBy says
-        ExecutionEnvironment s1 = RowWeave.createEnvironment("canon-default");
+        BatchSession s1 = RowWeave.createBatchSession("canon-default");
         s1.setParallelism(3);
         assertFalse(s1.isCanonicalizeOutput(), "canonicalize=false by default (retired)");
         s1.setCanonicalizeOutput(true);  // this case still needs a bit-identical comparison, so it is asked for explicitly
@@ -121,7 +121,7 @@ class SingleMachineCanonicalizeTest {
         s1.execute();
 
         // false
-        ExecutionEnvironment s2 = RowWeave.createEnvironment("canon-off");
+        BatchSession s2 = RowWeave.createBatchSession("canon-off");
         s2.setParallelism(3);
         s2.setCanonicalizeOutput(false);
         DataSet g2 = s2.fromSource(in(rows)).groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));

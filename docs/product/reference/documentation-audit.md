@@ -57,7 +57,7 @@ pages synchronized with source rather than writing first drafts.
   example index exist. Function, expression, source, sink, executor SPI, schema,
   validation, incremental and durable-provider method contracts now each have a
   dedicated reference traced to declared source lines and qualifying tests.
-* Method-level references now carry the Batch environment and execution contract
+* Method-level references now carry the Batch session and execution contract
   and the Stream session, DataStream, state, time, checkpoint, savepoint, restart
   and rescale lifecycle, including serializer and output-tag binding rules.
 * Stream lifecycle and stable refusals have a tested behavior reference; the
@@ -92,7 +92,7 @@ unanswered. `MISSING` means no authoritative page exists.
 | 2 | Build/runtime requirements and Java 8 embedding boundary | `README.md`, `docs/product/quickstart/installation.md` | COVERED | Keep build, bytecode, consumer, and certification boundaries synchronized when dependencies change. |
 | 3 | Maven coordinates and optional module selection | `docs/product/quickstart/installation.md` | COVERED | Maintain module, ServiceLoader, packaging, and conflict guidance as dependencies evolve. |
 | 4 | Source build and reproducible release checks | `docs/product/operations/security.md` (via build gates), `CONTRIBUTING.md`, `docs/product/reference/release-visibility.md` | COVERED | Keep the contributor build path current: local narrow verification, the isolated cluster and profile groups, the docs suite, the site build, and the CI jobs must match the workflow file whenever a gate is added or renamed. |
-| 5 | Batch environment creation and whole-graph execution | `docs/product/reference/batch-api.md`, `docs/product/reference/api-overview.md`, `docs/product/quickstart/first-job.md` | COVERED | Maintain method-level environment, compile, submit, sink, and failure timing rules in the Batch API reference; regenerate source anchors after API changes. |
+| 5 | Batch session creation and whole-graph execution | `docs/product/reference/batch-api.md`, `docs/product/reference/api-overview.md`, `docs/product/quickstart/first-job.md` | COVERED | Maintain method-level session, compile, submit, sink, and failure timing rules in the Batch API reference; regenerate source anchors after API changes. |
 | 6 | Batch transformations and aggregation contracts | `docs/product/reference/batch-api.md`, `docs/product/reference/batch-behavior.md`, `docs/product/reference/capability-matrix.md` | COVERED | Maintain method-level parameter, overload, exception, and schema rules for Batch transformations and aggregation in the Batch API reference alongside the behavior contract; keep both routed from the index. |
 | 7 | Custom function interfaces | `docs/product/reference/custom-functions.md` | COVERED | Keep each interface traced to its declared signature, emission rule, output-schema rule and enforced limit as the function vocabulary evolves. |
 | 8 | Expression syntax and evaluation | `docs/product/reference/expression-evaluation.md` | COVERED | Keep the precedence table, function registry, three-valued logic and both-engine equivalence traced to source as the language evolves. |
@@ -156,7 +156,7 @@ failure behavior, examples, and replacement rules are documented in the
 
 | Area | Production entry points | Documentation state |
 |---|---|---|
-| Batch engine | `RowWeave`, `ExecutionEnvironment`, `DataSet`, `Source`, `Sink` | Quickstart, overview, exhaustive inventory, and a method-level [Batch API reference](batch-api.md). |
+| Batch engine | `RowWeave`, `BatchSession`, `DataSet`, `Source`, `Sink` | Quickstart, overview, exhaustive inventory, and a method-level [Batch API reference](batch-api.md). |
 | Stream engine | `RowWeave`, `StreamSession`, `StreamJobClient`, `StreamJobHandle`, `DataStream`, lifecycle handles | Quickstart, overview, runbook, exhaustive inventory, and a method-level [Stream API reference](stream-api.md) covering state, time, and recovery handles. |
 | Batch cluster | `cluster.ClusterMain` | Deployment commands, readiness markers, typed output checks, and configuration routes are in [deployment](../operations/deployment.md). |
 | Stream cluster | `StreamClusterMain`, embedded master/worker methods | Runbook, deployment bootstrap, and property routes are in [deployment](../operations/deployment.md) and [run modes](../guides/run-modes.md). |

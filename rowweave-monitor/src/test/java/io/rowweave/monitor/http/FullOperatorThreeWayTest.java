@@ -11,7 +11,7 @@ import io.rowweave.FlatMapFunction;
 import io.rowweave.GroupCombineFunction;
 import io.rowweave.GroupCombineReduceFunction;
 import io.rowweave.GroupReduceFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.JoinFunction;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
@@ -57,7 +57,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Full-operator three-way comparison. Every public operator of {@link DataSet} must yield an
  * equivalent multiset of rows on a single machine (P1), the in-process pseudo cluster
  * InProcessCluster (P4) and a real process cluster (P2). Everything runs through the one entry
- * point {@link ExecutionEnvironment#commit()}; input comes from {@link CsvInput} reading the CSVs
+ * point {@link BatchSession#commit()}; input comes from {@link CsvInput} reading the CSVs
  * written by {@link TenDagData} rather than an embedded list source, which keeps the cross-process
  * case free of out-of-memory and serialization gaps. Output lands in {@link FileSink} files that are
  * compared pairwise by multiset fingerprint (rows sorted, BigDecimal normalized with
@@ -270,7 +270,7 @@ class FullOperatorThreeWayTest {
     private CsvInput csv(String path, DataSchema meta) { return new CsvInput(path, meta); }
 
     @FunctionalInterface
-    private interface Dag { void build(ExecutionEnvironment s, Io ioCols); }
+    private interface Dag { void build(BatchSession s, Io ioCols); }
 
     /**
      * Collect the (DataSchema, file path) of every output so the files can be read back and compared after the run.
@@ -294,7 +294,7 @@ class FullOperatorThreeWayTest {
      */
     private List<List<DataRow>> run(String name, int par, JobClient client, Dag dag, List<DataSchema> outMetas) {
         Io ioCols = new Io(name);
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(par);
         dag.build(s, ioCols);
         s.execute();

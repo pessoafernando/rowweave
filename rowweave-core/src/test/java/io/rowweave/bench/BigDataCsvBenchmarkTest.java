@@ -6,7 +6,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.cluster.ClusterJobClient;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -168,14 +168,14 @@ class BigDataCsvBenchmarkTest {
 
     /**
      * A scenario builds the graph with the public DataSet API on the given
-     * {@link ExecutionEnvironment} and outputs to the given {@link FileSink}. All three engines,
+     * {@link BatchSession} and outputs to the given {@link FileSink}. All three engines,
      * single machine at parallelism 1 and 4 and the cluster, go through this builder and then
-     * ExecutionEnvironment.execute(), because tests use the public entry point rather than
+     * BatchSession.execute(), because tests use the public entry point rather than
      * constructing internal execution objects directly.
      */
     @FunctionalInterface
     private interface SceneBuilder {
-        void build(ExecutionEnvironment session, FileSink out);
+        void build(BatchSession session, FileSink out);
     }
 
     // ============ scenario 1: groupBySum over region ============
@@ -289,7 +289,7 @@ class BigDataCsvBenchmarkTest {
         long nj = pureJava(name, new FileSink(outMeta, fj.getAbsolutePath()));
         long pjms = (System.nanoTime() - t) / 1_000_000;
 
-        // Single machine at parallelism 1, through ExecutionEnvironment.execute(), which uses the default
+        // Single machine at parallelism 1, through BatchSession.execute(), which uses the default
         // LocalJobClient: the public entry point rather than constructing an executor.
         t = System.nanoTime();
         runViaSession(name + "-p1", 1, null, scene, new FileSink(outMeta, f1.getAbsolutePath()));
@@ -326,16 +326,16 @@ class BigDataCsvBenchmarkTest {
     }
 
     /**
-     * Runs one scenario through {@link ExecutionEnvironment#commit()}, because a test uses the public
+     * Runs one scenario through {@link BatchSession#commit()}, because a test uses the public
      * entry point rather than constructing a PushDagExecutor or calling submitToSink. A null client
      * means the default single-machine LocalJobClient at the requested parallelism, and a non-null one
      * injects the cluster client. Canonicalization uses its default of false.
      */
     private void runViaSession(String jobName, int parallelism, io.rowweave.cluster.JobClient client,
                                SceneBuilder scene, FileSink out) {
-        ExecutionEnvironment s = client != null
-                ? new ExecutionEnvironment(jobName, jobName, client)
-                : RowWeave.createEnvironment(jobName);
+        BatchSession s = client != null
+                ? new BatchSession(jobName, jobName, client)
+                : RowWeave.createBatchSession(jobName);
         s.setParallelism(parallelism);
         scene.build(s, out);
         s.execute();

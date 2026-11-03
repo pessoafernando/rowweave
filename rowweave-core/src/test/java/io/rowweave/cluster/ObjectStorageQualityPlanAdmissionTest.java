@@ -3,7 +3,7 @@ package io.rowweave.cluster;
 import io.rowweave.AssignedSourceBatch;
 import io.rowweave.DataType;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ObjectStorageReadHandle;
 import io.rowweave.ObjectStorageReadRequest;
 import io.rowweave.ObjectStorageSnapshotSource;
@@ -229,7 +229,7 @@ class ObjectStorageQualityPlanAdmissionTest {
                 META, new ProbeProvider(), "endpoint-test", "credential-test", "domain",
                 "ledger.tsv", "version-1", 0L, sha256(empty),
                 ObjectStorageSnapshotSource.MIN_ROW_BYTES);
-        ExecutionEnvironment session = new ExecutionEnvironment("object-quality-plan", "object quality plan");
+        BatchSession session = new BatchSession("object-quality-plan", "object quality plan");
         session.classifyObjectStorageRows("ledger.object.source", input)
                 .writeToManifest(target);
         return session.toPlanGraph();

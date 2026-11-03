@@ -18,11 +18,11 @@ source-visible because Java packages do not express every product boundary.
 <!-- GENERATED:PUBLIC-API-INVENTORY:START -->
 ## Functional inventory
 
-### Batch DataSet
+### BatchSession / DataSet
 
+[`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java)
 [`io.rowweave.CoGroupDataSet`](../../../rowweave-core/src/main/java/io/rowweave/CoGroupDataSet.java)
 [`io.rowweave.DataSet`](../../../rowweave-core/src/main/java/io/rowweave/DataSet.java)
-[`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java)
 [`io.rowweave.Grouper`](../../../rowweave-core/src/main/java/io/rowweave/Grouper.java)
 [`io.rowweave.JoinDataSet`](../../../rowweave-core/src/main/java/io/rowweave/JoinDataSet.java)
 [`io.rowweave.RowWeave`](../../../rowweave-core/src/main/java/io/rowweave/RowWeave.java)
@@ -74,6 +74,7 @@ Boundary: Typed callbacks supplied by applications and connector authors.
 
 [`io.rowweave.AssignedSourceBatch`](../../../rowweave-core/src/main/java/io/rowweave/AssignedSourceBatch.java)
 [`io.rowweave.BatchExecutableSource`](../../../rowweave-core/src/main/java/io/rowweave/BatchExecutableSource.java)
+[`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java)
 [`io.rowweave.BatchSink`](../../../rowweave-core/src/main/java/io/rowweave/BatchSink.java)
 [`io.rowweave.BatchSource`](../../../rowweave-core/src/main/java/io/rowweave/BatchSource.java)
 [`io.rowweave.CollectingSink`](../../../rowweave-core/src/main/java/io/rowweave/CollectingSink.java)
@@ -176,6 +177,7 @@ and **52** method signatures. Required symbols are the primary application and p
 
 - [`io.rowweave.AssignedSourceBatch`](../../../rowweave-core/src/main/java/io/rowweave/AssignedSourceBatch.java) — required in `0.2.0`.
 - [`io.rowweave.BatchExecutableSource`](../../../rowweave-core/src/main/java/io/rowweave/BatchExecutableSource.java) — required in `0.2.0`.
+- [`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java) — required in `0.2.0`.
 - [`io.rowweave.BatchSink`](../../../rowweave-core/src/main/java/io/rowweave/BatchSink.java) — required in `0.2.0`.
 - [`io.rowweave.BatchSource`](../../../rowweave-core/src/main/java/io/rowweave/BatchSource.java) — required in `0.2.0`.
 - [`io.rowweave.CollectingSink`](../../../rowweave-core/src/main/java/io/rowweave/CollectingSink.java) — required in `0.2.0`.
@@ -186,7 +188,6 @@ and **52** method signatures. Required symbols are the primary application and p
 - [`io.rowweave.DataRowClassification`](../../../rowweave-core/src/main/java/io/rowweave/DataRowClassification.java) — required in `0.2.0`.
 - [`io.rowweave.DataSchema`](../../../rowweave-core/src/main/java/io/rowweave/DataSchema.java) — required in `0.2.0`.
 - [`io.rowweave.DiscardSink`](../../../rowweave-core/src/main/java/io/rowweave/DiscardSink.java) — required in `0.2.0`.
-- [`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java) — required in `0.2.0`.
 - [`io.rowweave.FileSink`](../../../rowweave-core/src/main/java/io/rowweave/FileSink.java) — required in `0.2.0`.
 - [`io.rowweave.FileSource`](../../../rowweave-core/src/main/java/io/rowweave/FileSource.java) — required in `0.2.0`.
 - [`io.rowweave.IncrementalSourceSplit`](../../../rowweave-core/src/main/java/io/rowweave/IncrementalSourceSplit.java) — required in `0.2.0`.
@@ -248,13 +249,13 @@ and **52** method signatures. Required symbols are the primary application and p
 - [`io.rowweave.DataSchema`](../../../rowweave-core/src/main/java/io/rowweave/DataSchema.java) — `getField(int): io.rowweave.Field`.
 - [`io.rowweave.DataSchema`](../../../rowweave-core/src/main/java/io/rowweave/DataSchema.java) — `getFields(): io.rowweave.Field[]`.
 - [`io.rowweave.DataSchema`](../../../rowweave-core/src/main/java/io/rowweave/DataSchema.java) — `getFieldIndex(java.lang.String): int`.
-- [`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java) — `fromSource(io.rowweave.Source): io.rowweave.DataSet`.
-- [`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java) — `fromSource(io.rowweave.Source[]): io.rowweave.DataSet`.
-- [`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java) — `setParallelism(int): void`.
-- [`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java) — `getParallelism(): int`.
-- [`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java) — `execute(): void`.
-- [`io.rowweave.RowWeave`](../../../rowweave-core/src/main/java/io/rowweave/RowWeave.java) — `createEnvironment(java.lang.String): io.rowweave.ExecutionEnvironment`.
-- [`io.rowweave.RowWeave`](../../../rowweave-core/src/main/java/io/rowweave/RowWeave.java) — `createEnvironment(java.lang.String, java.lang.String): io.rowweave.ExecutionEnvironment`.
+- [`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java) — `fromSource(io.rowweave.Source): io.rowweave.DataSet`.
+- [`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java) — `fromSource(io.rowweave.Source[]): io.rowweave.DataSet`.
+- [`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java) — `setParallelism(int): void`.
+- [`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java) — `getParallelism(): int`.
+- [`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java) — `execute(): void`.
+- [`io.rowweave.RowWeave`](../../../rowweave-core/src/main/java/io/rowweave/RowWeave.java) — `createBatchSession(java.lang.String): io.rowweave.BatchSession`.
+- [`io.rowweave.RowWeave`](../../../rowweave-core/src/main/java/io/rowweave/RowWeave.java) — `createBatchSession(java.lang.String, java.lang.String): io.rowweave.BatchSession`.
 - [`io.rowweave.DataSet`](../../../rowweave-core/src/main/java/io/rowweave/DataSet.java) — `getSchema(): io.rowweave.DataSchema`.
 - [`io.rowweave.DataSet`](../../../rowweave-core/src/main/java/io/rowweave/DataSet.java) — `sinkTo(io.rowweave.Sink): void`.
 - [`io.rowweave.DataSet`](../../../rowweave-core/src/main/java/io/rowweave/DataSet.java) — `sinkTo(java.lang.String, io.rowweave.Sink): void`.
@@ -330,6 +331,7 @@ Each name links to its production source declaration.
 - [`io.rowweave.AssignedSourceInputBatchExecutor`](../../../rowweave-core/src/main/java/io/rowweave/AssignedSourceInputBatchExecutor.java) — public class.
 - [`io.rowweave.BatchExecutableSource`](../../../rowweave-core/src/main/java/io/rowweave/BatchExecutableSource.java) — public interface.
 - [`io.rowweave.BatchRuntimes`](../../../rowweave-core/src/main/java/io/rowweave/BatchRuntimes.java) — public class.
+- [`io.rowweave.BatchSession`](../../../rowweave-core/src/main/java/io/rowweave/BatchSession.java) — public class.
 - [`io.rowweave.BatchSink`](../../../rowweave-core/src/main/java/io/rowweave/BatchSink.java) — public interface.
 - [`io.rowweave.BatchSinkBinding`](../../../rowweave-core/src/main/java/io/rowweave/BatchSinkBinding.java) — public class.
 - [`io.rowweave.BatchSinkDescriptor`](../../../rowweave-core/src/main/java/io/rowweave/BatchSinkDescriptor.java) — public class.
@@ -367,7 +369,6 @@ Each name links to its production source declaration.
 - [`io.rowweave.DurableSinkConfigurationEnvelopeCodec`](../../../rowweave-core/src/main/java/io/rowweave/DurableSinkConfigurationEnvelopeCodec.java) — public class.
 - [`io.rowweave.DurableSinkProviderKey`](../../../rowweave-core/src/main/java/io/rowweave/DurableSinkProviderKey.java) — public class.
 - [`io.rowweave.DurableSinkResourceLease`](../../../rowweave-core/src/main/java/io/rowweave/DurableSinkResourceLease.java) — public interface.
-- [`io.rowweave.ExecutionEnvironment`](../../../rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java) — public class.
 - [`io.rowweave.Field`](../../../rowweave-core/src/main/java/io/rowweave/Field.java) — public class.
 - [`io.rowweave.FileInputExecutor`](../../../rowweave-core/src/main/java/io/rowweave/FileInputExecutor.java) — public class.
 - [`io.rowweave.FileSink`](../../../rowweave-core/src/main/java/io/rowweave/FileSink.java) — public class.

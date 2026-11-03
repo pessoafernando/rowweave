@@ -22,7 +22,7 @@ class BatchSourceInputCompatibilityTest {
 
     @Test
     void jobSessionRejectsMissingInputsBeforeAnyIteration() {
-        ExecutionEnvironment session = new ExecutionEnvironment("source-validation", "source-validation");
+        BatchSession session = new BatchSession("source-validation", "source-validation");
         assertFailure(() -> session.fromSource((Source) null), "input[0]", "null");
         assertFailure(() -> session.fromSource((Source[]) null), "at least one");
         assertFailure(session::fromSource, "at least one");
@@ -34,7 +34,7 @@ class BatchSourceInputCompatibilityTest {
 
     @Test
     void jobSessionRejectsMalformedMetadataBeforeAnyIteration() {
-        ExecutionEnvironment session = new ExecutionEnvironment("source-validation", "source-validation");
+        BatchSession session = new BatchSession("source-validation", "source-validation");
         ProbeInput nullMeta = new ProbeInput(null);
         ProbeInput nullField = new ProbeInput(new DataSchema((Field) null));
         ProbeInput nullName = new ProbeInput(new DataSchema(
@@ -54,7 +54,7 @@ class BatchSourceInputCompatibilityTest {
 
     @Test
     void jobSessionRestoresV1NameAndTypeCompatibilityRules() {
-        ExecutionEnvironment session = new ExecutionEnvironment("source-validation", "source-validation");
+        BatchSession session = new BatchSession("source-validation", "source-validation");
         ProbeInput first = new ProbeInput(META);
         ProbeInput fieldCount = new ProbeInput(new DataSchema(
                 new Field("id", DataType.IntegerType)));
@@ -83,7 +83,7 @@ class BatchSourceInputCompatibilityTest {
 
     @Test
     void singleInputKeepsItsDescriptorInsteadOfWrappingItAsGenericIterable() {
-        ExecutionEnvironment session = new ExecutionEnvironment("source-validation", "source-validation");
+        BatchSession session = new BatchSession("source-validation", "source-validation");
         ProbeInput input = new ProbeInput(META);
         DataSet source = session.fromSource(input);
         source.sinkTo(new DiscardSink(META));

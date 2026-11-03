@@ -119,7 +119,7 @@ class ExprOperatorTest {
                 row(10, 3, new BigDecimal("100")),
                 row(1, 5, new BigDecimal("50")),
                 row(8, 2, new BigDecimal("80")));
-        io.rowweave.ExecutionEnvironment session = io.rowweave.RowWeave.createEnvironment("expr");
+        io.rowweave.BatchSession session = io.rowweave.RowWeave.createBatchSession("expr");
         io.rowweave.DataSet ds = session.fromSource(new io.rowweave.Source() {
                     @Override public DataSchema getSchema() { return META; }
                     @Override public java.util.Iterator<DataRow> iterator() { return srcRows.iterator(); }

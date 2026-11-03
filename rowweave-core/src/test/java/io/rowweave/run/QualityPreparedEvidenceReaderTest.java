@@ -5,7 +5,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.Source;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.ObjectStorageReadHandle;
@@ -335,7 +335,7 @@ class QualityPreparedEvidenceReaderTest {
         QualityPreparedEvidence oracle = null;
         for (int parallelism : new int[]{1, 2, 4}) {
             Path domain = temp.resolve("actual-p" + parallelism);
-            ExecutionEnvironment session = new ExecutionEnvironment("quality-evidence-p" + parallelism,
+            BatchSession session = new BatchSession("quality-evidence-p" + parallelism,
                     "quality evidence actual output");
             session.setParallelism(parallelism);
             RowValidation validation = RowValidation.builder(INPUT_META)
@@ -587,7 +587,7 @@ class QualityPreparedEvidenceReaderTest {
             if (i == inputs.length - 1) lastSplitDigest = digest;
         }
 
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "maximum-quality-evidence", "maximum quality evidence");
         session.setParallelism(65_536);
         DataRowClassification classification = session.fromSource(inputs)
@@ -805,7 +805,7 @@ class QualityPreparedEvidenceReaderTest {
     }
 
     private static PlanGraph graph(Path domain, QualityGatePolicy policy) {
-        ExecutionEnvironment session = new ExecutionEnvironment("evidence", "quality evidence");
+        BatchSession session = new BatchSession("evidence", "quality evidence");
         RowValidation validation = RowValidation.builder(INPUT_META)
                 .notNull("adaptor.required", 0)
                 .integerRange("period.range", 1, 1, 12).build();
@@ -821,7 +821,7 @@ class QualityPreparedEvidenceReaderTest {
     private static PlanGraph objectGraph(Path domain, QualityGatePolicy policy)
             throws Exception {
         ObjectStorageSnapshotSource input = objectInput();
-        ExecutionEnvironment session = new ExecutionEnvironment("object-evidence", "object evidence");
+        BatchSession session = new BatchSession("object-evidence", "object evidence");
         session.classifyObjectStorageRows("object.source", input)
                 .writeToManifest(TypedQualityManifest.of(
                                 domain.toString(), "valid", "rejected", "summary")

@@ -6,7 +6,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.JobClient;
@@ -37,7 +37,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Compares end-to-end wall clock for parallelism 1 and 4, locally and on a real cluster with one
- * Master and two Workers, through the public ExecutionEnvironment, over the same application split
+ * Master and two Workers, through the public BatchSession, over the same application split
  * across FileSource instances. Every timed run is also checked exactly against an independent
  * BigDecimal oracle, so no performance assertion on its own pollutes the CI signal.
  *
@@ -135,9 +135,9 @@ class SplitAwarePerformanceBaselineTest {
     private static RunResult runOnce(Path work, List<Path> parts, int parallelism,
                                      JobClient client, String label) {
         Path output = work.resolve(label + "-" + System.nanoTime() + ".tsv");
-        ExecutionEnvironment session = client == null
-                ? RowWeave.createEnvironment(label)
-                : new ExecutionEnvironment(label, label, client);
+        BatchSession session = client == null
+                ? RowWeave.createBatchSession(label)
+                : new BatchSession(label, label, client);
         session.setParallelism(parallelism);
         Source[] inputs = new Source[parts.size()];
         for (int i = 0; i < parts.size(); i++) {

@@ -4,7 +4,7 @@ import io.rowweave.RowWeave;
 import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.DataSchema;
@@ -80,7 +80,7 @@ class ManifestProcessCrashRecoveryTest {
     }
 
     private static void commitBaseline(Path domain) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("manifest-crash-baseline");
+        BatchSession session = RowWeave.createBatchSession("manifest-crash-baseline");
         session.fromSource(new CollectionSource(META, Collections.singletonList(row(1L))))
                 .sinkTo(new ManifestFileSink(META, domain.toString(), "a"));
         session.fromSource(new CollectionSource(META, Collections.singletonList(row(2L))))

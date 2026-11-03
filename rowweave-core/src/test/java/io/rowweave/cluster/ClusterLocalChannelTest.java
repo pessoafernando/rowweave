@@ -84,7 +84,7 @@ class ClusterLocalChannelTest {
         startCluster(nWorkers, parallelism, reuse);
         Path outPath = dir.resolve("out.tsv");
         io.rowweave.FileSink out = new io.rowweave.FileSink(GB, outPath.toString());
-        io.rowweave.ExecutionEnvironment s = new io.rowweave.ExecutionEnvironment("local", "local",
+        io.rowweave.BatchSession s = new io.rowweave.BatchSession("local", "local",
                 new ClusterJobClient("127.0.0.1", master.port()));
         s.setParallelism(parallelism);
         List<Source> ins = shards(rows, parallelism);

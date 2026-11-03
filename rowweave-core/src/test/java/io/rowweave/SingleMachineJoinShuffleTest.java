@@ -52,7 +52,7 @@ class SingleMachineJoinShuffleTest {
     }
 
     private static List<DataRow> runJoin(List<DataRow> left, List<DataRow> right, JoinType type, int parallelism) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("sm-par-b");
+        BatchSession session = RowWeave.createBatchSession("sm-par-b");
         session.setParallelism(parallelism);
         DataSet l = session.fromSource(input(LEFT, left));
         DataSet r = session.fromSource(input(RIGHT, right));

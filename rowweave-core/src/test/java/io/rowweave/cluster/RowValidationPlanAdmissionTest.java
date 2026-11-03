@@ -6,7 +6,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.registry.InProcessRegistry;
@@ -52,7 +52,7 @@ class RowValidationPlanAdmissionTest {
     @Test
     void planRoundTripKeepsDescriptionAndExecutesLocally(@TempDir Path temp) {
         Path output = temp.resolve("local.tsv");
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-plan", "quality plan");
+        BatchSession session = new BatchSession("quality-plan", "quality plan");
         session.fromSource(new CollectionSource(META, rows()))
                 .validateRows(VALIDATION)
                 .sinkTo(new FileSink(META, output.toString()));
@@ -148,7 +148,7 @@ class RowValidationPlanAdmissionTest {
 
     @Test
     void validationRemainsVisibleAndFusible() {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-visible", "quality visible");
+        BatchSession session = new BatchSession("quality-visible", "quality visible");
         DataSet checked = session.fromSource(new CollectionSource(META, rows()))
                 .validateRows(VALIDATION)
                 .filter("period > 0");
@@ -185,9 +185,9 @@ class RowValidationPlanAdmissionTest {
     }
 
     private static List<String> run(JobClient client, int parallelism, Path output) {
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("quality-runtime", "quality runtime")
-                : new ExecutionEnvironment("quality-runtime", "quality runtime", client);
+        BatchSession session = client == null
+                ? new BatchSession("quality-runtime", "quality runtime")
+                : new BatchSession("quality-runtime", "quality runtime", client);
         session.setParallelism(parallelism);
         session.fromSource(new CollectionSource(META, rows()))
                 .validateRows(VALIDATION)

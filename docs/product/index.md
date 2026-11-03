@@ -36,7 +36,7 @@ RowWeave provides dual Runtime support: Batch for bounded graphs and bounded-res
 | Public API inventory | [API inventory](reference/api-inventory.md) |
 | Supported capability and stable refusals | [Capability matrix](reference/capability-matrix.md) |
 | Batch behavior contracts | [Batch behavior](reference/batch-behavior.md) |
-| Batch environment and DataSet method reference | [Batch API reference](reference/batch-api.md) |
+| Batch session and DataSet method reference | [Batch API reference](reference/batch-api.md) |
 | Custom function interfaces | [Custom function interfaces](reference/custom-functions.md) |
 | Expression syntax and evaluation | [Expression evaluation](reference/expression-evaluation.md) |
 | Built-in Batch sources and replay | [Batch sources](reference/batch-sources.md) |

@@ -8,7 +8,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 
@@ -50,7 +50,7 @@ public final class AmountRollupExample {
           * @param outputPath result file path (tab-separated, bit-identical round trip)
      */
     public static void run(List<DataRow> details, String outputPath) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("amount-rollup");
+        BatchSession session = RowWeave.createBatchSession("amount-rollup");
 
         DataSet rollup = session.fromSource(detailInput(details))
                                 // Group and sum by multiple dimensions: groupBy(region, segment).sum(amount).

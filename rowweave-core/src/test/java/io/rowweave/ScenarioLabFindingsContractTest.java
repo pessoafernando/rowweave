@@ -36,7 +36,7 @@ class ScenarioLabFindingsContractTest {
 
     @Test
     void unionRejectsWidthOrTypeDifferenceAtGraphConstruction() {
-        ExecutionEnvironment session = RowWeave.createEnvironment("union-schema-contract");
+        BatchSession session = RowWeave.createBatchSession("union-schema-contract");
         DataSet left = session.fromSource(new CollectionSource(
                 new DataSchema(new Field("id", DataType.LongType)),
                 Arrays.asList(row(1L))));
@@ -84,7 +84,7 @@ class ScenarioLabFindingsContractTest {
         assertTrue(selectFailure.getMessage().contains("unknown field: missing"),
                 selectFailure::getMessage);
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("unknown-whole-agg-field");
+        BatchSession session = RowWeave.createBatchSession("unknown-whole-agg-field");
         DataSet empty = session.fromSource(new CollectionSource(
                 KEY_DECIMAL, java.util.Collections.emptyList()));
         IllegalArgumentException maxFailure = assertThrows(
@@ -108,7 +108,7 @@ class ScenarioLabFindingsContractTest {
         DataSchema sourceMeta = new DataSchema(
                 new Field("id", DataType.LongType),
                 new Field("name", DataType.StringType));
-        ExecutionEnvironment session = RowWeave.createEnvironment("select-schema-contract");
+        BatchSession session = RowWeave.createBatchSession("select-schema-contract");
         DataSet selected = session.fromSource(new CollectionSource(
                         sourceMeta, Arrays.asList(row(7L, "Ada"))))
                 .select("id + 1 as next_id", "upper(name) as upper_name",
@@ -137,7 +137,7 @@ class ScenarioLabFindingsContractTest {
                 new Field("event_time", DataType.TimestampType));
         java.sql.Date businessDate = java.sql.Date.valueOf("2026-09-22");
         java.sql.Timestamp eventTime = java.sql.Timestamp.valueOf("2026-09-22 10:11:12.123456789");
-        ExecutionEnvironment session = RowWeave.createEnvironment("select-temporal-schema-contract");
+        BatchSession session = RowWeave.createBatchSession("select-temporal-schema-contract");
         DataSet selected = session.fromSource(new CollectionSource(
                         sourceMeta, Arrays.asList(row("hour", businessDate, eventTime))))
                 .select("dateadd(part, 1, business_date) as dynamic_shift",
@@ -186,7 +186,7 @@ class ScenarioLabFindingsContractTest {
                 row("g3", decimal("42")), row("g3", decimal("-8.4")),
                 row("g3", decimal("0")), row("g4", decimal("999.999999")),
                 row("g4", decimal("0.000001")), row("g4", null));
-        ExecutionEnvironment session = RowWeave.createEnvironment("distinct-first-contract");
+        BatchSession session = RowWeave.createBatchSession("distinct-first-contract");
         Path output = tmp.resolve("distinct.tsv");
         session.fromSource(new CollectionSource(KEY_DECIMAL, input))
                 .distinct("k")

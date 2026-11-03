@@ -31,7 +31,7 @@ class TypedQualityPublicationLocalExecutionTest {
     void publishesThreeCanonicalMembersAndReadsTheExactSourceOnlyOnce(@TempDir Path tmp) {
         Path domain = tmp.resolve("quality");
         SOURCE_OPENS.set(0);
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-local", "quality local");
+        BatchSession session = new BatchSession("quality-local", "quality local");
         DataRowClassification classification = session.fromSource(new CountingExactInput(Arrays.asList(
                         row("A", 1), row(null, 2), row("B", 13), row("C", 13), row("D", 4))))
                 .uid("ledger.source")
@@ -68,7 +68,7 @@ class TypedQualityPublicationLocalExecutionTest {
         System.setProperty("rowweave.worker.operator.minMemory", "8192");
         try {
             SOURCE_OPENS.set(0);
-            ExecutionEnvironment session = new ExecutionEnvironment("quality-memory-admission", "quality memory admission");
+            BatchSession session = new BatchSession("quality-memory-admission", "quality memory admission");
             DataRowClassification classification = session.fromSource(new CountingExactInput(Arrays.asList(
                             row("A", 1), row(null, 2))))
                     .uid("ledger.source")

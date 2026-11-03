@@ -5,7 +5,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.join.JoinType;
@@ -71,7 +71,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
         return rs;
     }
 
-    private static void buildMixedDag(ExecutionEnvironment s, Source in, Path dir, String name) {
+    private static void buildMixedDag(BatchSession s, Source in, Path dir, String name) {
         DataSet mid = s.fromSource(in).filter("amt >= 5");
         DataSet joined = mid.join(mid,
                 SortMergeJoin.of(META, META, new String[]{"k"}, new String[]{"k"}, JoinType.INNER));
@@ -100,7 +100,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
     void mixedRejoinMultiSinkWholeGraphSourceReadOnce(@TempDir Path tmp) throws Exception {
         List<DataRow> data = rows();
 
-        ExecutionEnvironment oracle = new ExecutionEnvironment("mix-oracle", "mix-oracle");
+        BatchSession oracle = new BatchSession("mix-oracle", "mix-oracle");
         buildMixedDag(oracle, plainInput(data), tmp, "oracle");
         List<String> oracleA = multisetLines(tmp.resolve("oracle-A.tsv"));
         List<String> oracleB = multisetLines(tmp.resolve("oracle-B.tsv"));
@@ -116,7 +116,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(60), () -> {
-                ExecutionEnvironment s = new ExecutionEnvironment("mix-c1", "mix-c1",
+                BatchSession s = new BatchSession("mix-c1", "mix-c1",
                         new ClusterJobClient("127.0.0.1", m.port()));
                 s.setParallelism(1);
                 buildMixedDag(s, countingInput(data), tmp, "cluster");
@@ -135,7 +135,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
     void mixedRejoinMultiSinkWholeGraphSourceReadOnceP2(@TempDir Path tmp) throws Exception {
         List<DataRow> data = rows();
 
-        ExecutionEnvironment oracle = new ExecutionEnvironment("mix-oracle2", "mix-oracle2");
+        BatchSession oracle = new BatchSession("mix-oracle2", "mix-oracle2");
         buildMixedDag(oracle, plainInput(data), tmp, "oracle2");
         List<String> oracleA = multisetLines(tmp.resolve("oracle2-A.tsv"));
         List<String> oracleB = multisetLines(tmp.resolve("oracle2-B.tsv"));
@@ -151,7 +151,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(60), () -> {
-                ExecutionEnvironment s = new ExecutionEnvironment("mix-c2", "mix-c2",
+                BatchSession s = new BatchSession("mix-c2", "mix-c2",
                         new ClusterJobClient("127.0.0.1", m.port()));
                 s.setParallelism(2);
                 buildMixedDag(s, countingInput(data), tmp, "cluster2");
@@ -187,7 +187,7 @@ class ClusterMixedRejoinMultiSinkSubmitTest {
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
             assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-                ExecutionEnvironment s = new ExecutionEnvironment("mix-boom", "mix-boom",
+                BatchSession s = new BatchSession("mix-boom", "mix-boom",
                         new ClusterJobClient("127.0.0.1", m.port()));
                 s.setParallelism(1);
                 assertThrows(RuntimeException.class,

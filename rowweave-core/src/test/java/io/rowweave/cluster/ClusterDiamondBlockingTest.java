@@ -5,7 +5,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.join.JoinType;
@@ -64,7 +64,7 @@ class ClusterDiamondBlockingTest {
 
     private long runDiamond(String name, JobClient client, Source in, Path dir) {
         Path f = dir.resolve(name + ".tsv");
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : new ExecutionEnvironment(name, name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : new BatchSession(name, name);
         s.setParallelism(1);
         DataSet mid = s.fromSource(in).filter("amt >= 5");
         DataSet b1 = mid.filter("k >= 2");
@@ -114,7 +114,7 @@ class ClusterDiamondBlockingTest {
 
     private long runSelfJoin(String name, JobClient client, Source in, Path dir) {
         Path f = dir.resolve(name + ".tsv");
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : new ExecutionEnvironment(name, name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : new BatchSession(name, name);
         s.setParallelism(1);
         DataSet mid = s.fromSource(in).filter("amt >= 5");
         DataSet joined = mid.join(mid, SortMergeJoin.of(META, META, new String[]{"k"}, new String[]{"k"}, JoinType.INNER));

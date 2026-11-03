@@ -6,7 +6,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.InProcessCluster;
@@ -82,9 +82,9 @@ class PassThroughProfileTest {
             inputs[i] = new FileSource(ORDER, parts.get(i).toString());
         }
         Path output = work.resolve(label + "-" + System.nanoTime() + ".tsv");
-        ExecutionEnvironment session = client == null
-                ? RowWeave.createEnvironment(label)
-                : new ExecutionEnvironment(label, label, client);
+        BatchSession session = client == null
+                ? RowWeave.createBatchSession(label)
+                : new BatchSession(label, label, client);
         session.setParallelism(parallelism);
         session.fromSource(inputs)
                 .filter("amount >= 0")

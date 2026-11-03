@@ -4,7 +4,7 @@ import io.rowweave.DataType;
 import io.rowweave.CollectionSource;
 import io.rowweave.DiscardSink;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.Sink;
@@ -953,7 +953,7 @@ class MasterSafeInheritedRunRecoveryTest {
     }
 
     private static PlanArtifact qualityArtifact(String definitionId, Path domain) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-recovery", "quality recovery");
+        BatchSession session = new BatchSession("quality-recovery", "quality recovery");
         session.setDefinitionId(definitionId);
         session.setParallelism(2);
         DataRowClassification classified = session.fromSource(new CollectionSource(
@@ -975,7 +975,7 @@ class MasterSafeInheritedRunRecoveryTest {
                 META, new RecoveryObjectProvider(), "endpoint-prod", "credential-prod",
                 "domain", "ledger/retry.tsv", "generation-42", content.length,
                 sha256(content), ObjectStorageSnapshotSource.MIN_ROW_BYTES);
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "object-quality-recovery", "object quality recovery");
         session.setDefinitionId(definitionId);
         session.setParallelism(2);
@@ -1098,7 +1098,7 @@ class MasterSafeInheritedRunRecoveryTest {
     }
 
     private static long publishSourceSnapshot(Path domain) {
-        ExecutionEnvironment session = io.rowweave.RowWeave.createEnvironment("recovery-source-snapshot");
+        BatchSession session = io.rowweave.RowWeave.createBatchSession("recovery-source-snapshot");
         session.fromSource(new CollectionSource(META, Arrays.asList(row(7), row(8))))
                 .sinkTo(new ManifestFileSink(META, domain.toString(), "ledger"));
         session.execute();

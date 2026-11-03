@@ -28,7 +28,7 @@ class DocumentationSiteBuildTest {
         write(source, "README.md", "---\ndoc-contract: preview-0.2.0\ndoc-channel: default-branch\n---\n# RowWeave\n\nBuild data pipelines with tested APIs.\n");
         write(source, "docs/product/index.md", "---\ndoc-contract: preview-0.2.0\ndoc-channel: default-branch\n---\n# Documentation\n\nStart at [API](../reference/api.md) and [source](../../src/App.java).\n");
         write(source, "src/App.java", "public class App {\n}\n");
-        write(source, "docs/reference/api.md", "---\ndoc-contract: preview-0.2.0\ndoc-channel: default-branch\n---\n# API\n\nUse `ExecutionEnvironment`.\n\n```bash\nmvn -q test\n```\n");
+        write(source, "docs/reference/api.md", "---\ndoc-contract: preview-0.2.0\ndoc-channel: default-branch\n---\n# API\n\nUse `BatchSession`.\n\n```bash\nmvn -q test\n```\n");
         write(source, "CHANGELOG.md", "---\ndoc-contract: preview-0.2.0\ndoc-channel: default-branch\n---\n# Changelog\n\n## 0.2.0\n\nInitial public contract.\n");
 
         run(source, output);
@@ -63,14 +63,14 @@ class DocumentationSiteBuildTest {
         String api = read(output, "docs/reference/api.html");
         assertTrue(api.contains("<pre tabindex=\"0\">"));
         assertTrue(api.contains("<code class=\"language-bash\">"));
-        assertTrue(api.contains("ExecutionEnvironment"));
+        assertTrue(api.contains("BatchSession"));
         assertTrue(api.contains("id=\"api\""));
         String release = writeReleaseFixture(output);
         assertTrue(release.contains("<div class=\"table-wrap\" tabindex=\"0\" role=\"region\" aria-label=\"Scrollable table\">"));
         assertTrue(release.contains("<th scope=\"col\""));
         String searchIndex = read(output, "assets/search-index.js");
         assertTrue(searchIndex.contains("\"url\": \"index.html\""));
-        assertTrue(searchIndex.contains("ExecutionEnvironment"));
+        assertTrue(searchIndex.contains("BatchSession"));
         assertTrue(searchIndex.contains("0.2.0 source preview"));
     }
 

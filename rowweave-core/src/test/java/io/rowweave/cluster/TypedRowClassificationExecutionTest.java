@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.Sink;
 import io.rowweave.DataRowClassification;
 import io.rowweave.DataSchema;
@@ -102,7 +102,7 @@ class TypedRowClassificationExecutionTest {
 
         SOURCE_OPENS.set(0);
         FAILING_ABORTS.set(0);
-        ExecutionEnvironment session = new ExecutionEnvironment("classification-abort", "classification abort");
+        BatchSession session = new BatchSession("classification-abort", "classification abort");
         DataSet source = session.fromSource(inputs()).uid(SOURCE_UID);
         DataRowClassification classified = source.classifyRowsWithSourcePosition(VALIDATION);
         classified.validRows().sinkTo(new FileSink(META, validTarget.toString()));
@@ -123,9 +123,9 @@ class TypedRowClassificationExecutionTest {
     private static Result run(
             JobClient client, int parallelism, Path outputPrefix, boolean keyedValid) {
         SOURCE_OPENS.set(0);
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("classification-runtime", "classification runtime")
-                : new ExecutionEnvironment("classification-runtime", "classification runtime", client);
+        BatchSession session = client == null
+                ? new BatchSession("classification-runtime", "classification runtime")
+                : new BatchSession("classification-runtime", "classification runtime", client);
         session.setParallelism(parallelism);
         DataSet source = session.fromSource(inputs()).uid(SOURCE_UID);
         DataRowClassification classified = source.classifyRowsWithSourcePosition(VALIDATION);

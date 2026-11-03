@@ -6,7 +6,7 @@ import io.rowweave.plan.PlanGraph;
  * Legacy direct-plan runner retained for older tests and explicit diagnostics.
  *
  * @deprecated It does not own an AutoCloseable Master/Worker lifecycle and does not run the
- *     unified embedded cluster path. Use the default {@code RowWeave.createEnvironment(...)}
+ *     unified embedded cluster path. Use the default {@code RowWeave.createBatchSession(...)}
  *     or {@code RowWeave.startInProcessCluster(...)}.
  */
 @Deprecated

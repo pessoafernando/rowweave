@@ -5,7 +5,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -91,7 +91,7 @@ public final class MonitorLiveJobRunner {
             int n = 0;
             while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    ExecutionEnvironment s = new ExecutionEnvironment("live" + n, "full_op_dag_" + (n++),
+                    BatchSession s = new BatchSession("live" + n, "full_op_dag_" + (n++),
                             new ClusterJobClient("127.0.0.1", m.port()));
                     s.setParallelism(2);
                     File f = new File(dir, "out" + n + ".tsv");

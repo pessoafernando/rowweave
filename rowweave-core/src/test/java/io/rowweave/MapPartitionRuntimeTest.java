@@ -25,7 +25,7 @@ class MapPartitionRuntimeTest {
 
     @Test
     void publicApiBuildsOneBoundedFunctionNode() {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "map-partition-plan", "map-partition-plan",
                 new LocalJobClient(false));
         DataSet result = session.fromSource(new CollectionSource(
@@ -121,7 +121,7 @@ class MapPartitionRuntimeTest {
 
     private static List<Long> run(
             JobClient client, int parallelism, Path output) {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "map-partition-runtime", "map-partition-runtime", client);
         session.setParallelism(parallelism);
         DataSet result = session.fromSource(
@@ -145,7 +145,7 @@ class MapPartitionRuntimeTest {
     private static List<Long> runPartitionSums(
             JobClient client, Path output, List<DataRow> first,
             List<DataRow> second, boolean hashFirst) {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "map-partition-sums", "map-partition-sums", client);
         session.setParallelism(2);
         DataSet input = session.fromSource(

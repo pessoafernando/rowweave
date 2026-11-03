@@ -149,7 +149,7 @@ class SchemaConversionModelTest {
         SchemaConversion mapping = SchemaConversion.builder(source)
                 .required(0, new Field("id64", DataType.LongType), SchemaConversion.Cast.INTEGER_TO_LONG)
                 .build();
-        ExecutionEnvironment session = new ExecutionEnvironment("schema-model", "schema model");
+        BatchSession session = new BatchSession("schema-model", "schema model");
         DataRow row = new DataRow(1);
         row.set(0, 1);
         DataSet dataSet = session.fromSource(new CollectionSource(source, Arrays.asList(row)));
@@ -157,7 +157,7 @@ class SchemaConversionModelTest {
                 dataSet.convertSchema(mapping).getSchema().getField(0).getDataType());
 
         DataSchema drifted = new DataSchema(new Field("id", "changed-alias", DataType.IntegerType));
-        ExecutionEnvironment other = new ExecutionEnvironment("schema-drift", "schema drift");
+        BatchSession other = new BatchSession("schema-drift", "schema drift");
         DataSet driftedData = other.fromSource(new CollectionSource(drifted, Arrays.asList(row)));
         IllegalArgumentException mismatch = assertThrows(IllegalArgumentException.class,
                 () -> driftedData.convertSchema(mapping));

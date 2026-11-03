@@ -35,10 +35,10 @@ class DataSetApiBackfillTest {
         return r;
     }
 
-    private ExecutionEnvironment session;
+    private BatchSession session;
 
     private DataSet src(List<DataRow> rs) {
-        session = RowWeave.createEnvironment("api");
+        session = RowWeave.createBatchSession("api");
         return session.fromSource(new Source() {
             @Override public DataSchema getSchema() { return META; }
             @Override public java.util.Iterator<DataRow> iterator() { return rs.iterator(); }
@@ -134,7 +134,7 @@ class DataSetApiBackfillTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("apic", "apic", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("apic", "apic", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             DataSet ds = s.fromSource(new CollectionSource(META, data)).sum("amt");
             // In a cluster the Sink is written by the worker, and WorkerCollectingOutput is not worker-writable, so a client copy receives no rows,

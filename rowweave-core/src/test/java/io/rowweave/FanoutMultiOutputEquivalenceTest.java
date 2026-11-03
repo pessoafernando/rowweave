@@ -62,7 +62,7 @@ class FanoutMultiOutputEquivalenceTest {
         CountingInput src = new CountingInput(rows);
 
         // a fan-out job in which mid, filter amt>=10, feeds 5 downstream outputs.
-        ExecutionEnvironment s = RowWeave.createEnvironment("fanout5");
+        BatchSession s = RowWeave.createBatchSession("fanout5");
         DataSet mid = s.fromSource(src).filter("amt >= 10");
         WorkerCollectingOutput o0 = new WorkerCollectingOutput(mid.getSchema()); mid.filter("k >= 5").sinkTo(o0);
         WorkerCollectingOutput o1 = new WorkerCollectingOutput(mid.getSchema()); mid.filter("k < 5").sinkTo(o1);
@@ -114,7 +114,7 @@ class FanoutMultiOutputEquivalenceTest {
     /** A whole-graph tee, where a shared source flows through filter into groupBy, an expensive breaker computed once, and broadcasts to 5 branches that post-process it; returns how many times the source was read, which is 1. */
     private long runWholeGraph(List<DataRow> rows) {
         CountingInput src = new CountingInput(rows);
-        ExecutionEnvironment s = RowWeave.createEnvironment("perf-tee");
+        BatchSession s = RowWeave.createBatchSession("perf-tee");
         DataSet mid = s.fromSource(src).filter("amt >= 10")
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));  // the shared expensive breaker
         for (int i = 0; i < 5; i++) {
@@ -128,7 +128,7 @@ class FanoutMultiOutputEquivalenceTest {
     private long runPerSinkSimulated(List<DataRow> rows) {
         CountingInput src = new CountingInput(rows);
         for (int i = 0; i < 5; i++) {
-            ExecutionEnvironment s = RowWeave.createEnvironment("perf-persink-" + i);
+            BatchSession s = RowWeave.createBatchSession("perf-persink-" + i);
             s.fromSource(src).filter("amt >= 10")
                     .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
                     .filter("sum0 >= " + (i * 10)).sinkTo(new WorkerCollectingOutput(GB));
@@ -138,7 +138,7 @@ class FanoutMultiOutputEquivalenceTest {
     }
 
     private static List<DataRow> oracleFilter(List<DataRow> rows, String expr) {
-        ExecutionEnvironment s = RowWeave.createEnvironment("oracle-f");
+        BatchSession s = RowWeave.createBatchSession("oracle-f");
         WorkerCollectingOutput o = new WorkerCollectingOutput(META);
         s.fromSource(fixed(rows)).filter("amt >= 10").filter(expr).sinkTo(o);
         s.execute();
@@ -146,7 +146,7 @@ class FanoutMultiOutputEquivalenceTest {
     }
 
     private static List<DataRow> oracleGroupBy(List<DataRow> rows) {
-        ExecutionEnvironment s = RowWeave.createEnvironment("oracle-gb");
+        BatchSession s = RowWeave.createBatchSession("oracle-gb");
         WorkerCollectingOutput o = new WorkerCollectingOutput(GB);
         s.fromSource(fixed(rows)).filter("amt >= 10").groupBy(ParallelGroupByAgg.of(META, "k").sum("amt")).sinkTo(o);
         s.execute();

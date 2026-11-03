@@ -3,7 +3,7 @@ package io.rowweave.monitor.http;
 import io.rowweave.RowWeave;
 import io.rowweave.DataSet;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.bench.CsvInput;
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * expecting at least two workers. That assertion is the guard for genuine cross-JVM distributed
  * execution; without it a test can repeat the mistake of RealProcessClusterTest, where no
  * parallelism was set, every task landed on one worker and socket shuffle never happened. Work runs
- * through ExecutionEnvironment.commit with CsvInput rather than an embedded list source, which is
+ * through BatchSession.commit with CsvInput rather than an embedded list source, which is
  * closer to real use and the only shape that survives process boundaries.
  */
 @Tag("multiprocess")
@@ -65,7 +65,7 @@ class RealProcessClusterHarnessTest {
 
     /** A keyed shuffle over source -> groupBy(dept).sum(amount), with the single machine at parallelism one as the oracle. */
     private List<String> runGroupBy(int par, io.rowweave.cluster.JobClient client, String jobName, Path out) {
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(jobName, jobName, client) : RowWeave.createEnvironment(jobName);
+        BatchSession s = client != null ? new BatchSession(jobName, jobName, client) : RowWeave.createBatchSession(jobName);
         s.setParallelism(par);
         DataSet src = s.fromSource(new CsvInput(orders, ORDER));
         src.groupBy(ParallelGroupByAgg.of(ORDER, "dept").sum("amount"))

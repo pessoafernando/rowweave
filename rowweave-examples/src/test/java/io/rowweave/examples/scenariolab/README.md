@@ -4,7 +4,7 @@ ScenarioLab is the examples module test-only suite of 100 batches with 100
 scenarios each, for 10,000 functional scenarios. It is not a performance test.
 Inputs are small by design so failures isolate behavior rather than load.
 
-Each scenario runs the production path: build an `ExecutionEnvironment`,
+Each scenario runs the production path: build a `BatchSession`,
 compose the DAG, execute the in-process batch runtime, write a file output,
 read it back, and compare the whole result with an independent Java oracle.
 

@@ -4,7 +4,7 @@ import io.rowweave.DataType;
 import io.rowweave.DiscardSink;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ObjectStorageReadHandle;
 import io.rowweave.ObjectStorageReadRequest;
@@ -914,7 +914,7 @@ class MasterDurableRunDispatchTest {
                 META, new DurableObjectProvider(), "endpoint-prod", "credential-prod",
                 "domain", "ledger/retry.tsv", "generation-42", content.length,
                 sha256Hex(content), ObjectStorageSnapshotSource.MIN_ROW_BYTES);
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "durable-object-quality-retry", "durable object quality retry");
         session.setDefinitionId("durable-object-quality-retry");
         session.setParallelism(2);

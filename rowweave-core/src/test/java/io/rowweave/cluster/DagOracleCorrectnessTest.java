@@ -8,7 +8,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.Sink;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
@@ -44,7 +44,7 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * <p>This test computes the expected result of each DAG with {@link OracleOps} (hand-written HashMap and
  * List, sharing nothing with the engine's push machinery) and asserts **oracle == single machine P1 ==
- * single machine P4** (through {@link ExecutionEnvironment#commit()} and {@link FileSink}, as multiset
+ * single machine P4** (through {@link BatchSession#commit()} and {@link FileSink}, as multiset
  * fingerprints). The quadrant tests already show P1 == P4 == cluster, so oracle == P1 closes the loop and
  * implies oracle == every quadrant.
  *
@@ -101,7 +101,7 @@ class DagOracleCorrectnessTest {
 
     private long[] runEngine(String name, int parallelism, DataSchema srcMeta, List<DataRow> data, Dag dag, Path dir) {
         Path f = dir.resolve(name + "-p" + parallelism + ".tsv");
-        ExecutionEnvironment s = RowWeave.createEnvironment(name);
+        BatchSession s = RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet out = dag.build(s.fromSource(new CollectionSource(srcMeta, data)));
         out.sinkTo(new FileSink(out.getSchema(), f.toString()));
@@ -364,7 +364,7 @@ class DagOracleCorrectnessTest {
     }
 
     private long[] runMio4(String name, int parallelism, List<DataRow> da, Path f) {
-        ExecutionEnvironment s = RowWeave.createEnvironment(name);
+        BatchSession s = RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet a = s.fromSource(new CollectionSource(A, da));
         DataSet mid = a.filter("va >= 5");
@@ -381,7 +381,7 @@ class DagOracleCorrectnessTest {
         DataSchema joinAB = SortMergeJoin.of(A, B, new String[]{"k"}, new String[]{"k"}, JoinType.INNER).getOutputSchema();
         DataSchema jgb = ParallelGroupByAgg.of(joinAB, "k").sum("va").getOutputSchema();
         Path f1 = dir.resolve("mio5-o1.tsv"), f2 = dir.resolve("mio5-o2.tsv"), f3 = dir.resolve("mio5-o3.tsv");
-        ExecutionEnvironment s = RowWeave.createEnvironment("mio5");
+        BatchSession s = RowWeave.createBatchSession("mio5");
         s.setParallelism(4);
         DataSet a = s.fromSource(new CollectionSource(A, da));
         DataSet b = s.fromSource(new CollectionSource(B, db));
@@ -431,7 +431,7 @@ class DagOracleCorrectnessTest {
     }
 
     private long[] runUnionFilter(String name, int parallelism, List<DataRow> data, Path f) {
-        ExecutionEnvironment s = RowWeave.createEnvironment(name);
+        BatchSession s = RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet a1 = s.fromSource(new CollectionSource(A, data));
         DataSet a2 = s.fromSource(new CollectionSource(A, data));
@@ -456,7 +456,7 @@ class DagOracleCorrectnessTest {
     }
 
     private long[] runCoGroupFilter(String name, int parallelism, List<DataRow> da, List<DataRow> db, Path f) {
-        ExecutionEnvironment s = RowWeave.createEnvironment(name);
+        BatchSession s = RowWeave.createBatchSession(name);
         s.setParallelism(parallelism);
         DataSet a = s.fromSource(new CollectionSource(A, da));
         DataSet b = s.fromSource(new CollectionSource(B, db));
@@ -484,7 +484,7 @@ class DagOracleCorrectnessTest {
         List<DataRow> da = dataA(), db = dataB();
         DataSchema joinMeta = SortMergeJoin.of(A, B, new String[]{"k"}, new String[]{"k"}, JoinType.INNER).getOutputSchema();
         Path f1a = dir.resolve("mio1-o1.tsv"), f1b = dir.resolve("mio1-o2.tsv");
-        ExecutionEnvironment s = RowWeave.createEnvironment("mio1");
+        BatchSession s = RowWeave.createBatchSession("mio1");
         s.setParallelism(4);
         DataSet a = s.fromSource(new CollectionSource(A, da));
         DataSet b = s.fromSource(new CollectionSource(B, db));

@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.Source;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
@@ -44,7 +44,7 @@ class HaScenarioTest {
         try { return Files.lines(p).count(); } catch (Exception e) { throw new RuntimeException(e); }
     }
 
-    private static void submitGroupBy(ExecutionEnvironment s, Source input, Path out, MapFunction map) {
+    private static void submitGroupBy(BatchSession s, Source input, Path out, MapFunction map) {
         io.rowweave.DataSet ds = s.fromSource(input);
         if (map != null) ds = ds.map(map);
         ds.groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
@@ -57,7 +57,7 @@ class HaScenarioTest {
         File w1 = new File(tmp.toFile(), "w1"); w1.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0)) {
-            ExecutionEnvironment s1 = new ExecutionEnvironment("j1", "j1", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s1 = new BatchSession("j1", "j1", new ClusterJobClient("127.0.0.1", m.port()));
             s1.setParallelism(1);
             Path f1 = tmp.resolve("j1.tsv");
             submitGroupBy(s1, new CollectionSource(META, rows(800)), f1, null);
@@ -68,7 +68,7 @@ class HaScenarioTest {
                 Thread.sleep(300);
                 assertTrue(m.workers().size() >= 2, "the master sees the dynamically added worker (local heartbeat map)");
 
-                ExecutionEnvironment s2 = new ExecutionEnvironment("j2", "j2", new ClusterJobClient("127.0.0.1", m.port()));
+                BatchSession s2 = new BatchSession("j2", "j2", new ClusterJobClient("127.0.0.1", m.port()));
                 s2.setParallelism(2);
                 Path f2 = tmp.resolve("j2.tsv");
                 submitGroupBy(s2, new CollectionSource(META, rows(1600)), f2, null);
@@ -86,7 +86,7 @@ class HaScenarioTest {
         WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
         WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1);
         try {
-            ExecutionEnvironment s = new ExecutionEnvironment("dead", "dead", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("dead", "dead", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("dead.tsv");
             submitGroupBy(s, ClusterTestFileInput.write(
@@ -130,7 +130,7 @@ class HaScenarioTest {
         WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
         WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1);
         try {
-            ExecutionEnvironment s = new ExecutionEnvironment("mdie", "mdie", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("mdie", "mdie", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("mdie.tsv");
             submitGroupBy(s, ClusterTestFileInput.write(

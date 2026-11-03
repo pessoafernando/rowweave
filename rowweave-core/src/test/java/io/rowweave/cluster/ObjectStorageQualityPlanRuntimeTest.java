@@ -3,7 +3,7 @@ package io.rowweave.cluster;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ObjectStorageReadHandle;
 import io.rowweave.ObjectStorageReadRequest;
@@ -102,9 +102,9 @@ class ObjectStorageQualityPlanRuntimeTest {
                 new byte[]{(byte) 0xc3, (byte) 0x28, (byte) '\n'});
         RuntimeProvider.objects.put("part-a", first);
         RuntimeProvider.objects.put("part-b", second);
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("object-quality-runtime", "object quality runtime")
-                : new ExecutionEnvironment("object-quality-runtime", "object quality runtime", client);
+        BatchSession session = client == null
+                ? new BatchSession("object-quality-runtime", "object quality runtime")
+                : new BatchSession("object-quality-runtime", "object quality runtime", client);
         session.setParallelism(parallelism);
         session.classifyObjectStorageRows(
                         "ledger.object.source", input("part-a"), input("part-b"))

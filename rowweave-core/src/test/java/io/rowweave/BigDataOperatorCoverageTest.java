@@ -79,7 +79,7 @@ class BigDataOperatorCoverageTest {
 
     private static List<DataRow> run(int parallelism, java.util.function.Function<DataSet, DataSet> pipeline,
                                   Source in) {
-        ExecutionEnvironment s = RowWeave.createEnvironment("bigdata");
+        BatchSession s = RowWeave.createBatchSession("bigdata");
         s.setParallelism(parallelism);
         DataSet ds = pipeline.apply(s.fromSource(in));
         WorkerCollectingOutput out = new WorkerCollectingOutput(ds.getSchema());
@@ -287,7 +287,7 @@ class BigDataOperatorCoverageTest {
         }
         // INNER: each left row matches exactly one right row, since the right key is unique, giving N rows
         SortMergeJoin smj = SortMergeJoin.of(LEFT, RIGHT, new String[]{"lk"}, new String[]{"rk"}, JoinType.INNER);
-        ExecutionEnvironment s = RowWeave.createEnvironment("join-big");
+        BatchSession s = RowWeave.createBatchSession("join-big");
         s.setParallelism(P);
         DataSet l = s.fromSource(input(LEFT, left));
         DataSet r = s.fromSource(input(RIGHT, right));
@@ -316,7 +316,7 @@ class BigDataOperatorCoverageTest {
                 DataRow o = new DataRow(3); o.set(0, k); o.set(1, lc); o.set(2, rc); c.collect(o);
             }
         };
-        ExecutionEnvironment s = RowWeave.createEnvironment("cogroup-big");
+        BatchSession s = RowWeave.createBatchSession("cogroup-big");
         s.setParallelism(P);
         DataSet joined = s.fromSource(input(LEFT, left)).coGroup(s.fromSource(input(RIGHT, right)),
                 CoGroup.of(LEFT, RIGHT, new String[]{"lk"}, new String[]{"rk"}, fn));
@@ -400,7 +400,7 @@ class BigDataOperatorCoverageTest {
         List<DataRow> b = new ArrayList<>();
         for (int i = 0; i < N; i++) { DataRow r = new DataRow(2); r.set(0, i); r.set(1, "a"); a.add(r); }
         for (int i = 0; i < N; i++) { DataRow r = new DataRow(2); r.set(0, i); r.set(1, "b"); b.add(r); }
-        ExecutionEnvironment s = RowWeave.createEnvironment("union-big");
+        BatchSession s = RowWeave.createBatchSession("union-big");
         s.setParallelism(P);
         DataSet u = s.fromSource(input(LEFT, a)).union(s.fromSource(input(LEFT, b)), Union.of(LEFT));
         WorkerCollectingOutput out = new WorkerCollectingOutput(u.getSchema());

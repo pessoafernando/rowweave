@@ -6,7 +6,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.ops.ParallelGroupByAgg;
 import io.rowweave.ops.join.JoinType;
@@ -23,7 +23,7 @@ import java.nio.file.Path;
  * Re-measures performance on the parallel path, comparing canonicalization on, which appends a
  * full ordering over every field, against off, which stops at multiset equivalence, and also the
  * speedup of parallelism 4 over serial parallelism 1. Both go through
- * {@link ExecutionEnvironment#commit()}, because a test uses the public entry point and never
+ * {@link BatchSession#commit()}, because a test uses the public entry point and never
  * constructs an internal execution object.
  *
  * <p>Tagged bench, so the default suite skips it. To run it by hand:
@@ -64,9 +64,9 @@ class CanonicalizeRetireBenchmarkTest {
     private static Source bonuses()  { return new CsvInput(bonusesCsv, BONUS); }
     private static Source partners() { return new CsvInput(partnersCsv, PARTNER); }
 
-    /** A scenario builds the graph with the DataSet API on the given ExecutionEnvironment and outputs, which commit executes. */
+    /** A scenario builds the graph with the DataSet API on the given BatchSession and outputs, which commit executes. */
     @FunctionalInterface
-    private interface Scene { void build(ExecutionEnvironment s, FileSink out); }
+    private interface Scene { void build(BatchSession s, FileSink out); }
 
     private void ensureData() {
         if (ordersCsv != null) return;
@@ -85,11 +85,11 @@ class CanonicalizeRetireBenchmarkTest {
         return n;
     }
 
-    /** Runs once through ExecutionEnvironment.execute(), writes to a unique temporary file, and returns the row count and the net milliseconds. A null canon uses the default of false. */
+    /** Runs once through BatchSession.execute(), writes to a unique temporary file, and returns the row count and the net milliseconds. A null canon uses the default of false. */
     private long[] runOnce(String tag, int parallelism, Boolean canon, DataSchema outMeta, Scene scene) {
         Path f;
         try { f = Files.createTempFile("bench-" + tag + "-", ".tsv"); } catch (Exception e) { throw new RuntimeException(e); }
-        ExecutionEnvironment s = RowWeave.createEnvironment(tag);
+        BatchSession s = RowWeave.createBatchSession(tag);
         s.setParallelism(parallelism);
         if (canon != null) s.setCanonicalizeOutput(canon);
         long t = System.nanoTime();
@@ -148,7 +148,7 @@ class CanonicalizeRetireBenchmarkTest {
     @Test
     void canonOnVsOff() {
         ensureData();
-        System.out.println("=== canonicalize ON/OFF comparison (orders=" + ORDERS + ", P=" + P + ", ExecutionEnvironment.commit)===");
+        System.out.println("=== canonicalize ON/OFF comparison (orders=" + ORDERS + ", P=" + P + ", BatchSession.commit)===");
         compareCanon("join(orders x bonuses) large x small", JOIN, sceneJoin());
         compareCanon("bigJoin(orders x partners) large x large", BIG_JOIN, sceneBigJoin());
         compareCanon("groupBySum(region) small output", GB_REGION, sceneGroupBy());
@@ -157,7 +157,7 @@ class CanonicalizeRetireBenchmarkTest {
     @Test
     void parallelismP1vsP4() {
         ensureData();
-        System.out.println("=== P1 vs P" + P + " speedup (orders=" + ORDERS + ", canonicalize=false, ExecutionEnvironment.commit)===");
+        System.out.println("=== P1 vs P" + P + " speedup (orders=" + ORDERS + ", canonicalize=false, BatchSession.commit)===");
         compareParallelism("groupBySum(region)", GB_REGION, sceneGroupBy());
         compareParallelism("distinct(dept,region)", ORDER, sceneDistinct());
         compareParallelism("join(orders x bonuses) large x small", JOIN, sceneJoin());

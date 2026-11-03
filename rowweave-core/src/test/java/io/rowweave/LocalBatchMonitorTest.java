@@ -38,7 +38,7 @@ class LocalBatchMonitorTest {
         // its no-op registry. Recreate it so this runtime observes the monitor.
         InProcessBatchRuntime.resetProcessWideForTesting();
 
-        ExecutionEnvironment environment = RowWeave.createEnvironment("local-monitor");
+        BatchSession environment = RowWeave.createBatchSession("local-monitor");
         environment.setParallelism(2);
         List<DataRow> input = new ArrayList<>();
         for (int i = 0; i < 20; i++) {

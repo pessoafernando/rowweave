@@ -159,7 +159,7 @@ class FileInputTest {
         source.close();
 
         Path resultPath = tmp.resolve("result.tsv");
-        ExecutionEnvironment session = RowWeave.createEnvironment("file-input-local");
+        BatchSession session = RowWeave.createBatchSession("file-input-local");
         session.fromSource(new FileSource(LONG_META, sourcePath.toString()))
                 .filter("id >= 2")
                 .sinkTo(new FileSink(LONG_META, resultPath.toString()));
@@ -178,7 +178,7 @@ class FileInputTest {
         Path secondPath = writeLongs(tmp.resolve("part-1.tsv"), 2L, 4L);
         Path resultPath = tmp.resolve("all.tsv");
 
-        ExecutionEnvironment session = RowWeave.createEnvironment("file-input-splits");
+        BatchSession session = RowWeave.createBatchSession("file-input-splits");
         session.fromSource(
                         new FileSource(LONG_META, firstPath.toString()),
                         new FileSource(LONG_META, secondPath.toString()))

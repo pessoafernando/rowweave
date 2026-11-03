@@ -11,8 +11,8 @@ row semantics, null and decimal policy, schema and validation behavior,
 execution graph boundaries, breaker spill, and the accepted or refused shapes
 that those capabilities imply.
 
-RowWeave does not have a separate Batch language. `RowWeave.createEnvironment`
-returns an `ExecutionEnvironment`; `fromSource` starts a `DataSet`; composition
+RowWeave does not have a separate Batch language. `RowWeave.createBatchSession`
+returns a `BatchSession`; `fromSource` starts a `DataSet`; composition
 returns immutable dataset nodes; and `execute` submits all attached sinks as
 one graph. Code samples in the [first job](../quickstart/first-job.md) are
 runnable. Contract statements on this page point to focused tests.
@@ -144,7 +144,7 @@ that group collapse.
 
 ## Whole-job execution
 
-`ExecutionEnvironment.execute` submits one graph containing every source,
+`BatchSession.execute` submits one graph containing every source,
 operator, and attached sink. It does not return rows to the client. A sink
 receives rows at the graph boundary; in a cluster, the Worker writes the sink.
 `CollectingSink` is useful only in an addressable in-process test or local

@@ -136,10 +136,10 @@ def render_functional_view(types: dict[str, PublicType]) -> list[str]:
     approved = dict.fromkeys(required + retained)
     categories = [
         (
-            "Batch DataSet",
+            "BatchSession / DataSet",
             [
                 "io.rowweave.RowWeave",
-                "io.rowweave.ExecutionEnvironment",
+                "io.rowweave.BatchSession",
                 "io.rowweave.DataSet",
                 "io.rowweave.JoinDataSet",
                 "io.rowweave.CoGroupDataSet",

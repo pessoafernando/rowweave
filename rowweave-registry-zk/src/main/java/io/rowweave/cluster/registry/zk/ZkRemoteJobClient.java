@@ -28,7 +28,7 @@ import io.rowweave.incremental.IncrementalRunSubmission;
  * <p>Injected through an execution environment:
  * <pre>{@code
  * try (ZkRemoteJobClient client = new ZkRemoteJobClient("zk1:2181,zk2:2181,zk3:2181")) {
- * ExecutionEnvironment s = new ExecutionEnvironment("job", "job", client);
+ * BatchSession s = new BatchSession("job", "job", client);
  * buildDag(s);
  * s.execute();
  * } // close releases the ZooKeeper connection

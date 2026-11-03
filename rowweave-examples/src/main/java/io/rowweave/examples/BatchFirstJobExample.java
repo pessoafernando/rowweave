@@ -5,7 +5,7 @@ import io.rowweave.DataRow;
 import io.rowweave.DataSet;
 import io.rowweave.DataSchema;
 import io.rowweave.DataType;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.RowWeave;
@@ -33,10 +33,10 @@ public final class BatchFirstJobExample {
 
     /** Runs the example and writes tab-separated output to {@code outputPath}. */
     public static void run(List<DataRow> inputRows, String outputPath) {
-        ExecutionEnvironment environment = RowWeave.createEnvironment("first-job");
+        BatchSession session = RowWeave.createBatchSession("first-job");
         Source input = new CollectionSource(INPUT_SCHEMA, new ArrayList<>(inputRows));
 
-        DataSet totals = environment.fromSource(input)
+        DataSet totals = session.fromSource(input)
                 .filter(row -> row.getBigDecimal(1)
                         .compareTo(new BigDecimal("3")) >= 0)
                 .groupBy("categoryKey")
@@ -44,7 +44,7 @@ public final class BatchFirstJobExample {
                 .orderBy("categoryKey");
 
         totals.sinkTo(new FileSink(totals.getSchema(), outputPath));
-        environment.execute();
+        session.execute();
     }
 
     /** Creates one input row without copying or retaining the caller's schema. */

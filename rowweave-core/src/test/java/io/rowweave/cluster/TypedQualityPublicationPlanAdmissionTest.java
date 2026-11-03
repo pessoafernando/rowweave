@@ -5,7 +5,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.DiscardSink;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.QualityGatePolicy;
@@ -76,9 +76,9 @@ class TypedQualityPublicationPlanAdmissionTest {
     void canonicalPublicationExecutesThroughRealMasterWorkerFragments(@TempDir Path tmp) {
         Path domain = tmp.resolve("cluster-publication");
         Path worker = tmp.resolve("worker");
-        ExecutionEnvironment session;
+        BatchSession session;
         try (InProcessCluster cluster = new InProcessCluster(2, worker.toFile())) {
-            session = new ExecutionEnvironment("quality-cluster", "quality cluster", cluster);
+            session = new BatchSession("quality-cluster", "quality cluster", cluster);
             session.setParallelism(2);
             DataRowClassification classified = session.fromSource(new CollectionSource(
                             META, "quality-cluster-split", Arrays.asList(
@@ -154,7 +154,7 @@ class TypedQualityPublicationPlanAdmissionTest {
         assertInvalid(new PlanGraph(missing, canonical.parallelism()));
 
         Path extraDomain = tmp.resolve("extra");
-        ExecutionEnvironment extraSession = new ExecutionEnvironment("quality-extra", "quality extra");
+        BatchSession extraSession = new BatchSession("quality-extra", "quality extra");
         DataRowClassification extra = classification(extraSession);
         extra.writeToManifest(TypedQualityManifest.of(
                 extraDomain.toString(), "valid", "rejected", "summary"));
@@ -163,7 +163,7 @@ class TypedQualityPublicationPlanAdmissionTest {
         assertInvalid(extraSession.toPlanGraph());
 
         Path repeatedDomain = tmp.resolve("repeated");
-        ExecutionEnvironment repeatedSession = new ExecutionEnvironment("quality-repeated", "quality repeated");
+        BatchSession repeatedSession = new BatchSession("quality-repeated", "quality repeated");
         DataRowClassification repeated = classification(repeatedSession);
         repeated.writeToManifest(TypedQualityManifest.of(
                 repeatedDomain.toString(), "valid-a", "rejected-a", "summary-a"));
@@ -172,7 +172,7 @@ class TypedQualityPublicationPlanAdmissionTest {
         assertInvalid(repeatedSession.toPlanGraph());
 
         Path mixedDomain = tmp.resolve("mixed");
-        ExecutionEnvironment mixedSession = new ExecutionEnvironment("quality-mixed", "quality mixed");
+        BatchSession mixedSession = new BatchSession("quality-mixed", "quality mixed");
         DataRowClassification first = classification(mixedSession);
         first.writeToManifest(TypedQualityManifest.of(
                 mixedDomain.toString(), "valid", "rejected", "summary"));
@@ -309,7 +309,7 @@ class TypedQualityPublicationPlanAdmissionTest {
     @Test
     void workerRejectsSameRoleOutputWithDifferentPolicyIdentity(@TempDir Path tmp) {
         PlanGraph allowAll = canonical(tmp.resolve("same-domain"));
-        ExecutionEnvironment strictSession = new ExecutionEnvironment("strict-quality", "strict quality");
+        BatchSession strictSession = new BatchSession("strict-quality", "strict quality");
         classification(strictSession).writeToManifest(TypedQualityManifest.of(
                         tmp.resolve("same-domain").toString(), "valid", "rejected", "summary")
                 .withQualityGate(QualityGatePolicy.builder().maxRejectedRows(0).build()));
@@ -347,7 +347,7 @@ class TypedQualityPublicationPlanAdmissionTest {
     }
 
     private static PlanGraph canonical(Path domain) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-plan", "quality plan");
+        BatchSession session = new BatchSession("quality-plan", "quality plan");
         classification(session).writeToManifest(TypedQualityManifest.of(
                 domain.toString(), "valid", "rejected", "summary"));
         return session.toPlanGraph();
@@ -356,7 +356,7 @@ class TypedQualityPublicationPlanAdmissionTest {
     private static void runLocalQuality(
             Path domain, int parallelism, List<DataRow> rows,
             QualityGatePolicy policy) {
-        ExecutionEnvironment session = new ExecutionEnvironment("quality-local-gate",
+        BatchSession session = new BatchSession("quality-local-gate",
                 "quality local gate");
         session.setParallelism(parallelism);
         session.fromSource(new CollectionSource(META,
@@ -369,7 +369,7 @@ class TypedQualityPublicationPlanAdmissionTest {
         session.execute();
     }
 
-    private static DataRowClassification classification(ExecutionEnvironment session) {
+    private static DataRowClassification classification(BatchSession session) {
         DataSet source = session.fromSource(new CollectionSource(
                 META, "quality-split", Collections.emptyList())).uid("ledger.source");
         return source.classifyRowsWithSourcePosition(validation());

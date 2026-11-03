@@ -2,7 +2,7 @@
 doc-contract: preview-0.2.0
 doc-channel: default-branch
 ---
-# Batch environment and DataSet method reference
+# Batch session and DataSet method reference
 
 This page is the method-level contract for the Batch composition surface: how a
 job is created, how a graph is compiled and submitted, and what every `DataSet`
@@ -15,39 +15,39 @@ The exhaustive source-visible declaration set and the frozen `0.2.0` vocabulary
 are in [public API inventory](api-inventory.md). Every entry point here is a
 public type or method reachable from a published artifact.
 
-## Creating an environment
+## Creating a session
 
 [`RowWeave`](../../../rowweave-core/src/main/java/io/rowweave/RowWeave.java)
-is the static factory. `createEnvironment(String name)` at
+is the static factory. `createBatchSession(String name)` at
 `rowweave-core/src/main/java/io/rowweave/RowWeave.java:16` is the single-argument
-form; `createEnvironment(String jobName, String jobTitle)` at `:21` is the form
-that carries a display title. Both return an `ExecutionEnvironment` with no
+form; `createBatchSession(String jobName, String jobTitle)` at `:21` is the form
+that carries a display title. Both return a `BatchSession` with no
 injected client, so a submission goes to the process-wide shared in-process
 runtime.
 
 | Member | Declaration site | Contract |
 |---|---|---|
-| `ExecutionEnvironment` | `rowweave-core/src/main/java/io/rowweave/ExecutionEnvironment.java:28` | one job description: name, title, parallelism, sinks |
-| `ExecutionEnvironment(String, String)` | `ExecutionEnvironment.java:59` | job name plus display title |
-| `ExecutionEnvironment(String, String, JobClient)` | `ExecutionEnvironment.java:64` | injects the client a submission uses; a non-null client is never overridden |
-| `MetricsListener` | `ExecutionEnvironment.java:47` | nested `@FunctionalInterface` with one method, `onSinkComplete(ExecutionReport)` at `:48` |
+| `BatchSession` | `rowweave-core/src/main/java/io/rowweave/BatchSession.java:28` | one job description: name, title, parallelism, sinks |
+| `BatchSession(String, String)` | `BatchSession.java:59` | job name plus display title |
+| `BatchSession(String, String, JobClient)` | `BatchSession.java:64` | injects the client a submission uses; a non-null client is never overridden |
+| `MetricsListener` | `BatchSession.java:47` | nested `@FunctionalInterface` with one method, `onSinkComplete(ExecutionReport)` at `:48` |
 
 The job name and title are identity only: they select the compiled definition
 identity and appear in the plan description. Neither one changes computed
 results.
 
-## Environment configuration
+## Session configuration
 
 | Method | Declaration | Default | Failure and scope |
 |---|---|---|---|
-| `setParallelism(int)` | `ExecutionEnvironment.java:79` | `1` (`:52`) | `parallelism must be > 0, got <n>` at `:81`; compiled into the graph, so it governs both local and cluster execution |
-| `getParallelism()` | `ExecutionEnvironment.java:86` | reads the value that will be compiled | |
-| `setCanonicalizeOutput(boolean)` | `ExecutionEnvironment.java:97` | `false` (`:53`) | in-process runtime only; `true` reproduces the byte-for-byte `P=1` order |
-| `isCanonicalizeOutput()` | `ExecutionEnvironment.java:101` | reads the flag handed to the runtime | |
-| `setMetricsListener(MetricsListener)` | `ExecutionEnvironment.java:109` | `null` | `null` collects nothing |
-| `getJobName()` | `ExecutionEnvironment.java:113` | the name passed to `createEnvironment` | |
-| `getJobTitle()` | `ExecutionEnvironment.java:117` | falls back to the name | |
-| `setDefinitionId(String)` | `ExecutionEnvironment.java:122` | derived | the stable identity carried in the artifact |
+| `setParallelism(int)` | `BatchSession.java:79` | `1` (`:52`) | `parallelism must be > 0, got <n>` at `:81`; compiled into the graph, so it governs both local and cluster execution |
+| `getParallelism()` | `BatchSession.java:86` | reads the value that will be compiled | |
+| `setCanonicalizeOutput(boolean)` | `BatchSession.java:97` | `false` (`:53`) | in-process runtime only; `true` reproduces the byte-for-byte `P=1` order |
+| `isCanonicalizeOutput()` | `BatchSession.java:101` | reads the flag handed to the runtime | |
+| `setMetricsListener(MetricsListener)` | `BatchSession.java:109` | `null` | `null` collects nothing |
+| `getJobName()` | `BatchSession.java:113` | the name passed to `createBatchSession` | |
+| `getJobTitle()` | `BatchSession.java:117` | falls back to the name | |
+| `setDefinitionId(String)` | `BatchSession.java:122` | derived | the stable identity carried in the artifact |
 
 Parallelism is a job property rather than a per-operator property:
 `toPlanGraph()` compiles it into `PlanGraph.parallelism()`
@@ -56,7 +56,7 @@ Master reads that same value when it sizes a keyed shuffle. Because the graph
 carries it, the same plan submitted to a cluster gets the same requested
 parallelism it would get locally.
 
-A listener is advisory. At `ExecutionEnvironment.java:350` the report is handed
+A listener is advisory. At `BatchSession.java:350` the report is handed
 to the callback inside a guard that swallows a `RuntimeException`, so metrics
 observation never changes a job result or turns a successful run into a failed
 one.
@@ -65,8 +65,8 @@ one.
 
 | Method | Declaration | Contract |
 |---|---|---|
-| `fromSource(Source)` | `ExecutionEnvironment.java:127` | one `Source`; schema validated against the first entry |
-| `fromSource(Source...)` | `ExecutionEnvironment.java:138` | one logical SOURCE holding homogeneous Sources as splits |
+| `fromSource(Source)` | `BatchSession.java:127` | one `Source`; schema validated against the first entry |
+| `fromSource(Source...)` | `BatchSession.java:138` | one logical SOURCE holding homogeneous Sources as splits |
 | `DataSet.source(DataSchema, Iterable<DataRow>)` | `rowweave-core/src/main/java/io/rowweave/DataSet.java:178` | static and session-less: `sinkTo` refuses it |
 
 The varargs form does not fold several sources into several nodes. It produces a
@@ -96,7 +96,7 @@ left input to the SOURCE, so any node derived from a session-bound source can be
 registered. A graph built from two unrelated roots where only one is bound fails
 that walk, not the write.
 
-`toPlanGraph()` at `ExecutionEnvironment.java:280` compiles the whole job:
+`toPlanGraph()` at `BatchSession.java:280` compiles the whole job:
 
 1. It refuses an empty sink list with `no sink registered; call
    DataSet.sinkTo(..) before commit` at `:282`.
@@ -116,7 +116,7 @@ as `legacy-definition-` plus the hex at `:319`.
 
 ## Submission and failure timing
 
-`execute()` at `ExecutionEnvironment.java:332` is the single submission path.
+`execute()` at `BatchSession.java:332` is the single submission path.
 
 | Step | Declaration | What can fail, and when |
 |---|---|---|

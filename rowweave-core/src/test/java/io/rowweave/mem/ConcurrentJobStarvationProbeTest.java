@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.local.LocalJobClient;
@@ -72,7 +72,7 @@ class ConcurrentJobStarvationProbeTest {
     /** Submits a single-breaker groupBy job through LocalJobClient; true on success, false on a MemoryBudgetExceededException from an exhausted pool. */
     private static boolean submitGroupByJob() {
         try {
-            ExecutionEnvironment session = RowWeave.createEnvironment("probe");
+            BatchSession session = RowWeave.createBatchSession("probe");
             DataSet grouped = session.fromSource(smallInput())
                     .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
             grouped.sinkTo(new WorkerCollectingOutput(grouped.getSchema()));

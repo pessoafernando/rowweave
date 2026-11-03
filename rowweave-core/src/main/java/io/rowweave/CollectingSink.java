@@ -98,7 +98,7 @@ public final class CollectingSink implements Sink {
 
     @Override
     public void commitPrepared() {
-        // Until ExecutionEnvironment.commit returns synchronously, the in-memory result publishes no transaction visibility to external threads.
+        // Until BatchSession.commit returns synchronously, the in-memory result publishes no transaction visibility to external threads.
     }
 
     @Override

@@ -349,7 +349,7 @@ class PipelineCompositionShapesTest {
 
     /**
      * A Pipeline step takes a portable carrier only. The trusted in-process graph
-     * that the ExecutionEnvironment compiles is refused here, so composing stages cannot be
+     * that the BatchSession compiles is refused here, so composing stages cannot be
      * mistaken for submitting that graph to the Batch runtime.
      */
     @Test

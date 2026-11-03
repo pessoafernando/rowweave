@@ -4,7 +4,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.SourceExecutor;
 import io.rowweave.ObjectStorageReadHandle;
 import io.rowweave.ObjectStorageReadRequest;
@@ -132,9 +132,9 @@ class ObjectStorageSnapshotRuntimeTest {
             JobClient client, int parallelism, Path output) {
         RuntimeProvider.install("part-a", "a\t1.2500\nb\t2.0000\n");
         RuntimeProvider.install("part-b", "a\t3.7500\nb\t-0.5000\n");
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("object-source", "object-source")
-                : new ExecutionEnvironment("object-source", "object-source", client);
+        BatchSession session = client == null
+                ? new BatchSession("object-source", "object-source")
+                : new BatchSession("object-source", "object-source", client);
         session.setParallelism(parallelism);
         DataSet source = session.fromSource(
                 input("part-a"), input("part-b"));

@@ -59,7 +59,7 @@ class DefaultBatchRuntimeContractTest {
         assertEquals(first.runtimeId(), second.runtimeId());
         assertEquals(1L, second.startCount());
         assertEquals(2L, second.completedSubmissionCount());
-        assertTrue(second.running(), "ExecutionEnvironment must not close the shared runtime");
+        assertTrue(second.running(), "BatchSession must not close the shared runtime");
         assertEquals(2, FileSink.read(META, tmp.resolve("first.tsv").toString()).size());
         assertEquals(2, FileSink.read(META, tmp.resolve("second.tsv").toString()).size());
     }
@@ -70,7 +70,7 @@ class DefaultBatchRuntimeContractTest {
         Path input = tmp.resolve("input.tsv");
         Files.write(input, "9\n".getBytes(StandardCharsets.UTF_8));
         CollectingSink output = new CollectingSink(META);
-        ExecutionEnvironment session = RowWeave.createEnvironment("unsupported-local-attached");
+        BatchSession session = RowWeave.createBatchSession("unsupported-local-attached");
         session.fromSource(new FileSource(META, input.toString())).sinkTo(output);
 
         IllegalArgumentException failure = assertThrows(
@@ -102,7 +102,7 @@ class DefaultBatchRuntimeContractTest {
                 return new ExecutionReport(0L, 0L, 0L, 0L, null);
             }
         };
-        ExecutionEnvironment session = new ExecutionEnvironment("injected", "injected", injected);
+        BatchSession session = new BatchSession("injected", "injected", injected);
         session.fromSource(new FileSource(META, input.toString()))
                 .sinkTo(new FileSink(META, tmp.resolve("unused.tsv").toString()));
 
@@ -166,7 +166,7 @@ class DefaultBatchRuntimeContractTest {
     }
 
     private static void commitFileJob(String name, Path input, Path output) {
-        ExecutionEnvironment session = RowWeave.createEnvironment(name);
+        BatchSession session = RowWeave.createBatchSession(name);
         session.fromSource(new FileSource(META, input.toString()))
                 .sinkTo(new FileSink(META, output.toString()));
         session.execute();

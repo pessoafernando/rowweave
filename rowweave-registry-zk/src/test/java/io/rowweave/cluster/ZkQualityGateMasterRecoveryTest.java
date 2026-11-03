@@ -5,7 +5,7 @@ import io.rowweave.BatchSinkDescriptorCodec;
 import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.QualityEvidenceReadGuard;
@@ -597,7 +597,7 @@ class ZkQualityGateMasterRecoveryTest {
 
     private static PlanArtifact qualityArtifact(
             String definitionId, Path domain, QualityGatePolicy policy) {
-        ExecutionEnvironment session = new ExecutionEnvironment("zk-quality-recovery", "recovery");
+        BatchSession session = new BatchSession("zk-quality-recovery", "recovery");
         session.setDefinitionId(definitionId);
         session.setParallelism(2);
         DataRowClassification classified = session.fromSource(new CollectionSource(

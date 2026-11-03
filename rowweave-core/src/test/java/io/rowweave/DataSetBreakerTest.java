@@ -36,11 +36,11 @@ class DataSetBreakerTest {
         return new ArrayList<>(Arrays.asList(rs));
     }
 
-    private ExecutionEnvironment session;
+    private BatchSession session;
 
     /** Builds a session-bound source for the commit path, the same route production takes. */
     private DataSet src(List<DataRow> rs) {
-        session = RowWeave.createEnvironment("t");
+        session = RowWeave.createBatchSession("t");
         return session.fromSource(new Source() {
             @Override public DataSchema getSchema() { return META; }
             @Override public java.util.Iterator<DataRow> iterator() { return rs.iterator(); }

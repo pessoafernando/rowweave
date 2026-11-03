@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -65,7 +65,7 @@ class AggDualPathEquivalenceTest {
 
     /** Runs groupBy(sum, count, max) under the given pool budget and returns key to [sum, count, max], with a sentinel for the null key. */
     private Map<Object, DataRow> runWithBudget(long poolBytes) {
-        ExecutionEnvironment s = RowWeave.createEnvironment("agg-" + poolBytes);
+        BatchSession s = RowWeave.createBatchSession("agg-" + poolBytes);
         DataSet ds = s.fromSource(new GenInput())
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt").count().max("qty"));
         ds.sinkTo(new WorkerCollectingOutput(ds.getSchema()));

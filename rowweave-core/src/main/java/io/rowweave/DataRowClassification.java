@@ -29,15 +29,15 @@ public final class DataRowClassification {
     /**
      * register valid, rejected and canonical summary members as one
      * compound Manifest publication. This only builds the Plan; execution remains
-     * the owning {@link ExecutionEnvironment}'s responsibility.
+     * the owning {@link BatchSession}'s responsibility.
      */
     public void writeToManifest(TypedQualityManifest target) {
         if (target == null) {
             throw publicationInvalid("target is required");
         }
-        ExecutionEnvironment session = validRows.owningSession();
+        BatchSession session = validRows.owningSession();
         if (session == null || session != rejectedRows.owningSession()) {
-            throw publicationInvalid("classification must belong to one ExecutionEnvironment");
+            throw publicationInvalid("classification must belong to one BatchSession");
         }
 
         try {

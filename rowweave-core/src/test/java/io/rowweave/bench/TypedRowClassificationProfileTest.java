@@ -6,7 +6,7 @@ import io.rowweave.DataType;
 import io.rowweave.DiscardSink;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.ManifestFileSink;
 import io.rowweave.DataRowClassification;
@@ -105,7 +105,7 @@ class TypedRowClassificationProfileTest {
             Shape shape, int iterations, JobClient client, int parallelism) {
         long best = Long.MAX_VALUE;
         for (int i = 0; i < iterations; i++) {
-            ExecutionEnvironment session = new ExecutionEnvironment(
+            BatchSession session = new BatchSession(
                     "classification-profile", "classification profile");
             session.setParallelism(parallelism);
             DataSet source = session.fromSource(shape.inputs).uid("profile.source");
@@ -152,7 +152,7 @@ class TypedRowClassificationProfileTest {
             splitRows[i % shards].add(row);
         }
         Path domain = work.resolve(label + "-source-domain");
-        ExecutionEnvironment prepare = new ExecutionEnvironment(
+        BatchSession prepare = new BatchSession(
                 "classification-profile-source", "prepare exact manifest source");
         for (int i = 0; i < shards; i++) {
             prepare.fromSource(new CollectionSource(meta, splitRows[i]))

@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.local.LocalJobClient;
@@ -78,7 +78,7 @@ class ConcurrencyCapacityProbeTest {
     /** A three-breaker job: groupBy(sum) then distinct then orderBy. True when it succeeds, false when the pool is exhausted. */
     private static boolean submitJob() {
         try {
-            ExecutionEnvironment s = RowWeave.createEnvironment("probe");
+            BatchSession s = RowWeave.createBatchSession("probe");
             DataSet ds = s.fromSource(input()).groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"));
             DataSchema gm = ds.getSchema();
             ds = ds.distinct(Distinct.byColumns(gm, "k"))

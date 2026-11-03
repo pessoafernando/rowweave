@@ -93,7 +93,7 @@ class HashJoinHintTest {
     void explicitSortMergeHintSurvivesPublicApiPlanCompilation() {
         SortMergeJoin op = SortMergeJoin.of(
                 L, R, new String[]{"lk"}, new String[]{"rk"}, JoinType.INNER);
-        io.rowweave.ExecutionEnvironment session = io.rowweave.RowWeave.createEnvironment("explicit-smj-plan");
+        io.rowweave.BatchSession session = io.rowweave.RowWeave.createBatchSession("explicit-smj-plan");
         io.rowweave.DataSet joined = session.fromSource(input(L, new ArrayList<>()))
                 .join(session.fromSource(input(R, new ArrayList<>())), op, JoinHint.SORT_MERGE);
         joined.sinkTo(new io.rowweave.WorkerCollectingOutput(op.getOutputSchema()));
@@ -110,19 +110,19 @@ class HashJoinHintTest {
 
     @Test
     void dataSetJoinHintApiMatchesSmj() {
-        // DataSet.join(right, op, HASH) local-compatibility API, committed through ExecutionEnvironment and multiset-equivalent to the unhinted path.
+        // DataSet.join(right, op, HASH) local-compatibility API, committed through BatchSession and multiset-equivalent to the unhinted path.
         java.util.List<DataRow> ld = new ArrayList<>(), rd = new ArrayList<>();
         for (int i = 0; i < 100; i++) { DataRow r = new DataRow(2); r.set(0, i % 20); r.set(1, "l" + i); ld.add(r); }
         for (int i = 0; i < 25; i++) { DataRow r = new DataRow(2); r.set(0, i % 20); r.set(1, "r" + i); rd.add(r); }
         SortMergeJoin op = SortMergeJoin.of(L, R, new String[]{"lk"}, new String[]{"rk"}, JoinType.INNER);
 
         // no hint: local AUTO
-        io.rowweave.ExecutionEnvironment s1 = io.rowweave.RowWeave.createEnvironment("smj");
+        io.rowweave.BatchSession s1 = io.rowweave.RowWeave.createBatchSession("smj");
         io.rowweave.WorkerCollectingOutput o1 = new io.rowweave.WorkerCollectingOutput(op.getOutputSchema());
         s1.fromSource(input(L, new ArrayList<>(ld))).join(s1.fromSource(input(R, new ArrayList<>(rd))), op).sinkTo(o1);
         s1.execute();
         // HASH hint
-        io.rowweave.ExecutionEnvironment s2 = io.rowweave.RowWeave.createEnvironment("hash");
+        io.rowweave.BatchSession s2 = io.rowweave.RowWeave.createBatchSession("hash");
         io.rowweave.WorkerCollectingOutput o2 = new io.rowweave.WorkerCollectingOutput(op.getOutputSchema());
         s2.fromSource(input(L, new ArrayList<>(ld)))
                 .join(s2.fromSource(input(R, new ArrayList<>(rd))), op, JoinHint.HASH).sinkTo(o2);

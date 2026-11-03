@@ -70,7 +70,7 @@ when a sink happens to run.
 The job body composes five operations:
 
 ```java
-DataSet totals = environment.fromSource(input)
+DataSet totals = session.fromSource(input)
         .filter(row -> row.getBigDecimal(1)
                 .compareTo(new BigDecimal("3")) >= 0)
         .groupBy("categoryKey")
@@ -78,7 +78,7 @@ DataSet totals = environment.fromSource(input)
         .orderBy("categoryKey");
 
 totals.sinkTo(new FileSink(totals.getSchema(), outputPath));
-environment.execute();
+session.execute();
 ```
 
 | Stage | Behavior |
@@ -103,7 +103,7 @@ is non-null.
 
 ## Observe the graph boundary
 
-`environment.execute()` does not return rows to the client. It compiles the
+`session.execute()` does not return rows to the client. It compiles the
 whole graph and submits it through the configured job client. In local mode, the
 sink runs inside the same process. In a cluster, the Worker that executes the
 final stage writes the sink.

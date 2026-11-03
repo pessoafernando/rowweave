@@ -518,7 +518,7 @@ public final class FileSink implements Sink {
      * Reads a small result back in full according to the DataSchema (symmetric with {@link #collect}, restored bit by bit).
  *
      * @deprecated This materializes the entire result into a List, so memory is O(N); it is kept for compatibility only. For a large
-     * production result, use {@link FileSource#openReader()} to process rows one by one, or hand the FileSource directly to an ExecutionEnvironment.
+     * production result, use {@link FileSource#openReader()} to process rows one by one, or hand the FileSource directly to an BatchSession.
      */
     @Deprecated
     public static List<DataRow> read(DataSchema dataSchema, String path) {

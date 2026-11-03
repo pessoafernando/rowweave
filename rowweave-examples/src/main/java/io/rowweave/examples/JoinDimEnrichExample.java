@@ -8,7 +8,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 
@@ -58,7 +58,7 @@ public final class JoinDimEnrichExample {
           * @param outputPath result file path
      */
     public static void run(List<DataRow> events, List<DataRow> dims, String outputPath) {
-        ExecutionEnvironment session = RowWeave.createEnvironment("join-dim-enrich");
+        BatchSession session = RowWeave.createBatchSession("join-dim-enrich");
 
         DataSet eventsDs = session.fromSource(eventInput(events));
         DataSet dimsDs = session.fromSource(dimInput(dims));

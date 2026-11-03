@@ -118,7 +118,7 @@ class DiamondMaterializationRobustnessTest {
                 };
             }
         };
-        ExecutionEnvironment s = RowWeave.createEnvironment("fill-fail");
+        BatchSession s = RowWeave.createBatchSession("fill-fail");
         DataSet mid = s.fromSource(failing).filter("amt >= 5");
         DataSet b1 = mid.filter("k >= 2");
         DataSet b2 = mid.filter("k <= 6");

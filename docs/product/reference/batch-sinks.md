@@ -59,7 +59,7 @@ binding identity and capability profile. Its version is
 `DataSet.sinkTo(Sink)` is declared at
 `rowweave-core/src/main/java/io/rowweave/DataSet.java:210` and the
 stable-UID overload `DataSet.sinkTo(String, Sink)` at `DataSet.java:220`. Both
-require the DAG to originate from `ExecutionEnvironment.fromSource`; a node
+require the DAG to originate from `BatchSession.fromSource`; a node
 built without a session fails with `IllegalStateException` at `:214`. Registering
 a sink compiles the graph; it does not run anything.
 

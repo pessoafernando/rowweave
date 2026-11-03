@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.cluster.Endpoint;
@@ -86,7 +86,7 @@ class ZkWorkerLeaseFailoverTest {
 
     private static void runJob(Path output, ZkServiceRegistry clientRegistry) {
         ParallelGroupByAgg agg = ParallelGroupByAgg.of(META, "k").sum("amt");
-        ExecutionEnvironment session = new ExecutionEnvironment("lease-ha", "lease-ha",
+        BatchSession session = new BatchSession("lease-ha", "lease-ha",
                 new io.rowweave.cluster.ClusterJobClient(new RegistryMasterLocator(clientRegistry)));
         session.setParallelism(2);
         session.fromSource(new CollectionSource(META, rows()))

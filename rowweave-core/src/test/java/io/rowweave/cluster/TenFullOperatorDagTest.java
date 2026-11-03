@@ -10,7 +10,7 @@ import io.rowweave.FlatMapFunction;
 import io.rowweave.GroupCombineFunction;
 import io.rowweave.GroupCombineReduceFunction;
 import io.rowweave.GroupReduceFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.JoinFunction;
 import io.rowweave.MapFunction;
 import io.rowweave.DataSchema;
@@ -181,7 +181,7 @@ class TenFullOperatorDagTest {
     private static Field[] f(Field... x) { return x; }
 
     @FunctionalInterface
-    private interface Dag { void build(ExecutionEnvironment s, Io ioCols); }
+    private interface Dag { void build(BatchSession s, Io ioCols); }
 
     private final class Io {
         final String tag; final List<Path> paths = new ArrayList<>(); int used = 0;
@@ -209,7 +209,7 @@ class TenFullOperatorDagTest {
 
     private List<long[]> run(String name, int par, io.rowweave.cluster.JobClient client, int nOut, Dag dag, long[] ms) {
         Io ioCols = new Io(name);
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(par);
         long t0 = System.nanoTime();
         dag.build(s, ioCols);

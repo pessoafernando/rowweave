@@ -5,7 +5,7 @@ import io.rowweave.DataSet;
 import io.rowweave.Field;
 import io.rowweave.FileSource;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataRow;
 import io.rowweave.DataSchema;
 import io.rowweave.RowWeave;
@@ -129,7 +129,7 @@ class MuxFanoutProcessCertificationTest {
         return ordered ? new long[]{count, digest} : new long[]{count, sum};
     }
 
-    private static long[][] runJob(String name, ExecutionEnvironment session, FileSource a, FileSource b,
+    private static long[][] runJob(String name, BatchSession session, FileSource a, FileSource b,
                                    Path branchPlain, Path branchAgg) {
         session.setParallelism(PARALLELISM);
         DataSet mid = session.fromSource(a, b).filter("amt >= 10");
@@ -154,7 +154,7 @@ class MuxFanoutProcessCertificationTest {
         FileSource inputB = ClusterTestFileInput.write(tmp.resolve("src-b.tsv"), META,
                 data.subList(data.size() / 2, data.size()));
 
-        long[][] oracle = runJob("mux-fanout-oracle", RowWeave.createEnvironment("mux-fanout-oracle"),
+        long[][] oracle = runJob("mux-fanout-oracle", RowWeave.createBatchSession("mux-fanout-oracle"),
                 inputA, inputB, tmp.resolve("oracle-plain.tsv"), tmp.resolve("oracle-agg.tsv"));
         assertTrue(oracle[0][0] > 0 && oracle[1][0] > 0, "both branches must produce output");
 
@@ -189,7 +189,7 @@ class MuxFanoutProcessCertificationTest {
                     "WORKER_READY=", 30_000L, w1Ready, worker1Log);
 
             long[][] cluster = runJob("mux-fanout-cluster",
-                    new ExecutionEnvironment("mux-fanout-cluster", "mux-fanout-cluster",
+                    new BatchSession("mux-fanout-cluster", "mux-fanout-cluster",
                             new ClusterJobClient("127.0.0.1", masterPort)),
                     inputA, inputB, tmp.resolve("cluster-plain.tsv"),
                     tmp.resolve("cluster-agg.tsv"));

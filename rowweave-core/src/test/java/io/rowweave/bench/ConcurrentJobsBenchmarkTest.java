@@ -6,7 +6,7 @@ import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.ops.ParallelGroupByAgg;
 import org.junit.jupiter.api.Tag;
@@ -28,14 +28,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * A benchmark of many concurrent jobs submitted through the single-machine
- * {@link ExecutionEnvironment#commit()}. It measures availability, in that N jobs submitted at
+ * {@link BatchSession#commit()}. It measures availability, in that N jobs submitted at
  * once all complete correctly, each result multiset matching the serial oracle with no deadlock,
  * timeout or exhausted heap, and it measures throughput, in that the total wall clock of N
  * concurrent runs is reported against the accumulated wall clock of N serial runs, which shows
  * whether concurrency can amortize the fixed cost of one job and use the available cores.
  *
  * <p>Data streams from CSV in O(1) memory, and every job has its own source and sink with
- * nothing shared. Runs go through ExecutionEnvironment.execute() rather than internal objects.
+ * nothing shared. Runs go through BatchSession.execute() rather than internal objects.
  * Tagged bench, so by hand: {@code mvn test -Dtest=ConcurrentJobsBenchmarkTest -Dgroups=bench
  * -Drowweave.bench.orders=500000}.
  */
@@ -69,7 +69,7 @@ class ConcurrentJobsBenchmarkTest {
 
     /**
      * One job is a groupBy over region summing the amount, run through
-     * ExecutionEnvironment.execute(), with the result written to a FileSink in O(1) memory so the
+     * BatchSession.execute(), with the result written to a FileSink in O(1) memory so the
      * heap is never exhausted. Returns the multiset fingerprint of that file, the row count and the
      * order-independent hash sum, which is the correctness check without materializing rows.
      */
@@ -77,7 +77,7 @@ class ConcurrentJobsBenchmarkTest {
         Path f;
         try { f = Files.createTempFile("conc-" + name + "-", ".tsv"); } catch (Exception e) { throw new RuntimeException(e); }
         try {
-            ExecutionEnvironment s = RowWeave.createEnvironment(name);
+            BatchSession s = RowWeave.createBatchSession(name);
             s.setParallelism(1);  // serial inside one job, with concurrency across jobs, so this measures job-level concurrency rather than intra-job parallelism
             DataSet g = s.fromSource(orders())
                     .groupBy(ParallelGroupByAgg.of(ORDER, "region").sum("amount"));
@@ -109,7 +109,7 @@ class ConcurrentJobsBenchmarkTest {
         ensureData();
         long[] oracle = runJob("oracle");  // the fingerprint of the serial single job is the correctness baseline
 
-        System.out.println("\n=== concurrent multi-job benchmark (orders=" + ORDERS + "/job, each job=groupBySum(region), ExecutionEnvironment.commit)===");
+        System.out.println("\n=== concurrent multi-job benchmark (orders=" + ORDERS + "/job, each job=groupBySum(region), BatchSession.commit)===");
         System.out.printf("%-6s %-8s %-12s %-14s %-12s %-10s%n",
                 "jobs", "ok", "serial ms", "wall ms", "gain", "outcome");
 

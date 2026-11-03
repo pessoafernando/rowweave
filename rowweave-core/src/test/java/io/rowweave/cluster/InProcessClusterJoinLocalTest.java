@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -42,7 +42,7 @@ class InProcessClusterJoinLocalTest {
         DataRow r = new DataRow(2); r.set(0, k); r.set(1, tag); return r;
     }
 
-    private void buildDag(ExecutionEnvironment s, List<DataRow> left, List<DataRow> right, FileSink out) {
+    private void buildDag(BatchSession s, List<DataRow> left, List<DataRow> right, FileSink out) {
         DataSet l = s.fromSource(new CollectionSource(LEFT, left));
         DataSet r = s.fromSource(new CollectionSource(RIGHT, right));
         l.join(r, SortMergeJoin.of(LEFT, RIGHT, new String[]{"k"}, new String[]{"k"}, JoinType.INNER))
@@ -62,7 +62,7 @@ class InProcessClusterJoinLocalTest {
 
     private List<String> runVia(List<DataRow> left, List<DataRow> right, int par,
                                 io.rowweave.cluster.JobClient client, Path outPath) {
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment("jl", "jl", client) : RowWeave.createEnvironment("jl");
+        BatchSession s = client != null ? new BatchSession("jl", "jl", client) : RowWeave.createBatchSession("jl");
         s.setParallelism(par);
         buildDag(s, left, right, new FileSink(GB, outPath.toString()));
         s.execute();
@@ -104,7 +104,7 @@ class InProcessClusterJoinLocalTest {
                                    io.rowweave.cluster.JobClient client, Path dir, String tag) {
         Path o1 = dir.resolve(tag + "-o1.tsv"); // join→groupBy
         Path o2 = dir.resolve(tag + "-o2.tsv");
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment("fo", "fo", client) : RowWeave.createEnvironment("fo");
+        BatchSession s = client != null ? new BatchSession("fo", "fo", client) : RowWeave.createBatchSession("fo");
         s.setParallelism(par);
         DataSet l = s.fromSource(new CollectionSource(LEFT, left));
         DataSet r = s.fromSource(new CollectionSource(RIGHT, right));
@@ -138,7 +138,7 @@ class InProcessClusterJoinLocalTest {
 
     private List<String> runSharedSourceFullJoin(List<DataRow> left, int par,
                                                  io.rowweave.cluster.JobClient client, Path outPath) {
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment("ssfj", "ssfj", client) : RowWeave.createEnvironment("ssfj");
+        BatchSession s = client != null ? new BatchSession("ssfj", "ssfj", client) : RowWeave.createBatchSession("ssfj");
         s.setParallelism(par);
         DataSet src = s.fromSource(new CollectionSource(LEFT, left));
         DataSet b1 = src.groupBy(ParallelGroupByAgg.of(LEFT, "k").sum("amount"));
@@ -184,7 +184,7 @@ class InProcessClusterJoinLocalTest {
             GB2, RG_OUT, new String[]{"k"}, new String[]{"k"}, JoinType.FULL).getOutputSchema();
 
     private List<String> runAsymJoin(List<DataRow> left, int par, io.rowweave.cluster.JobClient client, Path outPath) {
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment("asym", "asym", client) : RowWeave.createEnvironment("asym");
+        BatchSession s = client != null ? new BatchSession("asym", "asym", client) : RowWeave.createBatchSession("asym");
         s.setParallelism(par);
         DataSet src = s.fromSource(new CollectionSource(LEFT, left));
         DataSet gbP = src.groupBy(ParallelGroupByAgg.of(LEFT, "k").sum("amount"));

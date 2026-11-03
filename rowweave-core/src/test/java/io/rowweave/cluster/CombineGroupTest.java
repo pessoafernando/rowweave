@@ -9,7 +9,7 @@ import io.rowweave.Field;
 import io.rowweave.FileSink;
 import io.rowweave.GroupCombineFunction;
 import io.rowweave.GroupCombineReduceFunction;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import org.junit.jupiter.api.Tag;
@@ -84,7 +84,7 @@ class CombineGroupTest {
         for (int i = 0; i < 5000; i++) expect = expect.add(new BigDecimal(i % 100));
         expect = expect.setScale(10, RoundingMode.HALF_UP);
 
-        ExecutionEnvironment s = RowWeave.createEnvironment("cr1"); s.setParallelism(1);
+        BatchSession s = RowWeave.createBatchSession("cr1"); s.setParallelism(1);
         DataSet ds = s.fromSource(new CollectionSource(META, data())).combineReduceGroup(SUM_CR, 4);
         Path f = dir.resolve("cr.tsv");
         ds.sinkTo(new FileSink(SUM1, f.toString()));
@@ -98,7 +98,7 @@ class CombineGroupTest {
         List<DataRow> d = data();
         long[] single;
         {
-            ExecutionEnvironment s = RowWeave.createEnvironment("crs"); s.setParallelism(1);
+            BatchSession s = RowWeave.createBatchSession("crs"); s.setParallelism(1);
             Path f = tmp.resolve("cr-s.tsv");
             s.fromSource(new CollectionSource(META, d)).combineReduceGroup(SUM_CR, 4).sinkTo(new FileSink(SUM1, f.toString()));
             s.execute();
@@ -109,7 +109,7 @@ class CombineGroupTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("crc", "crc", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("crc", "crc", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("cr-c.tsv");
             s.fromSource(new CollectionSource(META, d)).combineReduceGroup(SUM_CR, 4).sinkTo(new FileSink(SUM1, f.toString()));
@@ -119,7 +119,7 @@ class CombineGroupTest {
     }
 
     @Test void combineGroup_singleMachine(@TempDir Path dir) {
-        ExecutionEnvironment s = RowWeave.createEnvironment("cg1"); s.setParallelism(1);
+        BatchSession s = RowWeave.createBatchSession("cg1"); s.setParallelism(1);
         DataSet ds = s.fromSource(new CollectionSource(META, data())).combineGroup(SUM_C, 4);
         Path f = dir.resolve("cg.tsv");
         ds.sinkTo(new FileSink(META, f.toString()));
@@ -132,7 +132,7 @@ class CombineGroupTest {
         List<DataRow> d = data();
         long[] single;
         {
-            ExecutionEnvironment s = RowWeave.createEnvironment("cgs"); s.setParallelism(1);
+            BatchSession s = RowWeave.createBatchSession("cgs"); s.setParallelism(1);
             Path f = tmp.resolve("cg-s.tsv");
             s.fromSource(new CollectionSource(META, d)).combineGroup(SUM_C, 4).sinkTo(new FileSink(META, f.toString()));
             s.execute();
@@ -143,7 +143,7 @@ class CombineGroupTest {
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 32, "127.0.0.1", m.port(), w0);
              WorkerServer a1 = WorkerServer.newUnguarded("w1", 32, "127.0.0.1", m.port(), w1)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("cgc", "cgc", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("cgc", "cgc", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             Path f = tmp.resolve("cg-c.tsv");
             s.fromSource(new CollectionSource(META, d)).combineGroup(SUM_C, 4).sinkTo(new FileSink(META, f.toString()));

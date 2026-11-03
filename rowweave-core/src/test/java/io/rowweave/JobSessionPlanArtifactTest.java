@@ -28,7 +28,7 @@ class JobSessionPlanArtifactTest {
 
     @Test
     void compilesExplicitSourceUnaryBinaryAndSinkIds() {
-        ExecutionEnvironment session = new ExecutionEnvironment("ledger", "Ledger Close");
+        BatchSession session = new BatchSession("ledger", "Ledger Close");
         session.setDefinitionId("domain.ledger-close.v1");
         DataSet left = session.fromSource(new RowsInput(1, 2)).uid("left-source")
                 .filter("id > 0").uid("positive-filter");
@@ -68,7 +68,7 @@ class JobSessionPlanArtifactTest {
     @Test
     void duplicateUidFailsBeforeClientOrOutputSideEffects() {
         RecordingArtifactClient client = new RecordingArtifactClient();
-        ExecutionEnvironment session = new ExecutionEnvironment("duplicate", "duplicate", client);
+        BatchSession session = new BatchSession("duplicate", "duplicate", client);
         DataSet source = session.fromSource(new RowsInput(1)).uid("same");
         source.filter("id > 0").uid("same")
                 .sinkTo("output", new WorkerCollectingOutput(META));
@@ -83,7 +83,7 @@ class JobSessionPlanArtifactTest {
     @Test
     void commitUsesArtifactOverloadAndLegacyClientsUseDefaultAdapter() {
         RecordingArtifactClient recording = new RecordingArtifactClient();
-        ExecutionEnvironment session = new ExecutionEnvironment("artifact-submit", "artifact-submit", recording);
+        BatchSession session = new BatchSession("artifact-submit", "artifact-submit", recording);
         session.fromSource(new RowsInput(1)).uid("source")
                 .sinkTo("output", new WorkerCollectingOutput(META));
 
@@ -101,7 +101,7 @@ class JobSessionPlanArtifactTest {
 
     @Test
     void localAttachedFallbackPreservesV1ClosuresButCannotCrossCodecOrClusterBoundary() {
-        ExecutionEnvironment session = new ExecutionEnvironment("local-closure", "local-closure");
+        BatchSession session = new BatchSession("local-closure", "local-closure");
         WorkerCollectingOutput output = new WorkerCollectingOutput(META);
         session.fromSource(new NonPortableInput(7)).sinkTo(output);
 
@@ -129,7 +129,7 @@ class JobSessionPlanArtifactTest {
     }
 
     private static PlanArtifact legacyArtifact(String name, String title) {
-        ExecutionEnvironment session = new ExecutionEnvironment(name, title);
+        BatchSession session = new BatchSession(name, title);
         DataSet source = session.fromSource(new RowsInput(1)).uid("source");
         source.filter("id > 0").sinkTo(new DeterministicWorkerOutput());
         return session.toPlanArtifact();

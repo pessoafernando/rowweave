@@ -6,7 +6,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.Source;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.ManifestFileSource;
 import io.rowweave.DataRowClassification;
 import io.rowweave.DataSchema;
@@ -179,9 +179,9 @@ class TypedQualityPublicationDurabilityTest {
 
     private static void run(
             JobClient client, int parallelism, java.nio.file.Path domain, Source[] sources) {
-        ExecutionEnvironment session = client == null
-                ? new ExecutionEnvironment("quality-durable", "quality durable")
-                : new ExecutionEnvironment("quality-durable", "quality durable", client);
+        BatchSession session = client == null
+                ? new BatchSession("quality-durable", "quality durable")
+                : new BatchSession("quality-durable", "quality durable", client);
         session.setParallelism(parallelism);
         DataRowClassification classified = session.fromSource(sources)
                 .uid("ledger.source")
@@ -193,7 +193,7 @@ class TypedQualityPublicationDurabilityTest {
 
     private static PlanArtifact artifact(
             int parallelism, java.nio.file.Path domain, Source[] sources) {
-        ExecutionEnvironment session = new ExecutionEnvironment(
+        BatchSession session = new BatchSession(
                 "quality-durable", "quality durable");
         session.setParallelism(parallelism);
         DataRowClassification classified = session.fromSource(sources)

@@ -6,7 +6,7 @@ import io.rowweave.DataSet;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -56,7 +56,7 @@ class SlotAdmissionTest {
     }
 
     private long runGroupBy(int par, JobClient client, String name, Path out) {
-        ExecutionEnvironment s = client != null ? new ExecutionEnvironment(name, name, client) : RowWeave.createEnvironment(name);
+        BatchSession s = client != null ? new BatchSession(name, name, client) : RowWeave.createBatchSession(name);
         s.setParallelism(par);
         s.fromSource(new CollectionSource(META, rows(4000)))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
@@ -87,7 +87,7 @@ class SlotAdmissionTest {
         File w0 = new File(tmp.toFile(), "w0"); w0.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", 1, "127.0.0.1", m.port(), w0)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("adm-rej", "adm-rej", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("adm-rej", "adm-rej", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             s.fromSource(new CollectionSource(META, rows(4000)))
                     .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
@@ -195,7 +195,7 @@ class SlotAdmissionTest {
         File wBad = new File(tmp.toFile(), "wBad"); wBad.mkdirs();
         try (MasterServer m = new MasterServer(5000);
              WorkerServer a0 = WorkerServer.newUnguarded("w0", demand - 1, "127.0.0.1", m.port(), wBad)) {
-            ExecutionEnvironment s = new ExecutionEnvironment("under", "under", new ClusterJobClient("127.0.0.1", m.port()));
+            BatchSession s = new BatchSession("under", "under", new ClusterJobClient("127.0.0.1", m.port()));
             s.setParallelism(2);
             s.fromSource(new CollectionSource(META, rows(4000)))
                     .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))

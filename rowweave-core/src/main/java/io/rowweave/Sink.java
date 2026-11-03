@@ -1,7 +1,7 @@
 package io.rowweave;
 
 /**
- * The RowWeave result sink: a row-by-row collection endpoint carrying a DataSchema, and the <b>downstream exit</b> of a DataSet (data leaves only through it, and the ExecutionEnvironment runtime reads no return value).
+ * The RowWeave result sink: a row-by-row collection endpoint carrying a DataSchema, and the <b>downstream exit</b> of a DataSet (data leaves only through it, and the BatchSession runtime reads no return value).
  *
  * <p>{@code extends AutoCloseable} and {@link #close} defaults to a no-op, so a Sink that holds resources
  * (FileSink's BufferedWriter, DbOutput's connection) <b>must override</b> it to flush and release. The engine's {@code commit()}

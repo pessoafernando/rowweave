@@ -4,7 +4,7 @@ import io.rowweave.CollectionSource;
 import io.rowweave.DataType;
 import io.rowweave.Field;
 import io.rowweave.FileSink;
-import io.rowweave.ExecutionEnvironment;
+import io.rowweave.BatchSession;
 import io.rowweave.DataSchema;
 import io.rowweave.DataRow;
 import io.rowweave.ops.ParallelGroupByAgg;
@@ -39,7 +39,7 @@ class ClusterJobParallelismTest {
     }
 
     private long runGroupBy(int par, MasterServer m, String name, Path out) {
-        ExecutionEnvironment s = new ExecutionEnvironment(name, name, new ClusterJobClient("127.0.0.1", m.port()));
+        BatchSession s = new BatchSession(name, name, new ClusterJobClient("127.0.0.1", m.port()));
         s.setParallelism(par);
         s.fromSource(new CollectionSource(META, rows(4000)))
                 .groupBy(ParallelGroupByAgg.of(META, "k").sum("amt"))
