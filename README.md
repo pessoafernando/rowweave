@@ -6,7 +6,7 @@ doc-channel: default-branch
 
 **RowWeave** is a lightweight, embeddable data-processing engine for the JVM.
 Write typed Batch or Stream pipelines in plain Java, run them inside an
-existing application JVM, or submit the same explicit DAG to a small
+existing application JVM, or submit the same explicit DAG to a
 Master/Worker cluster. The engine focuses on exact decimal arithmetic,
 deterministic semantics, bounded-memory execution, and explicit admission
 limits.
@@ -15,7 +15,7 @@ limits.
 
 | Concern | RowWeave approach |
 |---|---|
-| **Embedding** | A Java library, not a platform to install. Local mode runs in one JVM; an optional small cluster uses Master plus Worker JVMs. |
+| **Embedding** | A Java library, not a platform to install. Local mode runs in one JVM; cluster mode uses separate Master and Worker JVMs. |
 | **Dependency footprint** | Pure-Java core with a small direct runtime dependency set: ASM, Netty, and SLF4J. Embedded execution does not require Hadoop, YARN, Kubernetes, Scala, or an external coordinator. |
 | **Exact decimal processing** | `BigDecimal` values accumulate at full precision and receive one defined output rounding. |
 | **Deterministic pipelines** | Typed rows, explicit schemas, and stated null rules for grouping, ordering, and joining. |
@@ -26,12 +26,12 @@ limits.
 RowWeave is a practical choice when Flink or Spark would bring more operational
 weight than a problem needs: embedded Java ETL, exact decimal transformations,
 repeatable backfills, deterministic integration tests, bounded sort/join/aggregate
-workloads, or a fixed Master/Worker deployment without a Hadoop or Kubernetes stack.
+workloads, or a Master/Worker deployment without a Hadoop or Kubernetes stack.
 
 It is not a general SQL warehouse, a Python-first analytics stack, or a
-thousand-node processing platform. Prefer Apache Flink, Apache Spark, or a
-database engine when you need their broader connector ecosystems, SQL optimizers,
-large elastic clusters, or unlimited unbounded-stream topologies.
+drop-in replacement for every distributed-processing workload. Prefer Apache
+Flink, Apache Spark, or a database engine when you need their broader connector
+ecosystems, SQL optimizers, or unlimited unbounded-stream topologies.
 
 ## Core contracts
 
