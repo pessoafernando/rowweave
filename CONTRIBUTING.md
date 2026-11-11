@@ -334,10 +334,11 @@ Coordinates and namespace:
 Governance files and license:
 
 * The governed set is present: `LICENSE`, `NOTICE`, `README.md`,
-  `CHANGELOG.md`, `CONTRIBUTING.md`, `SECURITY.md`, `SUPPORT.md`, `ROADMAP.md`,
-  and `THIRD-PARTY-NOTICES.md`.
-* A code-of-conduct file is not shipped with `0.2.0`. Adding one is an owner
-  decision that changes the governed set and the issue-intake wording.
+  `CHANGELOG.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md`, `SECURITY.md`,
+  `SUPPORT.md`, `ROADMAP.md`, and `THIRD-PARTY-NOTICES.md`.
+* `CODE_OF_CONDUCT.md` (Contributor Covenant, version 2.1) ships with the
+  preview. Conduct reports use the private reporting channel described on that
+  page, not the public issue templates.
 * The license-header decision is still open and must be recorded, not inferred:
   no file under `src/main/java` carries a per-file SPDX header line, while
   `LICENSE` holds the full license text and `NOTICE` names the copyright

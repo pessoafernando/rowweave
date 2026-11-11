@@ -23,6 +23,7 @@ RELEASE_CONTRACT = "rowweave-1.0.0"
 ROOT_PAGES = (
     "README.md",
     "CHANGELOG.md",
+    "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.md",
     "ROADMAP.md",
     "SECURITY.md",
@@ -440,7 +441,7 @@ def navigation_sections(pages: dict[str, Page]) -> list[tuple[str, list[str]]]:
         ("Architecture", ("docs/product/architecture/*.md",)),
         ("Operations", ("docs/product/operations/*.md",)),
         ("Operator runbooks", ("docs/runbooks/*.md",)),
-        ("Project", ("CHANGELOG.md", "CONTRIBUTING.md", "ROADMAP.md", "SECURITY.md", "SUPPORT.md", "THIRD-PARTY-NOTICES.md")),
+        ("Project", ("CHANGELOG.md", "CODE_OF_CONDUCT.md", "CONTRIBUTING.md", "ROADMAP.md", "SECURITY.md", "SUPPORT.md", "THIRD-PARTY-NOTICES.md")),
     )
     sections: list[tuple[str, list[str]]] = []
     included: set[str] = set()

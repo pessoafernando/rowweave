@@ -183,6 +183,7 @@ Start at the [documentation home](docs/product/index.md).
 * [Roadmap](ROADMAP.md) — work that is open in `0.2.0`, not supported behavior
 * [Support](SUPPORT.md)
 * [Contributing](CONTRIBUTING.md)
+* [Code of Conduct](CODE_OF_CONDUCT.md)
 
 ## Build
 
