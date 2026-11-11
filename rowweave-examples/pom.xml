@@ -55,7 +55,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>3.2.5</version>
+                <version>3.6.1</version>
                 <configuration>
                     <systemPropertyVariables>
                         <rowweave.java8.home>${rowweave.java8.home}</rowweave.java8.home>
