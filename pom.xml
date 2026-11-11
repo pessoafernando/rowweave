@@ -74,7 +74,7 @@
         <!-- Surefire late replacement is always defined; JaCoCo overrides it in core. -->
         <argLine></argLine>
         <!-- Centralized dependency versions. -->
-        <asm.version>9.7</asm.version>
+        <asm.version>9.11.1</asm.version>
         <netty.version>4.1.139.Final</netty.version>
         <slf4j.version>2.0.20</slf4j.version>
         <!-- The logging backend is test-only and runs on the JDK 17 build JVM. -->
