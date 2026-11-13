@@ -82,7 +82,7 @@
         <junit.version>5.10.2</junit.version>
         <jol.version>0.17</jol.version>
         <aws.sdk.version>2.42.37</aws.sdk.version>
-        <jackson.version>2.22.3</jackson.version>
+        <jackson.version>2.23.0</jackson.version>
         <postgresql.jdbc.version>42.7.13</postgresql.jdbc.version>
         <!-- Curator is isolated to the optional registry and release qualification tooling. -->
         <curator.version>5.9.0</curator.version>
