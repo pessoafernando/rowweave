@@ -7,6 +7,20 @@ doc-channel: default-branch
 All notable changes to RowWeave are documented here. The format follows
 Keep a Changelog, and the project uses Semantic Versioning.
 
+## 0.2.1
+
+### Dependencies
+
+* ASM 9.7 → 9.11.1 and Jackson 2.22.3 → 2.23.0.
+* Maven surefire, failsafe, jar and shade plugin upgrades.
+* GitHub Actions bumps: actions/checkout v4 → v7 and actions/setup-java v4 → v6.
+
+### Tooling
+
+* The identity and content-boundary gates now fail loudly when ripgrep is
+  missing, and the release-contract baseline was refreshed for the renamed
+  cluster client.
+
 ## 0.2.0 (initial public preview)
 
 This is the first public preview. The artifact is not yet published to a Maven

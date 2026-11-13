@@ -58,7 +58,7 @@ does not widen that boundary.
 
 ## Maturity
 
-Version `0.2.0` is the **initial public preview**. The API can change before
+Version `0.2.1` is the current public preview. The API can change before
 `1.0.0`, and no Maven artifact has been published yet. Evaluate from source.
 Support is evaluation-only during the source preview: see
 [Support](SUPPORT.md) for issue intake and current-branch fixes.
@@ -180,7 +180,7 @@ Start at the [documentation home](docs/product/index.md).
 * [Monitoring](docs/product/operations/monitoring.md)
 * [Security model](docs/product/operations/security.md)
 * [Troubleshooting](docs/product/operations/troubleshooting.md)
-* [Roadmap](ROADMAP.md) — work that is open in `0.2.0`, not supported behavior
+* [Roadmap](ROADMAP.md) — work that is open in `0.2.1`, not supported behavior
 * [Support](SUPPORT.md)
 * [Contributing](CONTRIBUTING.md)
 * [Code of Conduct](CODE_OF_CONDUCT.md)

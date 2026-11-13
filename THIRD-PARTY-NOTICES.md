@@ -2,7 +2,6 @@
 doc-contract: preview-0.2.0
 doc-channel: default-branch
 ---
-
 # Third-party notices
 
 RowWeave is licensed under the Apache License, Version 2.0 ([LICENSE](LICENSE), [NOTICE](NOTICE)). This file records the third-party artifacts the build resolves, the license each one declares, and which of them are redistributed inside a published image.
@@ -24,7 +23,7 @@ These dependencies ship compiled classes inside a connector image, so their lice
 
 | Artifact | Version | Declared license | License URL |
 |---|---|---|---|
-| `com.fasterxml.jackson.core:jackson-core` | 2.22.3 | The Apache Software License, Version 2.0 | https://www.apache.org/licenses/LICENSE-2.0.txt |
+| `com.fasterxml.jackson.core:jackson-core` | 2.23.0 | The Apache Software License, Version 2.0 | https://www.apache.org/licenses/LICENSE-2.0.txt |
 | `org.checkerframework:checker-qual` | 3.55.1 | The MIT License | https://opensource.org/licenses/MIT |
 | `org.postgresql:postgresql` | 42.7.13 | BSD-2-Clause | https://jdbc.postgresql.org/about/license.html |
 | `org.reactivestreams:reactive-streams` | 1.0.4 | MIT-0 | https://spdx.org/licenses/MIT-0.html |
@@ -97,7 +96,7 @@ Ordinary Maven dependencies: your application resolves them itself, so it receiv
 | `org.junit.jupiter:junit-jupiter-api` | 5.10.2 | Eclipse Public License v2.0 | https://www.eclipse.org/legal/epl-v20.html |
 | `org.junit.platform:junit-platform-commons` | 1.10.2 | Eclipse Public License v2.0 | https://www.eclipse.org/legal/epl-v20.html |
 | `org.opentest4j:opentest4j` | 1.3.0 | The Apache License, Version 2.0 | https://www.apache.org/licenses/LICENSE-2.0.txt |
-| `org.ow2.asm:asm` | 9.7 | BSD-3-Clause | https://asm.ow2.io/license.html |
+| `org.ow2.asm:asm` | 9.11.1 | BSD-3-Clause | https://asm.ow2.io/license.html |
 | `org.slf4j:slf4j-simple` | 2.0.20 | MIT | https://opensource.org/license/mit |
 | `org.xerial.snappy:snappy-java` | 1.1.10.12 | Apache-2.0 | https://www.apache.org/licenses/LICENSE-2.0.html |
 
@@ -123,9 +122,13 @@ Established by reading each built image, so this describes the artifact rather t
 | Image | Embedded license files |
 |---|---|
 | `rowweave-connector-postgres-cdc-0.2.0-runtime.jar` | `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/licenses/com.ongres.scram/scram-client-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.scram/scram-common-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/saslprep-2.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/stringprep-2.2/META-INF/LICENSE` |
+| `rowweave-connector-postgres-cdc-0.2.1-runtime.jar` | `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/licenses/com.ongres.scram/scram-client-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.scram/scram-common-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/saslprep-2.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/stringprep-2.2/META-INF/LICENSE` |
 | `rowweave-connector-postgres-cdc-0.2.0-deployment.jar` | `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/licenses/com.ongres.scram/scram-client-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.scram/scram-common-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/saslprep-2.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/stringprep-2.2/META-INF/LICENSE` |
+| `rowweave-connector-postgres-cdc-0.2.1-deployment.jar` | `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/licenses/com.ongres.scram/scram-client-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.scram/scram-common-3.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/saslprep-2.2/META-INF/LICENSE`, `META-INF/licenses/com.ongres.stringprep/stringprep-2.2/META-INF/LICENSE` |
 | `rowweave-connector-s3-0.2.0-runtime.jar` | `META-INF/FastDoubleParser-LICENSE`, `META-INF/FastDoubleParser-NOTICE`, `META-INF/FastDoubleParser-ThirdParty-LICENSE`, `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/NOTICE`, `META-INF/NOTICE.txt`, `META-INF/Schubfach-LICENSE`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-FastDoubleParser-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-NOTICE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.reactivestreams-reactive-streams-1.0.4-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.slf4j-slf4j-api-2.0.20-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-NOTICE.txt`, `META-INF/thirdparty-LICENSE` |
+| `rowweave-connector-s3-0.2.1-runtime.jar` | `META-INF/FastDoubleParser-LICENSE`, `META-INF/FastDoubleParser-NOTICE`, `META-INF/FastDoubleParser-ThirdParty-LICENSE`, `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/NOTICE`, `META-INF/NOTICE.txt`, `META-INF/Schubfach-LICENSE`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-FastDoubleParser-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-NOTICE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.reactivestreams-reactive-streams-1.0.4-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.slf4j-slf4j-api-2.0.20-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-NOTICE.txt`, `META-INF/thirdparty-LICENSE` |
 | `rowweave-connector-s3-0.2.0-deployment.jar` | `META-INF/FastDoubleParser-LICENSE`, `META-INF/FastDoubleParser-NOTICE`, `META-INF/FastDoubleParser-ThirdParty-LICENSE`, `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/NOTICE`, `META-INF/NOTICE.txt`, `META-INF/Schubfach-LICENSE`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-FastDoubleParser-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-NOTICE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.reactivestreams-reactive-streams-1.0.4-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.slf4j-slf4j-api-2.0.20-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-NOTICE.txt`, `META-INF/thirdparty-LICENSE` |
+| `rowweave-connector-s3-0.2.1-deployment.jar` | `META-INF/FastDoubleParser-LICENSE`, `META-INF/FastDoubleParser-NOTICE`, `META-INF/FastDoubleParser-ThirdParty-LICENSE`, `META-INF/LICENSE`, `META-INF/LICENSE.txt`, `META-INF/NOTICE`, `META-INF/NOTICE.txt`, `META-INF/Schubfach-LICENSE`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-FastDoubleParser-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/com.fasterxml.jackson.core-jackson-core-2.22.3-NOTICE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.reactivestreams-reactive-streams-1.0.4-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/org.slf4j-slf4j-api-2.0.20-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-LICENSE.txt`, `META-INF/THIRD-PARTY-LICENSES/software.amazon.eventstream-eventstream-1.0.1-NOTICE.txt`, `META-INF/thirdparty-LICENSE` |
 
 ## License texts RowWeave adds to its images
 
@@ -164,6 +167,6 @@ The two `com.fasterxml.jackson.core` entries are the documents that shading drop
 - ASM is BSD-3-Clause, Checker Framework qualifiers are MIT, and reactive streams is MIT-0, which drops the attribution clause.
 - Artifacts whose POM declares no license block are labelled as such; RowWeave does not change their terms.
 
-# Third-party notices
+---
 
-Generated by `tools/oss_third_party_notices.py` on 2026-11-02 from `rowweave-dependency-tree.txt` and Maven-resolved POM metadata.
+Generated by `tools/oss_third_party_notices.py` on 2026-11-13 from `rowweave_tree.log` and Maven-resolved POM metadata.

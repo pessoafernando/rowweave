@@ -4,7 +4,7 @@ doc-channel: default-branch
 ---
 # Support
 
-Version `0.2.0` is a source-only public preview. There is no published Maven
+Version `0.2.1` is a source-only public preview. There is no published Maven
 artifact yet, the API can change before `1.0.0`, and fixes target the default
 branch. Support is evaluation-only: the project does not provide an SLA or
 backported patch releases.

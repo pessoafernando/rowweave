@@ -27,7 +27,7 @@ with the maintainers until a fix and advisory are available.
 
 | Version | Support status | Where fixes land |
 |---|---|---|
-| `0.2.0` source preview | Evaluation only; no artifact is published | Default branch |
+| `0.2.1` source preview | Evaluation only; no artifact is published | Default branch |
 
 There are no earlier supported releases and no backport policy. Supply fixes or
 validation against the current default branch.

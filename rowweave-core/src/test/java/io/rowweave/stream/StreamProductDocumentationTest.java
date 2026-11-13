@@ -152,7 +152,7 @@ class StreamProductDocumentationTest {
         assertFalse(roadmap.contains("Typed ordering and ranked-top convenience methods."));
 
         String readme = read("README.md");
-        require(readme, "Roadmap](ROADMAP.md) — work that is open in `0.2.0`");
+        require(readme, "Roadmap](ROADMAP.md) — work that is open in `0.2.1`");
     }
 
     private static void requireDeploymentAndConnectorRows(String matrix) {

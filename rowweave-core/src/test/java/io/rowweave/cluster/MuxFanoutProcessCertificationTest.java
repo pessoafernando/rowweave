@@ -329,4 +329,3 @@ class MuxFanoutProcessCertificationTest {
         return Long.parseLong(metric.substring(start, end));
     }
 }
-
