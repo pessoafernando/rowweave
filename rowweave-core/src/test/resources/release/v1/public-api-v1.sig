@@ -19,17 +19,17 @@ METHOD io.rowweave.artifact.PlanArtifact#payload ()[B
 METHOD io.rowweave.portable.PortableBatchPlan#requiredCapabilities ()Ljava/util/List;
 METHOD io.rowweave.portable.PortableBatchPlan#nodes ()Ljava/util/List;
 METHOD io.rowweave.portable.PortableBatchPlan#rootSinkOperatorIds ()Ljava/util/List;
-TYPE io.rowweave.cluster.RealClusterJobClient
-CTOR io.rowweave.cluster.RealClusterJobClient#<init> (Ljava/lang/String;I)V
-METHOD io.rowweave.cluster.RealClusterJobClient#submitRun (Lio/rowweave/artifact/PlanArtifact;Lio/rowweave/run/RunSubmission;)Lio/rowweave/plan/ExecutionReport;
-METHOD io.rowweave.cluster.RealClusterJobClient#submitIncrementalRun (Lio/rowweave/incremental/IncrementalRunSubmission;)Lio/rowweave/plan/ExecutionReport;
-METHOD io.rowweave.cluster.RealClusterJobClient#queryRun (Ljava/lang/String;)Lio/rowweave/run/RunSnapshot;
-METHOD io.rowweave.cluster.RealClusterJobClient#queryRunEvents (Ljava/lang/String;JI)Lio/rowweave/run/RunExecutionEventPage;
-METHOD io.rowweave.cluster.RealClusterJobClient#cancelRun (Ljava/lang/String;Ljava/lang/String;)Lio/rowweave/run/RunCancellationResult;
-METHOD io.rowweave.cluster.RealClusterJobClient#queryBatchSinkOutcome (Ljava/lang/String;)Lio/rowweave/commit/BatchSinkOutcome;
-METHOD io.rowweave.cluster.RealClusterJobClient#queryQualityGateDecision (Ljava/lang/String;)Lio/rowweave/QualityGateDecision;
-METHOD io.rowweave.cluster.RealClusterJobClient#queryIncrementalFrontier (Ljava/lang/String;)Lio/rowweave/incremental/IncrementalFrontierView;
-METHOD io.rowweave.cluster.RealClusterJobClient#close ()V
+TYPE io.rowweave.cluster.ClusterJobClient
+CTOR io.rowweave.cluster.ClusterJobClient#<init> (Ljava/lang/String;I)V
+METHOD io.rowweave.cluster.ClusterJobClient#submitRun (Lio/rowweave/artifact/PlanArtifact;Lio/rowweave/run/RunSubmission;)Lio/rowweave/plan/ExecutionReport;
+METHOD io.rowweave.cluster.ClusterJobClient#submitIncrementalRun (Lio/rowweave/incremental/IncrementalRunSubmission;)Lio/rowweave/plan/ExecutionReport;
+METHOD io.rowweave.cluster.ClusterJobClient#queryRun (Ljava/lang/String;)Lio/rowweave/run/RunSnapshot;
+METHOD io.rowweave.cluster.ClusterJobClient#queryRunEvents (Ljava/lang/String;JI)Lio/rowweave/run/RunExecutionEventPage;
+METHOD io.rowweave.cluster.ClusterJobClient#cancelRun (Ljava/lang/String;Ljava/lang/String;)Lio/rowweave/run/RunCancellationResult;
+METHOD io.rowweave.cluster.ClusterJobClient#queryBatchSinkOutcome (Ljava/lang/String;)Lio/rowweave/commit/BatchSinkOutcome;
+METHOD io.rowweave.cluster.ClusterJobClient#queryQualityGateDecision (Ljava/lang/String;)Lio/rowweave/QualityGateDecision;
+METHOD io.rowweave.cluster.ClusterJobClient#queryIncrementalFrontier (Ljava/lang/String;)Lio/rowweave/incremental/IncrementalFrontierView;
+METHOD io.rowweave.cluster.ClusterJobClient#close ()V
 TYPE io.rowweave.run.RunSubmission
 CTOR io.rowweave.run.RunSubmission#<init> (Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;IJJ)V
 METHOD io.rowweave.run.RunSubmission#runId ()Ljava/lang/String;

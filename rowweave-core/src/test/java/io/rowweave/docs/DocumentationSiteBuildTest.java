@@ -89,7 +89,7 @@ class DocumentationSiteBuildTest {
 
         try (Stream<Path> paths = Files.walk(output)) {
             long pages = paths.filter(path -> path.toString().endsWith(".html")).count();
-            assertEquals(60, pages, "expected curated documentation pages");
+            assertEquals(61, pages, "expected curated documentation pages");
             try (Stream<Path> all = Files.walk(output)) {
                 List<Path> generatedPages = all.filter(Files::isRegularFile)
                         .collect(java.util.stream.Collectors.toList());

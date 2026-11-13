@@ -40,7 +40,7 @@ class AccessibilityDocumentationReviewTest {
         require(quickstart, "## Common first-job problems");
 
         String reference = read("docs/product/reference/api-overview.md");
-        require(reference, "## Batch `DataSet`");
+        require(reference, "## BatchSession / DataSet");
         require(reference, "## StreamSession / DataStream");
         require(reference, "## Error model");
 
