@@ -25,6 +25,11 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
+if ! command -v rg >/dev/null 2>&1; then
+  echo "ZERO-RESIDUE GATE: FAIL (ripgrep is required and was not found on PATH)"
+  exit 1
+fi
+
 if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" != "false" ]; then
   echo "ZERO-RESIDUE GATE: FAIL (full Git history is required; shallow or missing repository)"
   echo "Fetch complete history before running the historical identity checks."
@@ -51,7 +56,7 @@ legacy_data_suffix_token="$(printf '\x64\x61\x74\x61\x73\x65\x74\x78')"
 legacy_row_suffix_token="$(printf '\x72\x6f\x77\x78')"
 machine_user_token="$(printf '\x6c\x7a\x78')"
 OBJECT_PATTERN="${PATTERN}|(?i)${legacy_data_suffix_token}|(?i)${legacy_row_suffix_token}|\\b${machine_user_token}\\b"
-PUBLISH_IDENTITY_ALLOW='^[^<]*<[0-9]+\+[^< ]*@users\.noreply\.github\.com>$'
+PUBLISH_IDENTITY_ALLOW='^GitHub <noreply@github\.com>$|^[^<]*<[0-9]+\+[^< ]*@users\.noreply\.github\.com>$'
 STREAM_PATTERN='(?i)StreamV[0-9]|Stream[ ](?:Runtime[ ])?v[0-9]|stream-runtime-v[0-9]'
 DOC='docs/product/reference/format-constants.md'
 

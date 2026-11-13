@@ -285,7 +285,9 @@ final class QualityEvidencePathAccess {
             if (i > domainComponent && dev != domainDevice) {
                 throw invalid("evidence member crosses the admitted domain filesystem");
             }
-            if ((uid != 0 && uid != processUid) || (mode & GROUP_OR_OTHER_WRITE) != 0) {
+            if (i >= domainComponent
+                    && ((uid != 0 && uid != processUid)
+                    || (mode & GROUP_OR_OTHER_WRITE) != 0)) {
                 throw invalid("evidence path ownership or permissions are untrusted");
             }
             AclFileAttributeView acl = guardedAclView(component, guard, ops);

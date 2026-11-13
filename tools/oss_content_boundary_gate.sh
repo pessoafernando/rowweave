@@ -39,6 +39,11 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
+if ! command -v rg >/dev/null 2>&1; then
+  echo "CONTENT BOUNDARY GATE: FAIL (ripgrep is required and was not found on PATH)"
+  exit 1
+fi
+
 PATTERN='(^|[^A-Za-z0-9_-])(s1[4-9]|t2[0-7])\b|\x{5386}\x{53f2}\x{76f2}\x{533a}|\x{7f3a}\x{9677}[:\x{ff1a}]|\x{4fee}\x{590d}[:\x{ff1a}]|bug \x{4fee}\x{590d}|\x{672a}\x{4fee}\x{524d}|R[0-9]+-K[0-9]+|ARL[0-9]+|RED \x{8bc1}\x{636e}|\x{2192} RED|deterministic RED|consumer RED|\x{6700}\x{5c0f} RED|GREEN \x{540e}|\x{5f53}\x{524d}\x{5b9e}\x{73b0}\x{9884}\x{671f}|dagF04/F05'
 SELF='^(\./)?tools/oss_content_boundary_gate\.sh$'
 

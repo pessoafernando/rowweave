@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 /** Exported Stream Java signatures are frozen by the public API contract. */
 class StreamPublicApiSignatureBaselineTest {
     private static final String STREAM_SIGNATURE_DIGEST =
-            "13ea84fe5613fac1aab6244d0b0568c2ab392878190732378aa04c74b9027e4e";
+            "bd6c577c1ab2e085618efab1a6bef591ada3bbf752eb93b5a89708f7a4adef88";
 
     @Test
     void exportedStreamSignaturesStayBinaryAndSourceCompatible()

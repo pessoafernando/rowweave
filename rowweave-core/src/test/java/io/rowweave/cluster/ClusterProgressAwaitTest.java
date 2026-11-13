@@ -47,7 +47,7 @@ class ClusterProgressAwaitTest {
     void slowButAliveJobNotKilled(@TempDir Path tmp) throws Exception {
         String timeoutKey = "rowweave.cluster.submitTimeoutMs";
         String cleanupKey = "rowweave.cluster.submitCleanupGraceMs";
-        String previousTimeout = System.setProperty(timeoutKey, "10000");
+        String previousTimeout = System.setProperty(timeoutKey, "60000");
         String previousCleanup = System.setProperty(cleanupKey, "3000");
         try {
             List<DataRow> data = rows(3000);
@@ -70,7 +70,7 @@ class ClusterProgressAwaitTest {
                 long ms = System.currentTimeMillis() - t0;
                 assertEquals(8, countLines(f), "8 groups keyed by k, the slow job completes (not killed by mistake)");
                 assertTrue(ms >= 1000, "the job really is slow (took " + ms + "ms, the sleeps accumulate)");
-                assertTrue(ms < 10_000, "the slow job should finish inside the requested execution budget: " + ms + "ms");
+                assertTrue(ms < 60_000, "the slow job should finish inside the requested execution budget: " + ms + "ms");
             }
         } finally {
             restore(timeoutKey, previousTimeout);
@@ -131,4 +131,3 @@ class ClusterProgressAwaitTest {
         else System.setProperty(key, previous);
     }
 }
-

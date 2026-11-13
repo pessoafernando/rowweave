@@ -48,7 +48,7 @@ class StreamProductDocumentationTest {
             throws Exception {
         String modes = read("docs/product/guides/run-modes.md");
         requireCurrentStreamNaming(modes);
-        require(modes, "## Stream: Local / InProcess / cross-host cluster");
+        require(modes, "## Stream: Local / InProcess / separate-process cluster");
         require(modes, "Master-only");
         require(modes, "Worker-only");
         require(modes, "ZooKeeper");
@@ -156,7 +156,7 @@ class StreamProductDocumentationTest {
     }
 
     private static void requireDeploymentAndConnectorRows(String matrix) {
-        require(matrix, "Batch deployment modes are Local, InProcess, and real cluster.");
+        require(matrix, "Batch deployment modes are Local, InProcess, and cluster.");
         require(matrix, "## Connector capabilities");
         require(matrix, "| JDBC snapshot source |");
         require(matrix, "| PostgreSQL logical-replication CDC source |");
